@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="assets/images/favicon.png">
-<title>Akka Cookbook</title>
+<title>导读 · Akka Cookbook</title>
 <link rel="stylesheet" href="assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="lib/prettify/prettify.css">
@@ -52,7 +52,12 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 </div>
 <div class="md-flex__cell md-flex__cell--stretch">
 <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+<span class="md-header-nav__topic">
 Akka Cookbook
+</span>
+<span class="md-header-nav__topic">
+导读
+</span>
 </div>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
@@ -130,7 +135,7 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
-  <li><a href="introduction.html" class="page">导读</a></li>
+  <li><a href="introduction.html" class="active page">导读</a></li>
   <li><a href="actor/index.html" class="page">Actor</a>
   <ul>
     <li><a href="actor/request-response.html" class="page">请求-响应模式</a></li>
@@ -168,9 +173,12 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="index.html#akka-cookbook" class="header">Akka Cookbook</a>
+  <li><a href="introduction.html#导读" class="header">导读</a>
   <ul>
-    <li><a href="index.html#目录" class="header">目录</a></li>
+    <li><a href="introduction.html#helloworld" class="header">HelloWorld</a></li>
+    <li><a href="introduction.html#behavior" class="header">Behavior</a></li>
+    <li><a href="introduction.html#actorref" class="header">ActorRef</a></li>
+    <li><a href="introduction.html#构造-actorsystem" class="header">构造 ActorSystem</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -192,9 +200,12 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="index.html#akka-cookbook" class="header">Akka Cookbook</a>
+  <li><a href="introduction.html#导读" class="header">导读</a>
   <ul>
-    <li><a href="index.html#目录" class="header">目录</a></li>
+    <li><a href="introduction.html#helloworld" class="header">HelloWorld</a></li>
+    <li><a href="introduction.html#behavior" class="header">Behavior</a></li>
+    <li><a href="introduction.html#actorref" class="header">ActorRef</a></li>
+    <li><a href="introduction.html#构造-actorsystem" class="header">构造 ActorSystem</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -205,58 +216,64 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#akka-cookbook" name="akka-cookbook" class="anchor"><span class="anchor-link"></span></a>Akka Cookbook</h1>
-<p><strong><em>提供清晰、实用的 Akka 应用指导</em></strong></p>
-<p>在线阅读：<a href="https://www.yangbajing.me/akka-cookbook/">https://www.yangbajing.me/akka-cookbook/</a> 。</p>
-<p>从Akka 2.6开始，<a href="">Typed</a> 已经作为默认实现，本书也将基于 typed actor 讲解有关Akka的各种知识。同时，本书示例都将使用 Scala 2.13 完成。可以在 <a href="https://github.com/yangbajing/akka-cookbook">https://github.com/yangbajing/akka-cookbook</a> 找到本书的所有示例及源文件。</p>
-<h2><a href="#目录" name="目录" class="anchor"><span class="anchor-link"></span></a>目录</h2>
-<div class="toc ">
+<h1><a href="#导读" name="导读" class="anchor"><span class="anchor-link"></span></a>导读</h1>
+<p>Akka Typed Actor从2.4开始直到2.5可以商用，进而Akka 2.6已经把Akka Typed Actor做为推荐的Actor使用模式。Typed Actor与原先的Untyped Actor最大且直观的区别就是<code>ActorRef</code>有类型了，其签名也改成了<code>akka.actor.typed.ActorRef[T]</code>。</p>
+<h2><a href="#helloworld" name="helloworld" class="anchor"><span class="anchor-link"></span></a>HelloWorld</h2>
+<p>第一个示例是一个 Ping-Pong，从一个actor发送消息到另一个actor，并收到回复。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala#L23-L50" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
+  sealed trait Command
+  final case object Start extends Command
+  final case class PongCommand(message: String) extends Command
+  def apply(): Behavior[Command] = Behaviors.receive {
+    case (context, Start) =&gt;
+      val pong = context.spawn(Pong(), &quot;pong&quot;)
+      pong ! Pong.PingCommand(&quot;Scala&quot;, context.self)
+      context.log.info(&quot;Started Pong actor and send message complete.&quot;)
+      Behaviors.same
+    case (context, PongCommand(message)) =&gt;
+      context.log.info(s&quot;Receive pong message: $message&quot;)
+      Behaviors.stopped
+  }
+}
+
+object Pong {
+  sealed trait Command
+  final case class PingCommand(message: String, replyTo: ActorRef[Ping.Command]) extends Command
+  def apply(): Behavior[Command] = Behaviors.receive[Command] {
+    case (context, PingCommand(message, replyTo)) =&gt;
+      context.log.info(s&quot;Receive ping message: $message&quot;)
+      replyTo ! Ping.PongCommand(s&quot;Hello $message&quot;)
+      Behaviors.stopped
+  }
+}</code></pre>
+<p>运行actor需要有一个ActorSystem，这面的代码将执行这个示例。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala#L56-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">val system: ActorSystem[Ping.Command] = ActorSystem(Ping(), &quot;helloworld&quot;)
+system ! Ping.Start
+system.terminate()</code></pre>
+<p>运行示例程序，可看到如何输出：</p>
+<pre class="prettyprint"><code class="language-sbtshell">sbt:akka-cookbook&gt; cookbook-actor/runMain cookbook.actor.introduction.HelloWorld
+[info] running (fork) cookbook.actor.introduction.HelloWorld 
+[2019-11-19 19:24:39,285] [INFO] [akka.event.slf4j.Slf4jLogger] [helloworld-akka.actor.default-dispatcher-3] [] - Slf4jLogger started
+[2019-11-19 19:24:39,374] [INFO] [cookbook.actor.introduction.Ping$] [helloworld-akka.actor.default-dispatcher-3] [akka://helloworld/user] - Started Pong actor and send message complete.
+[2019-11-19 19:24:39,374] [INFO] [cookbook.actor.introduction.Pong$] [helloworld-akka.actor.default-dispatcher-6] [akka://helloworld/user/pong] - Receive ping message: Scala
+[2019-11-19 19:24:39,375] [INFO] [cookbook.actor.introduction.Ping$] [helloworld-akka.actor.default-dispatcher-3] [akka://helloworld/user] - Receive pong message: Hello Scala
+[success] Total time: 1 s, completed Nov 19, 2019 19:24:39 PM
+</code></pre>
+<h2><a href="#behavior" name="behavior" class="anchor"><span class="anchor-link"></span></a>Behavior</h2>
+<p>Akka Typed不再需要通过类的形式来实现Actor接口定义，而是函数的形式来定义actor。可以看到，定义的actor类型为<code>Behavior[T]</code>（形为），通过<code>Behaviors.receiveMessage[T](T =&gt; Behavior[T]): Receive[T]</code>函数来处理接收到的消息，而<code>Receive</code>继承了<code>Behavior trait</code>。通过函数签名可以看到，每次接收到消息并对其处理完成后，都必需要返回一个新的形为。</p>
+<p><code>apply(): Behavior[Command]</code>函数签名里的范性参数类型<code>Command</code>限制了这个actor将只接收<code>Command</code>或<code>Command</code>子类型的消息，编译器将在编译期对传给actor的消息做类型检查，相对于从前的untyped actor可以向actor传入任何类型的消息，这可以限制的减少程序中的bug。特别是在程序规模很大，当你定义了成百上千个消息时。</p>
+<p>也因为有类型的actor，在Akka Typed中没有了隐式发送的<code>sender: ActorRef</code>，必需在发送的消息里面包含回复字段，就如<code>PingCommand</code>消息定义里的<code>replyTo: ActorRef[Ping.Command]</code>字段一样。actor在处理完消息后可以通过它向发送者回复处理结果。</p>
+<h2><a href="#actorref" name="actorref" class="anchor"><span class="anchor-link"></span></a>ActorRef</h2>
+<p><code>ActorRef[T]</code>是<code>Behavior[T]</code>被ActorSystem构造后创建的actor的引用，与经典<code>ActorRef</code>的区别显而易见，它拥有了一个类型参数<code>T</code>，<code>T</code>限定了这个actor只能处理<code>T</code>或它的子类型。这相对经典actor是一大进步，特别是在你的actor系统规模很大时，若没有一个静态的类型约束你将十之八九会迷失在消息的海洋……</p>
+<h2><a href="#构造-actorsystem" name="构造-actorsystem" class="anchor"><span class="anchor-link"></span></a>构造 ActorSystem</h2>
+<p><code>ActorSystem</code>构造至少需要转入两个参数：</p>
 <ul>
-  <li><a href="introduction.html" class="page">导读</a>
-  <ul>
-    <li><a href="introduction.html#helloworld" class="header">HelloWorld</a></li>
-    <li><a href="introduction.html#behavior" class="header">Behavior</a></li>
-    <li><a href="introduction.html#actorref" class="header">ActorRef</a></li>
-    <li><a href="introduction.html#构造-actorsystem" class="header">构造 ActorSystem</a></li>
-  </ul></li>
-  <li><a href="actor/index.html" class="page">Actor</a>
-  <ul>
-    <li><a href="actor/request-response.html" class="page">请求-响应模式</a></li>
-    <li><a href="actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
-    <li><a href="actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-    <li><a href="actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
-    <li><a href="actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
-    <li><a href="actor/create-child-actor.html" class="page">创建子 actor</a></li>
-    <li><a href="actor/supervise.html" class="page">处理 actor 异常</a></li>
-    <li><a href="actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
-    <li><a href="actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
-    <li><a href="actor/stop.html" class="page">怎样优雅的停止actor</a></li>
-  </ul></li>
-  <li><a href="streams/index.html" class="page">Akka 流（Streams）</a>
-  <ul>
-    <li><a href="streams/file.html" class="page">访问文件</a></li>
-    <li><a href="streams/ftp.html" class="page">访问FTP/sFTP</a></li>
-  </ul></li>
-  <li><a href="storage/index.html" class="page">访问存储</a>
-  <ul>
-    <li><a href="storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
-    <li><a href="storage/cassandra.html" class="page">访问 Cassandra</a></li>
-    <li><a href="storage/mongodb.html" class="page">访问 MongoDB</a></li>
-    <li><a href="storage/elasticsearch.html" class="page">访问 Elasticsearch</a></li>
-  </ul></li>
-  <li><a href="integration/index.html" class="page">集成</a>
-  <ul>
-    <li><a href="integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
-  </ul></li>
-  <li><a href="http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="cluster/index.html" class="page">Akka 集群</a></li>
-  <li><a href="persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><code>guardianBehavior: Behavior[T]</code>：守卫行为，它将被创建为守卫actor，其 ActorPath 地址为：<code>akka://helloworld/user</code>。</li>
+  <li><code>name: String</code>：ActorSystem名字，这个名字除了在日志线程中显示外，在Akka Cluster时也很重要，用于标识同一个集群。</li>
 </ul>
 </div>
-</div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/index.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/introduction.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -272,13 +289,26 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="introduction.html" title="导读" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="index.html" title="Akka Cookbook" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Previous
+</span>
+Akka Cookbook
+</span>
+</div>
+</a>
+<a href="actor/index.html" title="Actor" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-导读
+Actor
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

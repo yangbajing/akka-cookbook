@@ -135,15 +135,20 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
+  <li><a href="../introduction.html" class="page">导读</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a>
   <ul>
-    <li><a href="../actor/introduction.html" class="page">介绍</a></li>
-    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
-    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
     <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
-    <li><a href="../actor/actor-req-resp.html" class="page">Actor之间使用请求-响应模式</a></li>
+    <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
@@ -159,7 +164,7 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../integration/index.html" class="active page">集成</a>
   <ul>
-    <li><a href="../integration/spring-web.html" class="page">Spring Web &amp; Akka Streams</a></li>
+    <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
@@ -186,7 +191,12 @@ yangbajing/akka-cookbook
 <p>将Akka与第3方框架、应该集成。</p>
 <div class="toc ">
 <ul>
-  <li><a href="../integration/spring-web.html" class="page">Spring Web &amp; Akka Streams</a></li>
+  <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a>
+  <ul>
+    <li><a href="../integration/spring-web.html#添加-akka-streams-支持" class="header">添加 Akka Streams 支持</a></li>
+    <li><a href="../integration/spring-web.html#编写控制器" class="header">编写控制器</a></li>
+    <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
+  </ul></li>
 </ul>
 </div>
 </div>
@@ -220,13 +230,13 @@ Previous
 </span>
 </div>
 </a>
-<a href="../integration/spring-web.html" title="Spring Web & Akka Streams" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../integration/spring-web.html" title="在 Spring 里使用 Akka Streams" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Spring Web & Akka Streams
+在 Spring 里使用 Akka Streams
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

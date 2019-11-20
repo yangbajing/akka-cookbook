@@ -44,3 +44,7 @@ Actor[akka://fault-tolerance/user#0] started.
 ....
 Actor[akka://fault-tolerance/user#0] Received signal PostStop
 ```
+
+## 监管树
+
+Akka Typed的监管策略里没有了经典（Untyped）actor的 **Escalate** 策略。就是说Akka Typed默认是不支持异常冒泡的，需要**watch**子actor，并监听`ChildFailed`信号并再手动重新抛出异常，或者不处理子actor的终止信息而自动抛出`DeathPactException`异常。关于这方面的内容请参阅： @ref[怎样向上冒泡异常](escalate-exception.md)。

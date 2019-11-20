@@ -33,12 +33,15 @@ lazy val book = _project("book")
         "version" -> version.value,
         "scala.version" -> scalaVersion.value,
         "scala.binary_version" -> scalaBinaryVersion.value,
+        "alpakka.version" -> versionAlpakka,
         "scaladoc.akka.base_url" -> s"http://doc.akka.io/api/$versionAkka",
         "akka.version" -> versionAkka))
 
 lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "compile->compile;test->test")
 
-lazy val cookbookStreams = _project("cookbook-streams").dependsOn(cookbookCommon % "compile->compile;test->test")
+lazy val cookbookStreams = _project("cookbook-streams")
+  .dependsOn(cookbookCommon % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Seq(_alpakkaCsv, _alpakkaFtp, _alpakkaFile))
 
 lazy val cookbookCluster = _project("cookbook-cluster")
   .dependsOn(cookbookCommon % "compile->compile;test->test")

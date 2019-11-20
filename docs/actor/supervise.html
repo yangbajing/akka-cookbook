@@ -135,15 +135,20 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
+  <li><a href="../introduction.html" class="page">导读</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a>
   <ul>
-    <li><a href="../actor/introduction.html" class="page">介绍</a></li>
-    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
-    <li><a href="../actor/supervise.html" class="active page">处理 actor 异常</a></li>
     <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
     <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
-    <li><a href="../actor/actor-req-resp.html" class="page">Actor之间使用请求-响应模式</a></li>
+    <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/supervise.html" class="active page">处理 actor 异常</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
@@ -159,7 +164,7 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../integration/index.html" class="page">集成</a>
   <ul>
-    <li><a href="../integration/spring-web.html" class="page">Spring Web &amp; Akka Streams</a></li>
+    <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
@@ -173,6 +178,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/supervise.html#监管策略" class="header">监管策略</a></li>
     <li><a href="../actor/supervise.html#错误-validation-error-与失败-failure-" class="header">错误（Validation Error）与失败（Failure）</a></li>
     <li><a href="../actor/supervise.html#示例" class="header">示例</a></li>
+    <li><a href="../actor/supervise.html#监管树" class="header">监管树</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -199,6 +205,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/supervise.html#监管策略" class="header">监管策略</a></li>
     <li><a href="../actor/supervise.html#错误-validation-error-与失败-failure-" class="header">错误（Validation Error）与失败（Failure）</a></li>
     <li><a href="../actor/supervise.html#示例" class="header">示例</a></li>
+    <li><a href="../actor/supervise.html#监管树" class="header">监管树</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -272,6 +279,8 @@ Actor[akka://fault-tolerance/user#0] started.
 ....
 Actor[akka://fault-tolerance/user#0] Received signal PostStop
 </code></pre>
+<h2><a href="#监管树" name="监管树" class="anchor"><span class="anchor-link"></span></a>监管树</h2>
+<p>Akka Typed的监管策略里没有了经典（Untyped）actor的 <strong>Escalate</strong> 策略。就是说Akka Typed默认是不支持异常冒泡的，需要**watch**子actor，并监听<code>ChildFailed</code>信号并再手动重新抛出异常，或者不处理子actor的终止信息而自动抛出<code>DeathPactException</code>异常。关于这方面的内容请参阅： <a href="escalate-exception.html">怎样向上冒泡异常</a>。</p>
 </div>
 <div>
 <a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/supervise.md" title="Edit this page" class="md-source-file md-edit">
@@ -290,7 +299,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../actor/stop.html" title="怎样优雅的停止actor" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../actor/create-child-actor.html" title="创建子 actor" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -299,17 +308,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-怎样优雅的停止actor
+创建子 actor
 </span>
 </div>
 </a>
-<a href="../actor/request-response.html" title="请求-响应模式" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../actor/watch-actor.html" title="监视 actor 的停止状态" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-请求-响应模式
+监视 actor 的停止状态
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

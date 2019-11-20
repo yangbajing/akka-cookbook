@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>Actor之间使用请求-响应模式 · Akka Cookbook</title>
+<title>actor之间使用ask（请求-响应模式） · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-Actor之间使用请求-响应模式
+actor之间使用ask（请求-响应模式）
 </span>
 </div>
 </div>
@@ -135,15 +135,20 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
+  <li><a href="../introduction.html" class="page">导读</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a>
   <ul>
-    <li><a href="../actor/introduction.html" class="page">介绍</a></li>
-    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
-    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
     <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
-    <li><a href="../actor/actor-req-resp.html" class="active page">Actor之间使用请求-响应模式</a></li>
+    <li><a href="../actor/actor-inside-ask.html" class="active page">actor之间使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
@@ -159,7 +164,7 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../integration/index.html" class="page">集成</a>
   <ul>
-    <li><a href="../integration/spring-web.html" class="page">Spring Web &amp; Akka Streams</a></li>
+    <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
@@ -168,11 +173,11 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="../actor/actor-req-resp.html#actor之间使用请求-响应模式" class="header">Actor之间使用请求-响应模式</a>
+  <li><a href="../actor/actor-inside-ask.html#actor之间使用ask-请求-响应模式-" class="header">actor之间使用ask（请求-响应模式）</a>
   <ul>
-    <li><a href="../actor/actor-req-resp.html#适用范围" class="header">适用范围</a></li>
-    <li><a href="../actor/actor-req-resp.html#问题" class="header">问题</a></li>
-    <li><a href="../actor/actor-req-resp.html#完整代码" class="header">完整代码</a></li>
+    <li><a href="../actor/actor-inside-ask.html#适用范围" class="header">适用范围</a></li>
+    <li><a href="../actor/actor-inside-ask.html#问题" class="header">问题</a></li>
+    <li><a href="../actor/actor-inside-ask.html#完整代码" class="header">完整代码</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -194,11 +199,11 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="../actor/actor-req-resp.html#actor之间使用请求-响应模式" class="header">Actor之间使用请求-响应模式</a>
+  <li><a href="../actor/actor-inside-ask.html#actor之间使用ask-请求-响应模式-" class="header">actor之间使用ask（请求-响应模式）</a>
   <ul>
-    <li><a href="../actor/actor-req-resp.html#适用范围" class="header">适用范围</a></li>
-    <li><a href="../actor/actor-req-resp.html#问题" class="header">问题</a></li>
-    <li><a href="../actor/actor-req-resp.html#完整代码" class="header">完整代码</a></li>
+    <li><a href="../actor/actor-inside-ask.html#适用范围" class="header">适用范围</a></li>
+    <li><a href="../actor/actor-inside-ask.html#问题" class="header">问题</a></li>
+    <li><a href="../actor/actor-inside-ask.html#完整代码" class="header">完整代码</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -209,7 +214,7 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#actor之间使用请求-响应模式" name="actor之间使用请求-响应模式" class="anchor"><span class="anchor-link"></span></a>Actor之间使用请求-响应模式</h1>
+<h1><a href="#actor之间使用ask-请求-响应模式-" name="actor之间使用ask-请求-响应模式-" class="anchor"><span class="anchor-link"></span></a>actor之间使用ask（请求-响应模式）</h1>
 <p>当请求与响应之间存在1:1映射时，可以通过调用<code>ActorContext[T]</code>上的<code>ask</code>函数来与另一个actor进行交互。</p>
 <p>构造一个传出消息，它使用<code>context.ask[Response]</code>提供的<code>ActorRef[Response]</code>作为接收响应的actor放入消息中将成功/失败（<code>Try[Response]</code>）转换为发送者actor可接收的消息类型</p>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/pingpong/PingPongMain.scala#L29-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
@@ -358,7 +363,7 @@ object PingPongMain {
 }</code></pre>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/actor-req-resp.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/actor-inside-ask.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -387,13 +392,13 @@ Previous
 </span>
 </div>
 </a>
-<a href="../streams/index.html" title="Akka 流（Streams）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../actor/actor-outside-ask.html" title="Actor外使用ask（请求-响应模式）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Akka 流（Streams）
+Actor外使用ask（请求-响应模式）
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

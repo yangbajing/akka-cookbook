@@ -20,6 +20,7 @@ import akka.actor.ActorSystem;
 import akka.stream.Materializer;
 import akka.stream.alpakka.spring.web.AkkaStreamsRegistrar;
 import akka.stream.alpakka.spring.web.SpringWebAkkaStreamsProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,24 +28,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ReactiveAdapterRegistry;
 
-import java.util.Objects;
-
+// #SampleConfiguration
 @Configuration
 @ConditionalOnClass(akka.stream.javadsl.Source.class)
 @EnableConfigurationProperties(SpringWebAkkaStreamsProperties.class)
-public class SpringWebAkkaStreamsConfiguration {
-
-  private static final String DEFAULT_ACTORY_SYSTEM_NAME = "SpringWebAkkaStreamsSystem";
+public class SampleConfiguration {
 
   private final ActorSystem system;
   private final Materializer mat;
-  private final SpringWebAkkaStreamsProperties properties;
 
-  public SpringWebAkkaStreamsConfiguration(final SpringWebAkkaStreamsProperties properties) {
-    this.properties = properties;
+  @Autowired
+  public SampleConfiguration(final SpringWebAkkaStreamsProperties properties) {
     final ReactiveAdapterRegistry registry = ReactiveAdapterRegistry.getSharedInstance();
 
-    system = ActorSystem.create(getActorSystemName(properties));
+    system = ActorSystem.create(properties.getActorSystemName());
     mat = Materializer.createMaterializer(system);
     new AkkaStreamsRegistrar(mat).registerAdapters(registry);
   }
@@ -60,26 +57,5 @@ public class SpringWebAkkaStreamsConfiguration {
   public Materializer getMaterializer() {
     return mat;
   }
-
-  public SpringWebAkkaStreamsProperties getProperties() {
-    return properties;
-  }
-
-  private String getActorSystemName(final SpringWebAkkaStreamsProperties properties) {
-    Objects.requireNonNull(
-        properties,
-        String.format(
-            "%s is not present in application context",
-            SpringWebAkkaStreamsProperties.class.getSimpleName()));
-
-    if (isBlank(properties.getActorSystemName())) {
-      return DEFAULT_ACTORY_SYSTEM_NAME;
-    }
-
-    return properties.getActorSystemName();
-  }
-
-  private boolean isBlank(String str) {
-    return (str == null || str.isEmpty());
-  }
 }
+// #SampleConfiguration

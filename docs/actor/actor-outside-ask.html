@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>访问文件 · Akka Cookbook</title>
+<title>Actor外使用ask（请求-响应模式） · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-访问文件
+Actor外使用ask（请求-响应模式）
 </span>
 </div>
 </div>
@@ -141,7 +141,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
     <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
     <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="active page">Actor外使用ask（请求-响应模式）</a></li>
     <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
     <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
     <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
@@ -152,7 +152,7 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
-    <li><a href="../streams/file.html" class="active page">访问文件</a></li>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
   </ul></li>
   <li><a href="../storage/index.html" class="page">访问存储</a>
@@ -173,10 +173,10 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="../streams/file.html#访问文件" class="header">访问文件</a>
+  <li><a href="../actor/actor-outside-ask.html#actor外使用ask-请求-响应模式-" class="header">Actor外使用ask（请求-响应模式）</a>
   <ul>
-    <li><a href="../streams/file.html#fileio-topath-写数据到文件" class="header">FileIO.toPath 写数据到文件</a></li>
-    <li><a href="../streams/file.html#fileio-frompath-从文件读数据" class="header">FileIO.fromPath 从文件读数据</a></li>
+    <li><a href="../actor/actor-outside-ask.html#适用范围" class="header">适用范围</a></li>
+    <li><a href="../actor/actor-outside-ask.html#问题" class="header">问题</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -198,10 +198,10 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="../streams/file.html#访问文件" class="header">访问文件</a>
+  <li><a href="../actor/actor-outside-ask.html#actor外使用ask-请求-响应模式-" class="header">Actor外使用ask（请求-响应模式）</a>
   <ul>
-    <li><a href="../streams/file.html#fileio-topath-写数据到文件" class="header">FileIO.toPath 写数据到文件</a></li>
-    <li><a href="../streams/file.html#fileio-frompath-从文件读数据" class="header">FileIO.fromPath 从文件读数据</a></li>
+    <li><a href="../actor/actor-outside-ask.html#适用范围" class="header">适用范围</a></li>
+    <li><a href="../actor/actor-outside-ask.html#问题" class="header">问题</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -212,50 +212,31 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#访问文件" name="访问文件" class="anchor"><span class="anchor-link"></span></a>访问文件</h1>
-<p>Akka Streams内置了 <code>FileIO</code> 工具库，可对文件以流的方式进行读、写。</p>
-<p><code>FileIO</code>提供了<code>toPath</code>和<code>fromPath</code>两个函数。<code>toPath</code>是一个Sink，它接收上游流过来的元素（<code>ByteString</code>）并将其写入（追加）文件；<code>fromPath</code>是一个Source，它将按下游的（要求）从文件读取数据。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L28-L30" target="_blank" title="Go to snippet source"></a><code class="language-scala">private val LINE_SEPARATOR = ByteString(&quot;\n&quot;)
-private val file = Files.createTempFile(&quot;cookbook&quot;, &quot;txt&quot;)
-private val TAKE_SIZE = 100</code></pre>
-<h2><a href="#fileio-topath-写数据到文件" name="fileio-topath-写数据到文件" class="anchor"><span class="anchor-link"></span></a>FileIO.toPath 写数据到文件</h2>
-<p>这里构造了0到99（包含）个数字，并按一行一个的方式写入文件。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L35-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">val f = Source
-  .fromIterator(() =&gt; Iterator.from(0))
-  .map(n =&gt; ByteString(n.toString))
-  .take(TAKE_SIZE)
-  .merge(Source.repeat(LINE_SEPARATOR).take(TAKE_SIZE))
-  .runWith(FileIO.toPath(file))
-val ioResult = f.futureValue
-ioResult.count should be &gt; 0L</code></pre>
-<p>这里使用了较复杂的方式来写入换行符<code>LINE_SEPARATER</code>，使用了<code>merge</code>来将两个源（Source）交叉合并的方式。其实也可以在<code>map(n =&gt; ByteString(n.toString))</code>将数字转换成字符串时直接把换行符给附加上去，就像这样：<code>map(n =&gt; ByteString(n.toString) ++ LINE_SEPARATOR)</code>。</p><div class="callout warning "><div class="callout-title">Warning</div>
-<p>需要注意<code>Source.repeat(....).take(....)</code>这里的<code>take</code>函数，在这个例子里是不可或缺的，若忘记限制<code>repeat</code>流的长度，则整个流将无限调用下去，直到写满你的磁盘。</p>
-<p><em>当然，在这里会被<code>futureValue</code>的超时异常而终止测试的执行，最终很有可能不会写满你的磁盘。</em></p></div>
-<p><code>FileIO.toPath</code>在多个重载版本，在以未指定<code>options</code>参数时方式调用时，<code>options</code>的默认值为：<code>Set(WRITE, TRUNCATE_EXISTING, CREATE)</code>，它以写入的方式打开文件，同时若文件已存在则清空内容，不存在则创建。<code>toPath</code>完整版本函数签名如下，<code>startPosition</code>指定了写入指针的初始偏移量（字节）：</p>
-<pre class="prettyprint"><code class="language-scala">def toPath(f: Path, options: Set[OpenOption], startPosition: Long): Sink[ByteString, Future[IOResult]]
-</code></pre>
-<h2><a href="#fileio-frompath-从文件读数据" name="fileio-frompath-从文件读数据" class="anchor"><span class="anchor-link"></span></a>FileIO.fromPath 从文件读数据</h2>
-<p>使用<code>Framing.delimiter</code>按指定的分隔标准从文件流读取数据（元素）。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L48-L55" target="_blank" title="Go to snippet source"></a><code class="language-scala">val f = FileIO
-  .fromPath(file)
-  .via(Framing.delimiter(LINE_SEPARATOR, 8192))
-  .filterNot(_.isEmpty)
-  .map(bytes =&gt; bytes.utf8String.toInt)
-  .runWith(Sink.seq)
-val ints = f.futureValue
-ints should be(0 until 100)</code></pre>
-<p><code>FileIO.fromPath</code>也有重载版本，其完整版本函数签名如下：</p>
-<pre class="prettyprint"><code class="language-scala">def fromPath(f: Path, chunkSize: Int, startPosition: Long): Source[ByteString, Future[IOResult]]
-</code></pre>
-<ul>
-  <li><code>chunkSize</code>：每次从文件里指定字节的块（缓冲）大小（字节）</li>
-  <li><code>startPosition</code>：指定读取指针偏移量（字节）</li>
-</ul><div class="callout note "><div class="callout-title">Note</div>
-<p>使用<code>Framing.delimiter</code>从文件流里读取数据时需要注意一个问题，若文件不以你指定的分隔值结尾将会抛出异常：<code>Caused by: akka.stream.scaladsl.Framing$FramingException: Stream finished but there was a truncated final frame in the buffer</code>。当流读到文件末尾还未能找到指定的分隔值而不能结束分帧（framing）操作，而这时上游已经发送了完成（ <strong>Finish</strong> ）信号，而<code>Framing</code>还有未完成的buffer则会抛出此异常。</p>
-<p>你将<code>Source.repeat(LINE_SEPARATOR)</code>的<code>take</code>函数参数指定为<code>99</code>再次运行测试代码就可重写这个问题。</p></div>
+<h1><a href="#actor外使用ask-请求-响应模式-" name="actor外使用ask-请求-响应模式-" class="anchor"><span class="anchor-link"></span></a>Actor外使用ask（请求-响应模式）</h1>
+<p>在与非Akka应用集成时，通常需要向actor发送一个请求并期待它有响应。这可以通过<code>ask</code>函数（或<code>!</code>）来实现。</p>
+<pre class="prettyprint"><code class="language-scala">import akka.actor.typed.scaladsl.AskPattern._
+import scala.concurrent.duration._
+
+implicit val system: ActorSystem[_] = system
+implicit val timeout: Timeout = 3.seconds
+
+val result: Future[Hello.Response] = 
+  cookieFabric.ask(ref =&gt; Hello.SayHello(&quot;Scala&quot;, ref))
+</code></pre><div class="callout note "><div class="callout-title">Note</div>
+<p><code>import AskPattern._</code>导入的<code>ask</code>函数本来需要有一个<code>Scheduler</code>的隐式参数，但<code>object AskPattern</code>还同时提供了一个<code>schedulerFromActorSystem</code>隐式函数从<code>ActorSystem[_]</code>获得<code>Scheduler</code>，这里建议直接使用<code>implicit ActorSystem[_]</code>（在使用Akka Streams时，也提供了从<code>ActorSystem[_]</code>获得<code>Materializer</code>的隐式转换函数，直接使用<code>implicit ActorSystem[_]</code>可以减少样版代码，使代码更清晰）。</p></div>
+<h2><a href="#适用范围" name="适用范围" class="anchor"><span class="anchor-link"></span></a>适用范围</h2>
+<ol>
+  <li>从actor系统外部访问时，如Akka HTTP请求访问actor获取响应值</li>
+</ol>
+<h2><a href="#问题" name="问题" class="anchor"><span class="anchor-link"></span></a>问题</h2>
+<ol>
+  <li>在返回的Future回调内很可能意外的捕获了外部状态，因为这些回调将在与ask不同的线程上执行</li>
+  <li>一个ask只能有一个响应（ask将生成临时actor）</li>
+  <li>当请求超时时，接收actor并不知道且仍将继续处理请求直至完成，甚至可能会在超时发生后才开始处理它</li>
+</ol>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/file.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/actor-outside-ask.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -271,7 +252,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../streams/index.html" title="Akka 流（Streams）" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../actor/actor-inside-ask.html" title="actor之间使用ask（请求-响应模式）" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -280,17 +261,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-Akka 流（Streams）
+actor之间使用ask（请求-响应模式）
 </span>
 </div>
 </a>
-<a href="../streams/ftp.html" title="访问FTP/sFTP" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../actor/create-actor-externally.html" title="通过 ActorSystem 创建 actor" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-访问FTP/sFTP
+通过 ActorSystem 创建 actor
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

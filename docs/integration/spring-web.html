@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>Spring Web & Akka Streams · Akka Cookbook</title>
+<title>在 Spring 里使用 Akka Streams · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-Spring Web & Akka Streams
+在 Spring 里使用 Akka Streams
 </span>
 </div>
 </div>
@@ -135,15 +135,20 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
+  <li><a href="../introduction.html" class="page">导读</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a>
   <ul>
-    <li><a href="../actor/introduction.html" class="page">介绍</a></li>
-    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
-    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
     <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
-    <li><a href="../actor/actor-req-resp.html" class="page">Actor之间使用请求-响应模式</a></li>
+    <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
@@ -159,13 +164,22 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../integration/index.html" class="page">集成</a>
   <ul>
-    <li><a href="../integration/spring-web.html" class="active page">Spring Web &amp; Akka Streams</a></li>
+    <li><a href="../integration/spring-web.html" class="active page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../integration/spring-web.html#在-spring-里使用-akka-streams" class="header">在 Spring 里使用 Akka Streams</a>
+  <ul>
+    <li><a href="../integration/spring-web.html#添加-akka-streams-支持" class="header">添加 Akka Streams 支持</a></li>
+    <li><a href="../integration/spring-web.html#编写控制器" class="header">编写控制器</a></li>
+    <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
+  </ul></li>
+</ul>
 </nav>
 
 </nav>
@@ -179,11 +193,103 @@ yangbajing/akka-cookbook
 </div>
 </div>
 </div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../integration/spring-web.html#在-spring-里使用-akka-streams" class="header">在 Spring 里使用 Akka Streams</a>
+  <ul>
+    <li><a href="../integration/spring-web.html#添加-akka-streams-支持" class="header">添加 Akka Streams 支持</a></li>
+    <li><a href="../integration/spring-web.html#编写控制器" class="header">编写控制器</a></li>
+    <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#spring-web-akka-streams" name="spring-web-akka-streams" class="anchor"><span class="anchor-link"></span></a>Spring Web &amp; Akka Streams</h1>
-<p>TODO</p>
+<h1><a href="#在-spring-里使用-akka-streams" name="在-spring-里使用-akka-streams" class="anchor"><span class="anchor-link"></span></a>在 Spring 里使用 Akka Streams</h1>
+<p>Akka Streams 作为 Reactive Streams 的一种实现，可以很方便的与其它 Reactive Streams 实现进行互操作。而从 Spring 5 开始，也提供了 Reactive Streams 实现的版本： <strong>WebFlow</strong> 。 <a href="https://doc.akka.io/docs/alpakka/2.0/spring-web.html"><strong>Alpakka Spring Web</strong></a> 项目提供了对Spring Boot的支持，可以让我们在 Spring 项目中使用 Akka Streams。</p>
+<h2><a href="#添加-akka-streams-支持" name="添加-akka-streams-支持" class="anchor"><span class="anchor-link"></span></a>添加 Akka Streams 支持</h2>
+<p>需要给Spring项目添加 Akka Streams 依赖：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % "2.0.0-M1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;com.lightbend.akka&lt;/groupId&gt;
+  &lt;artifactId&gt;akka-stream-alpakka-spring-web_2.13&lt;/artifactId&gt;
+  &lt;version&gt;2.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'com.lightbend.akka', name: 'akka-stream-alpakka-spring-web_2.13', version: '2.0.0-M1'
+}</code></pre></dd></dl>
+<p>在自定义配置：<code>SampleConfiguration</code>中实例化<code>ActorSystem</code>和<code>Materializer</code>两个 <strong>Bean</strong> 。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleConfiguration.java#L32-L60" target="_blank" title="Go to snippet source"></a><code class="language-java">@Configuration
+@ConditionalOnClass(akka.stream.javadsl.Source.class)
+@EnableConfigurationProperties(SpringWebAkkaStreamsProperties.class)
+public class SampleConfiguration {
+
+  private final ActorSystem system;
+  private final Materializer mat;
+
+  @Autowired
+  public SampleConfiguration(final SpringWebAkkaStreamsProperties properties) {
+    final ReactiveAdapterRegistry registry = ReactiveAdapterRegistry.getSharedInstance();
+
+    system = ActorSystem.create(properties.getActorSystemName());
+    mat = Materializer.createMaterializer(system);
+    new AkkaStreamsRegistrar(mat).registerAdapters(registry);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(ActorSystem.class)
+  public ActorSystem getActorSystem() {
+    return system;
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(Materializer.class)
+  public Materializer getMaterializer() {
+    return mat;
+  }
+}</code></pre>
+<h2><a href="#编写控制器" name="编写控制器" class="anchor"><span class="anchor-link"></span></a>编写控制器</h2>
+<p>在添加了 Akka Streams 支持后，我们就可以在控制器代码里直接返回 <code>Source[T, Mat]</code> 类型的结果了。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleController.java#L20-L31" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.NotUsed;
+import akka.stream.javadsl.Source;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class SampleController {
+  @RequestMapping(&quot;/&quot;)
+  public Source&lt;String, NotUsed&gt; index() {
+    return Source.repeat(&quot;Hello world!&quot;).intersperse(&quot;\n&quot;).take(10);
+  }
+}</code></pre>
+<h2><a href="#运行程序" name="运行程序" class="anchor"><span class="anchor-link"></span></a>运行程序</h2>
+<p><code>SampleApplication.java</code> 代码如下，如通常的Spring Boot程序并无起二致。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleApplication.java#L23-L28" target="_blank" title="Go to snippet source"></a><code class="language-java">@SpringBootApplication
+public class SampleApplication {
+  public static void main(String[] args) {
+    SpringApplication.run(SampleApplication.class, args);
+  }
+}</code></pre>
+<p>运行 <code>SampleApplication</code> 启动Spring Web程序，通过<code>curl</code>访问服务示例如下：</p>
+<pre><code>$ curl -i http://localhost:8080
+HTTP/1.1 200 
+Content-Type: text/plain
+Transfer-Encoding: chunked
+Date: Wed, 20 Nov 2019 03:47:44 GMT
+
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+Hello world!
+</code></pre>
+<p>可以看到响应头里有：<code>Transfer-Encoding: chunked</code>，这个结果是以流的形式将数据一块一块返回的。</p>
 </div>
 <div>
 <a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/integration/spring-web.md" title="Edit this page" class="md-source-file md-edit">

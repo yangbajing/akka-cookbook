@@ -1,14 +1,16 @@
-# 介绍
+# 导读
+
+Akka Typed Actor从2.4开始直到2.5可以商用，进而Akka 2.6已经把Akka Typed Actor做为推荐的Actor使用模式。Typed Actor与原先的Untyped Actor最大且直观的区别就是`ActorRef`有类型了，其签名也改成了`akka.actor.typed.ActorRef[T]`。
 
 ## HelloWorld
 
 第一个示例是一个 Ping-Pong，从一个actor发送消息到另一个actor，并收到回复。
 
-@@snip [Ping-Pong](../../../../../cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala) { #ping-pong }
+@@snip [Ping-Pong](../../../../cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala) { #ping-pong }
 
 运行actor需要有一个ActorSystem，这面的代码将执行这个示例。
 
-@@snip [Ping-Pong](../../../../../cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala) { #helloworld }
+@@snip [Ping-Pong](../../../../cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala) { #helloworld }
 
 运行示例程序，可看到如何输出：
 
@@ -24,7 +26,11 @@ sbt:akka-cookbook> cookbook-actor/runMain cookbook.actor.introduction.HelloWorld
 
 ## Behavior
 
-Akka Typed使用`Behavior[T]`（ **行为** ）替代了经典（Untyped）actor的`Actor`特质。每次actor被调用后都需要返回一个新的行为以待下一次actor被执行时调用。`Behavior`更明确的表达出actor是由一系列响应消息的行为组成，它可以是一个纯函数（ *就像示例一样，Behavior由函数创建，它关不需要定义一个类* ），也可以拥有状态……
+Akka Typed不再需要通过类的形式来实现Actor接口定义，而是函数的形式来定义actor。可以看到，定义的actor类型为`Behavior[T]`（形为），通过`Behaviors.receiveMessage[T](T => Behavior[T]): Receive[T]`函数来处理接收到的消息，而`Receive`继承了`Behavior trait`。通过函数签名可以看到，每次接收到消息并对其处理完成后，都必需要返回一个新的形为。
+
+`apply(): Behavior[Command]`函数签名里的范性参数类型`Command`限制了这个actor将只接收`Command`或`Command`子类型的消息，编译器将在编译期对传给actor的消息做类型检查，相对于从前的untyped actor可以向actor传入任何类型的消息，这可以限制的减少程序中的bug。特别是在程序规模很大，当你定义了成百上千个消息时。
+
+也因为有类型的actor，在Akka Typed中没有了隐式发送的`sender: ActorRef`，必需在发送的消息里面包含回复字段，就如`PingCommand`消息定义里的`replyTo: ActorRef[Ping.Command]`字段一样。actor在处理完消息后可以通过它向发送者回复处理结果。
 
 ## ActorRef
 

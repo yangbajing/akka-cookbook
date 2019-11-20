@@ -271,7 +271,7 @@ object Dependencies {
 
   val versionSpringBoot = "2.1.10.RELEASE"
 
-  val _springs = Seq("org.springframework.boot" % "spring-boot-starter-web" % versionSpringBoot)
+  val _springs = Seq("org.springframework.boot" % "spring-boot-starter-webflux" % versionSpringBoot)
 
   val _bcprovJdk15on = "org.bouncycastle" % "bcprov-jdk15on" % versionBcprovJdk15on
   val _quartz = ("org.quartz-scheduler" % "quartz" % versionQuartz).exclude("com.zaxxer", "HikariCP-java7")
