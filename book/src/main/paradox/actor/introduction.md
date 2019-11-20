@@ -34,5 +34,5 @@ Akka Typed使用`Behavior[T]`（ **行为** ）替代了经典（Untyped）actor
 
 `ActorSystem`构造至少需要转入两个参数：
 
-- `guardianBehavior: Behavior[T]`：守卫行为，它将被创建为守卫actor，其地址为：`akka://helloworld/user`。
+- `guardianBehavior: Behavior[T]`：守卫行为，它将被创建为守卫actor，其 ActorPath 地址为：`akka://helloworld/user`。
 - `name: String`：ActorSystem名字，这个名字除了在日志线程中显示外，在Akka Cluster时也很重要，用于标识同一个集群。

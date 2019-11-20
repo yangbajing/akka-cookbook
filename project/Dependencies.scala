@@ -162,6 +162,7 @@ object Dependencies {
     ("com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % versionAlpakka)
       .excludeAll(ExclusionRule("com.typesafe.akka"))
       .cross(CrossVersion.binary)
+      .excludeAll(ExclusionRule("org.springframework"))
 
   val _akkaPersistenceCassandra =
     ("com.typesafe.akka" %% "akka-persistence-cassandra" % "0.100")
@@ -267,6 +268,10 @@ object Dependencies {
     "ch.qos.logback" % "logback-classic" % versionLogback)
 
   val _logstashLogbackEncoder = "net.logstash.logback" % "logstash-logback-encoder" % versionLogstashLogback
+
+  val versionSpringBoot = "2.1.10.RELEASE"
+
+  val _springs = Seq("org.springframework.boot" % "spring-boot-starter-web" % versionSpringBoot)
 
   val _bcprovJdk15on = "org.bouncycastle" % "bcprov-jdk15on" % versionBcprovJdk15on
   val _quartz = ("org.quartz-scheduler" % "quartz" % versionQuartz).exclude("com.zaxxer", "HikariCP-java7")

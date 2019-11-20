@@ -8,14 +8,16 @@ ThisBuild / scalafmtOnCompile := true
 lazy val root = Project(id = "akka-cookbook", base = file(".")).aggregate(
   book,
   cookbookActor,
-  cookbookStream,
+  cookbookStreams,
   cookbookCluster,
   cookbookPersistence,
+  storageCassandra,
+  integrationSpring,
   cookbookCommon)
 
 lazy val book = _project("book")
   .enablePlugins(ParadoxMaterialThemePlugin)
-  .dependsOn(cookbookActor, cookbookStream, cookbookCluster, cookbookPersistence, cookbookCommon)
+  .dependsOn(cookbookActor, cookbookStreams, cookbookCommon)
   .settings(Publishing.noPublish: _*)
   .settings(
     Compile / paradoxMaterialTheme ~= {
@@ -36,7 +38,7 @@ lazy val book = _project("book")
 
 lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "compile->compile;test->test")
 
-lazy val cookbookStream = _project("cookbook-stream").dependsOn(cookbookCommon % "compile->compile;test->test")
+lazy val cookbookStreams = _project("cookbook-streams").dependsOn(cookbookCommon % "compile->compile;test->test")
 
 lazy val cookbookCluster = _project("cookbook-cluster")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
@@ -46,9 +48,13 @@ lazy val cookbookPersistence = _project("cookbook-persistence")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
   .settings(libraryDependencies ++= Seq(_akkaPersistenceTyped))
 
-lazy val cookbookSpring = _project("cookbook-spring")
+lazy val storageCassandra = _storageProject("cookbook-cassandra")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_alpakkaSpringWeb))
+  .settings(libraryDependencies ++= _cassandras)
+
+lazy val integrationSpring = _integrationProject("cookbook-spring")
+  .dependsOn(cookbookCommon % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Seq(_alpakkaSpringWeb) ++ _springs)
 
 lazy val cookbookCommon = _project("cookbook-common").settings(
   libraryDependencies ++= Seq(
@@ -60,6 +66,10 @@ lazy val cookbookCommon = _project("cookbook-common").settings(
       _akkaTypedTestkit % Test,
       _akkaStreamTestkit % Test,
       _scalatest % Test) ++ _akkas ++ _logs)
+
+def _integrationProject(name: String) = _project(name, s"integration/$name")
+
+def _storageProject(name: String) = _project(name, s"storage/$name")
 
 def _project(name: String, _base: String = null) =
   Project(id = name, base = file(if (_base eq null) name else _base))

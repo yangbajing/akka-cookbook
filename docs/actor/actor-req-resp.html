@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="description" content="book">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
+
+<meta name="lang:clipboard.copy" content="Copy to clipboard">
+<meta name="lang:clipboard.copied" content="Copied to clipboard">
+<meta name="lang:search.language" content="">
+<meta name="lang:search.pipeline.stopwords" content="true">
+<meta name="lang:search.pipeline.trimmer" content="true">
+<meta name="lang:search.result.none" content="No matching documents">
+<meta name="lang:search.result.one" content="1 matching document">
+<meta name="lang:search.result.other" content="# matching documents">
+<meta name="lang:search.tokenizer" content="[\s\-]+">
+
+
+<meta name="description" content="book">
+<link rel="shortcut icon" href="../assets/images/favicon.png">
+<title>Actor之间使用请求-响应模式 · Akka Cookbook</title>
+<link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+<link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
+<link rel="stylesheet" href="../lib/prettify/prettify.css">
+<script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+<style>
+body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}
+code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
+</style>
+<link rel="stylesheet" href="../assets/fonts/font-awesome.css">
+<link rel="stylesheet" href="../assets/fonts/material-icons.css">
+<link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+</head>
+<body
+>
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+<label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+<header class="md-header" data-md-component="header">
+<nav class="md-header-nav md-grid">
+<div class="md-flex">
+<div class="md-flex__cell md-flex__cell--shrink">
+<a href="../index.html" title="Akka Cookbook" class="md-header-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch">
+<div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+<span class="md-header-nav__topic">
+Akka Cookbook
+</span>
+<span class="md-header-nav__topic">
+Actor之间使用请求-响应模式
+</span>
+</div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+<label class="md-icon md-search__icon" for="__search"></label>
+<button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix>
+<div class="md-search-result" data-md-component="result">
+<div class="md-search-result__meta">
+Type to start searching
+</div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-header-nav__source">
+<a href="https://github.com/yangbajing/akka-cookbook"
+title="Go to repository"
+class="md-source"
+data-md-source="github">
+<div class="md-source__icon">
+<i class="fa fa-github"></i>
+</div>
+<div class="md-source__repository">
+yangbajing/akka-cookbook
+</div>
+</a>
+
+</div>
+</div>
+</div>
+</nav>
+</header>
+
+<div class="md-container">
+<main class="md-main">
+<div class="md-main__inner md-grid" data-md-component="container">
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
+<label class="md-nav__title md-nav__title--site" for="drawer">
+<a href="../index.html" title="Akka Cookbook" class="md-nav__button md-logo">
+<span class="md-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+<a href="../index.html" title="Akka Cookbook">
+Akka Cookbook
+</a>
+</label>
+<div class="md-nav__source">
+<a href="https://github.com/yangbajing/akka-cookbook"
+title="Go to repository"
+class="md-source"
+data-md-source="github">
+<div class="md-source__icon">
+<i class="fa fa-github"></i>
+</div>
+<div class="md-source__repository">
+yangbajing/akka-cookbook
+</div>
+</a>
+
+</div>
+<ul>
+  <li><a href="../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../actor/introduction.html" class="page">介绍</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
+    <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
+    <li><a href="../actor/actor-req-resp.html" class="active page">Actor之间使用请求-响应模式</a></li>
+  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
+  <ul>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
+    <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+  </ul></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a>
+  <ul>
+    <li><a href="../storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
+    <li><a href="../storage/cassandra.html" class="page">访问 Cassandra</a></li>
+    <li><a href="../storage/mongodb.html" class="page">访问 MongoDB</a></li>
+    <li><a href="../storage/elasticsearch.html" class="page">访问 Elasticsearch</a></li>
+  </ul></li>
+  <li><a href="../integration/index.html" class="page">集成</a>
+  <ul>
+    <li><a href="../integration/spring-web.html" class="page">Spring Web &amp; Akka Streams</a></li>
+  </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+</ul>
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../actor/actor-req-resp.html#actor之间使用请求-响应模式" class="header">Actor之间使用请求-响应模式</a>
+  <ul>
+    <li><a href="../actor/actor-req-resp.html#适用范围" class="header">适用范围</a></li>
+    <li><a href="../actor/actor-req-resp.html#问题" class="header">问题</a></li>
+    <li><a href="../actor/actor-req-resp.html#完整代码" class="header">完整代码</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</nav>
+<ul style="display: none">
+<li class="md-nav__item md-version" id="project.version">
+<label class="md-nav__link" for="__version">
+<i class="md-icon" title="Version">label_outline</i> 1.0.0
+</label>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../actor/actor-req-resp.html#actor之间使用请求-响应模式" class="header">Actor之间使用请求-响应模式</a>
+  <ul>
+    <li><a href="../actor/actor-req-resp.html#适用范围" class="header">适用范围</a></li>
+    <li><a href="../actor/actor-req-resp.html#问题" class="header">问题</a></li>
+    <li><a href="../actor/actor-req-resp.html#完整代码" class="header">完整代码</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
+<div class="md-content">
+<article class="md-content__inner md-typeset">
+<div class="md-content__searchable">
+<h1><a href="#actor之间使用请求-响应模式" name="actor之间使用请求-响应模式" class="anchor"><span class="anchor-link"></span></a>Actor之间使用请求-响应模式</h1>
+<p>当请求与响应之间存在1:1映射时，可以通过调用<code>ActorContext[T]</code>上的<code>ask</code>函数来与另一个actor进行交互。</p>
+<p>构造一个传出消息，它使用<code>context.ask[Response]</code>提供的<code>ActorRef[Response]</code>作为接收响应的actor放入消息中将成功/失败（<code>Try[Response]</code>）转换为发送者actor可接收的消息类型</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/pingpong/PingPongMain.scala#L29-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
+  sealed trait Request
+  private final case class WrappedResponse(response: Pong.Response) extends Request
+  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup { context =&gt;
+    implicit val timeout: Timeout = 2.seconds
+    val pong = context.spawn(Pong(), &quot;pong&quot;)
+    context.watch(pong)
+    context.ask(pong, (replyTo: ActorRef[Pong.Response]) =&gt; Pong.Message(&quot;Hello Scala!&quot;, 1, replyTo)) {
+      case Success(value)     =&gt; WrappedResponse(value)
+      case Failure(exception) =&gt; throw exception
+    }
+
+    Behaviors
+      .receiveMessage[Request] {
+        case WrappedResponse(Pong.Result(message, count)) =&gt;
+          context.log.info(s&quot;Received pong response: $message, ${count}th.&quot;)
+          context.ask[Pong.Request, Pong.Response](pong, Pong.Message(message, count + 1, _)) {
+            case Success(value)     =&gt; WrappedResponse(value)
+            case Failure(exception) =&gt; throw exception
+          }
+          Behaviors.same
+      }
+      .receiveSignal {
+        case (_, Terminated(`pong`)) =&gt;
+          context.log.info(s&quot;Actor $pong be terminated.&quot;)
+          latch.countDown()
+          Behaviors.stopped
+      }
+  }
+}</code></pre>
+<p><code>context.ask</code>的响应映射函数在接收actor中运行，可以安全的访问actor内部状态， <strong>但抛出异常的话actor将会被停止</strong> 。</p>
+<pre class="prettyprint"><code class="language-scala">  override def ask[Req, Res](target: RecipientRef[Req], createRequest: ActorRef[Res] =&gt; Req)(
+      mapResponse: Try[Res] =&gt; T)(implicit responseTimeout: Timeout, classTag: ClassTag[Res]): Unit = {
+    import akka.actor.typed.scaladsl.AskPattern._
+    pipeToSelf((target.ask(createRequest))(responseTimeout, system.scheduler))(mapResponse)
+  }
+
+  def pipeToSelf[Value](future: Future[Value])(mapResult: Try[Value] =&gt; T): Unit = {
+    future.onComplete(value =&gt; self.unsafeUpcast ! AdaptMessage(value, mapResult))
+  }
+</code></pre>
+<p>上面是<code>context.ask</code>函数实现：</p>
+<ul>
+  <li><code>target</code>：接收actor引用</li>
+  <li><code>createRequest</code>：创建请求消息函数，参数是ask创建的临时actor，此临时actor用于适配接收actor的消息类型</li>
+  <li><code>mapResponse</code>：将获取的响应消息类型Res映射成请求actor可以接收的消息类型</li>
+</ul>
+<p>可以看到，<code>context.ask</code>函数实际上是在目标actor（<code>target</code>）上调用了<code>ask</code>方法，并将返回的<code>Future[T]</code>结果转换并发送到<code>context</code>所在的actor。</p>
+<h2><a href="#适用范围" name="适用范围" class="anchor"><span class="anchor-link"></span></a>适用范围</h2>
+<ol>
+  <li>单个查询响应的转换</li>
+  <li>发送actor需要在继续之前知道消息已被处理（通过<code>context.ask(..., ...)(mapResponse)</code>的<code>mapResponse</code>函数）</li>
+  <li>如果请求超时，允许actor重新发送消息（通过<code>mapResponse</code>回调函数里处理）</li>
+  <li>跟踪未完成的请求</li>
+  <li>保存上下文。发送者actor接收的请求有上下文信息（context.ask将生成一个临时actor，这个临时actor即可作为一个确定上下文的载体），如：请求ID reqId，而后端协议不支持这个参数时</li>
+</ol>
+<h2><a href="#问题" name="问题" class="anchor"><span class="anchor-link"></span></a>问题</h2>
+<ol>
+  <li>一个ask只能有一个响应（因为ask会创建一个临时actor，这个actor在收到响应后就会结束自己）</li>
+  <li>当请求超时时，接收actor（发回响应的那个）并不知道且仍可能将请求处理并完成，甚至若接收actor很忙的话会在请求超时发生以后再处理它</li>
+  <li>为超时情况找到一个好的（包装）值，特别是在ask函数调用后还会触发链式调用时（一个异步调用完成后进行另一个异步调用）。这时候希望来快速响应超时情况并回复请求者，但同时需要避免误报。</li>
+</ol>
+<h2><a href="#完整代码" name="完整代码" class="anchor"><span class="anchor-link"></span></a>完整代码</h2>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/pingpong/PingPongMain.scala" target="_blank" title="Go to snippet source"></a><code class="language-scala">/*
+ * Copyright 2019 yangbajing.me
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package cookbook.actor.pingpong
+
+import java.util.concurrent.CountDownLatch
+
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ ActorRef, ActorSystem, Behavior, Terminated }
+import akka.util.Timeout
+
+import scala.concurrent.duration._
+import scala.util.{ Failure, Success }
+
+object Ping {
+  sealed trait Request
+  private final case class WrappedResponse(response: Pong.Response) extends Request
+  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup { context =&gt;
+    implicit val timeout: Timeout = 2.seconds
+    val pong = context.spawn(Pong(), &quot;pong&quot;)
+    context.watch(pong)
+    context.ask(pong, (replyTo: ActorRef[Pong.Response]) =&gt; Pong.Message(&quot;Hello Scala!&quot;, 1, replyTo)) {
+      case Success(value)     =&gt; WrappedResponse(value)
+      case Failure(exception) =&gt; throw exception
+    }
+
+    Behaviors
+      .receiveMessage[Request] {
+        case WrappedResponse(Pong.Result(message, count)) =&gt;
+          context.log.info(s&quot;Received pong response: $message, ${count}th.&quot;)
+          context.ask[Pong.Request, Pong.Response](pong, Pong.Message(message, count + 1, _)) {
+            case Success(value)     =&gt; WrappedResponse(value)
+            case Failure(exception) =&gt; throw exception
+          }
+          Behaviors.same
+      }
+      .receiveSignal {
+        case (_, Terminated(`pong`)) =&gt;
+          context.log.info(s&quot;Actor $pong be terminated.&quot;)
+          latch.countDown()
+          Behaviors.stopped
+      }
+  }
+}
+
+object Pong {
+  sealed trait Request
+  final case class Message(message: String, count: Int, replyTo: ActorRef[Response]) extends Request
+  sealed trait Response
+  final case class Result(message: String, count: Int) extends Response
+  def apply(): Behavior[Request] = Behaviors.receive {
+    case (context, Message(message, 100, _)) =&gt;
+      context.log.info(s&quot;Receiving 100th Ping message: $message, it will stop.&quot;)
+      Behaviors.stopped
+    case (_, Message(message, count, replyTo)) =&gt;
+      replyTo ! Result(message, count)
+      Behaviors.same
+  }
+}
+
+object PingPongMain {
+  def main(args: Array[String]): Unit = {
+    val latch = new CountDownLatch(1)
+    val system = ActorSystem(Ping(latch), &quot;ping-pong&quot;)
+    latch.await()
+    system.terminate()
+  }
+}</code></pre>
+</div>
+<div>
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/actor-req-resp.md" title="Edit this page" class="md-source-file md-edit">
+Edit this page
+</a>
+</div>
+<div class="print-only">
+<span class="md-source-file md-version">
+1.0.0
+</span>
+</div>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-nav">
+<nav class="md-footer-nav__inner md-grid">
+<a href="../actor/adapted-response.html" title="适配响应类型到 actor" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Previous
+</span>
+适配响应类型到 actor
+</span>
+</div>
+</a>
+<a href="../streams/index.html" title="Akka 流（Streams）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Next
+</span>
+Akka 流（Streams）
+</span>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+</div>
+</a>
+</nav>
+</div>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-footer-copyright">
+Powered by
+<a href="https://github.com/lightbend/paradox">Paradox</a>
+and
+<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
+
+</div>
+<div class="md-footer-social">
+<a href="https://yangbajing.github.io/akka-cookbook/" class="md-footer-social__link fa fa-globe"></a><a href="https://github.com/yangbajing/akka-cookbook" class="md-footer-social__link fa fa-github"></a><a href="https://weibo.com/yangbajing" class="md-footer-social__link fa fa-globe"></a>
+</div>
+
+</div>
+</div>
+</footer>
+
+</div>
+<script src="../assets/javascripts/application.583bbe55.js"></script>
+<script src="../assets/javascripts/paradox-material-theme.js"></script>
+<script>app.initialize({version:"0.17",url:{base:"../."}})</script>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+window.prettyPrint && prettyPrint();
+});
+</script>
+</body>
+</html>

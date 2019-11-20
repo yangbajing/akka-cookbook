@@ -28,6 +28,7 @@ import scala.concurrent.duration._
 object RootActor {
   sealed trait Command
   case class Spawn[T](behavior: Behavior[T], name: String, props: Props, replyTo: ActorRef[ActorRef[T]]) extends Command
+  // 在此添加其它业务消息
 
   def apply(): Behavior[Command] = Behaviors.receive {
     case (context, Spawn(behavior, name, props, replyTo)) =>

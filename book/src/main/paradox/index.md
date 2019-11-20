@@ -14,6 +14,9 @@
 
 * [actor](actor/index.md)
 * [streams](streams/index.md)
+* [storage](storage/index.md)
+* [integration](integration/index.md)
+* [http](http/index.md)
 * [cluster](cluster/index.md)
 * [persistence](persistence/index.md)
 
