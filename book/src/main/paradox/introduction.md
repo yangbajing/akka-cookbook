@@ -1,4 +1,4 @@
-# 导读
+# 介绍
 
 Akka Typed Actor从2.4开始直到2.5可以商用，进而Akka 2.6已经把Akka Typed Actor做为推荐的Actor使用模式。Typed Actor与原先的Untyped Actor最大且直观的区别就是`ActorRef`有类型了，其签名也改成了`akka.actor.typed.ActorRef[T]`。
 

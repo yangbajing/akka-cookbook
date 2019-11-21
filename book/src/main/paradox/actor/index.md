@@ -1,7 +1,5 @@
 # Actor
 
-*[https://doc.akka.io/docs/akka/current/typed/](https://doc.akka.io/docs/akka/current/typed/)*
-
 @@toc { depth=2 }
 
 @@@ index
@@ -13,15 +11,18 @@
 * [create-actor-externally](create-actor-externally.md)
 * [pipe-to-self](pipe-to-self.md)
 * [create-child-actor](create-child-actor.md)
+* [timer](timer.md)
+* [change-behavior-and-state-machine](change-behavior-and-state-machine.md)
+* [stash](stash.md)
 * [supervise](supervise.md)
 * [watch-actor](watch-actor.md)
 * [escalate-exception](escalate-exception.md)
 * [stop](stop.md)
+* [lifecycle](lifecycle.md)
 
 @@@
 
 TODO
 
-* [lifecycle](lifecycle.md)
 * [discovery](discovery.md)
 * [shutdown](shutdown.md)

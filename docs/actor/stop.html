@@ -135,7 +135,7 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
-  <li><a href="../introduction.html" class="page">导读</a></li>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a>
   <ul>
     <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
@@ -145,10 +145,14 @@ yangbajing/akka-cookbook
     <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
     <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
     <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
     <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
     <li><a href="../actor/stop.html" class="active page">怎样优雅的停止actor</a></li>
+    <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
@@ -167,7 +171,10 @@ yangbajing/akka-cookbook
     <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a>
+  <ul>
+    <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
+  </ul></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
@@ -214,7 +221,7 @@ yangbajing/akka-cookbook
 <div class="md-content__searchable">
 <h1><a href="#怎样优雅的停止actor" name="怎样优雅的停止actor" class="anchor"><span class="anchor-link"></span></a>怎样优雅的停止actor</h1>
 <h2><a href="#返回-behaviors-stopped" name="返回-behaviors-stopped" class="anchor"><span class="anchor-link"></span></a>返回 Behaviors.stopped</h2>
-<p>每处理一个消息，actor都将返回一个行为，可以通过返回 <code>Behaviors.stopped</code> 行为来告诉ActorSystem此actor应被自动停止。</p>
+<p>每处理一个消息，actor都将返回一个行为，可以通过返回 <code>Behaviors.stopped</code> 行为来告诉Actor系统此actor应被自动停止。</p>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L39-L41" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, Stop) =&gt;
   context.log.info(s&quot;Receive message: $Stop, will stopped.&quot;)
   Behaviors.stopped</code></pre>
@@ -227,7 +234,8 @@ yangbajing/akka-cookbook
 <p>当 <code>PostStop</code> 信号被处理后，<code>cleanup</code>清理函数将紧接着执行。</p>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L56-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">def cleanup(log: Logger): Unit = {
   log.info(&quot;Perform cleanup action.&quot;)
-}</code></pre>
+}</code></pre><div class="callout note "><div class="callout-title">Note</div>
+<p>Akka Typed不再提供<code>PoisonPill</code>消息来停止actor，推荐使用自定义消息并反回<code>Behaviors.stopped</code>行为来停止actor。</p></div>
 </div>
 <div>
 <a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/stop.md" title="Edit this page" class="md-source-file md-edit">
@@ -259,13 +267,13 @@ Previous
 </span>
 </div>
 </a>
-<a href="../streams/index.html" title="Akka 流（Streams）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../actor/lifecycle.html" title="Actor 生命周期" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Akka 流（Streams）
+Actor 生命周期
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

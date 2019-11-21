@@ -2,7 +2,7 @@
 
 ## 返回 Behaviors.stopped
 
-每处理一个消息，actor都将返回一个行为，可以通过返回 `Behaviors.stopped` 行为来告诉ActorSystem此actor应被自动停止。
+每处理一个消息，actor都将返回一个行为，可以通过返回 `Behaviors.stopped` 行为来告诉Actor系统此actor应被自动停止。
 
 @@snip [stopped](../../../../../cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala) { #stopped }
 
@@ -17,3 +17,7 @@
 当 `PostStop` 信号被处理后，`cleanup`清理函数将紧接着执行。
 
 @@snip [stopped](../../../../../cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala) { #cleanup }
+
+@@@note
+Akka Typed不再提供`PoisonPill`消息来停止actor，推荐使用自定义消息并反回`Behaviors.stopped`行为来停止actor。
+@@@

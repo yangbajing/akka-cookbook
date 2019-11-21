@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>生命周期</title>
+<title>Actor 生命周期 · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -43,7 +43,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <nav class="md-header-nav md-grid">
 <div class="md-flex">
 <div class="md-flex__cell md-flex__cell--shrink">
-<a href="../actor/lifecycle.html" title="生命周期" class="md-header-nav__button md-logo">
+<a href="../index.html" title="Akka Cookbook" class="md-header-nav__button md-logo">
 <i class="md-icon">local_library</i>
 </a>
 </div>
@@ -52,7 +52,12 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 </div>
 <div class="md-flex__cell md-flex__cell--stretch">
 <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
-生命周期
+<span class="md-header-nav__topic">
+Akka Cookbook
+</span>
+<span class="md-header-nav__topic">
+Actor 生命周期
+</span>
 </div>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
@@ -107,12 +112,12 @@ yangbajing/akka-cookbook
 <div class="md-sidebar__inner">
 <nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
 <label class="md-nav__title md-nav__title--site" for="drawer">
-<a href="../actor/lifecycle.html" title="生命周期" class="md-nav__button md-logo">
+<a href="../index.html" title="Akka Cookbook" class="md-nav__button md-logo">
 <span class="md-nav__button md-logo">
 <i class="md-icon">local_library</i>
 </a>
-<a href="../actor/lifecycle.html" title="生命周期">
-生命周期
+<a href="../index.html" title="Akka Cookbook">
+Akka Cookbook
 </a>
 </label>
 <div class="md-nav__source">
@@ -130,6 +135,47 @@ yangbajing/akka-cookbook
 
 </div>
 <ul>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
+    <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
+    <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
+    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../actor/lifecycle.html" class="active page">Actor 生命周期</a></li>
+  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
+  <ul>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
+    <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+  </ul></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a>
+  <ul>
+    <li><a href="../storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
+    <li><a href="../storage/cassandra.html" class="page">访问 Cassandra</a></li>
+    <li><a href="../storage/mongodb.html" class="page">访问 MongoDB</a></li>
+    <li><a href="../storage/elasticsearch.html" class="page">访问 Elasticsearch</a></li>
+  </ul></li>
+  <li><a href="../integration/index.html" class="page">集成</a>
+  <ul>
+    <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
+  </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a>
+  <ul>
+    <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
+  </ul></li>
+  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
 </nav>
@@ -148,8 +194,60 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#生命周期" name="生命周期" class="anchor"><span class="anchor-link"></span></a>生命周期</h1>
-<p>TODO</p>
+<h1><a href="#actor-生命周期" name="actor-生命周期" class="anchor"><span class="anchor-link"></span></a>Actor 生命周期</h1>
+<p>Akka Typed以函数式的方式构建，使用<code>Behavior[T]</code>函数的方式替代了经典（Untyped）Actor类的方式来创建actor。相应的，已没有了<code>preStart</code>、<code>postStop</code>、<code>preRestart</code>、<code>postRestart</code>等生命周期回调函数，采用<code>Behaviors.setup</code>构造块和信号的方式来实现一个actor生命周期管理功能。</p>
+<p>Akka Typed actor生命周期已简化为4个部分：</p>
+<p><img src="imgs/actor-lifecycle.png" alt="actor lifecycle" /></p>
+<ol>
+  <li>开始：通常将<code>Behaviors.receive</code>消息处理逻辑包装在<code>Behaviors.setup</code>代码块里，在<code>setup</code>代码块里进行业务初始工作，如：打开外部资源等</li>
+  <li>消息处理：处理消息并返回下一个行为</li>
+  <li>重启前：若设置了<code>SupervisorStrategy.restart</code>监管策略，则在actor被重启前将收到<code>PreRestart</code>信号，可在此选择对资源做同步或清理工作</li>
+  <li>停止后：在actor被停止后，将收到<code>PostStop</code>信号，可在此做数据持久化和资源清理工作</li>
+</ol><div class="callout note "><div class="callout-title">Note</div>
+<p>建议<code>PreRestart</code>和<code>PostStop</code>可执行相同的数据持久化和资源清理工作，这样在重新执行<code>Behaviors.setup</code>的构造逻辑时能和第一次创建actor时保持一致。这也更符合 <strong>Let it crash</strong> 精神！</p></div>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/lifecycle/Lifecycle.scala#L23-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Lifecycle {
+  def apply(): Behavior[String] = Behaviors.setup { context =&gt;
+    context.log.info(&quot;actor started.&quot;)
+    Behaviors
+      .receiveMessage[String] {
+        case &quot;restart&quot; =&gt;
+          context.log.info(&quot;Beginning restart.&quot;)
+          throw new RuntimeException(&quot;Beginning restart.&quot;)
+        case message =&gt;
+          context.log.info(s&quot;Received message is $message&quot;)
+          Behaviors.same
+      }
+      .receiveSignal {
+        case (_, PreRestart) =&gt;
+          context.log.info(&quot;actor pre restart.&quot;)
+          Behaviors.same
+        case (_, PostStop) =&gt;
+          context.log.info(&quot;actor post stop.&quot;)
+          Behaviors.same
+      }
+  }
+}</code></pre>
+<p>下面是<code>Lifecycle</code>行为的测试代码：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/lifecycle/LifecycleTest.scala#L27-L37" target="_blank" title="Go to snippet source"></a><code class="language-scala">class LifecycleTest extends ScalaTestWithActorTestKit with WordSpecLike {
+  &quot;Lifecycle&quot; should {
+    &quot;lifecycle&quot; in {
+      val ref = spawn(Behaviors.supervise(Lifecycle()).onFailure(SupervisorStrategy.restart))
+      ref ! &quot;hello&quot;
+      TimeUnit.SECONDS.sleep(1)
+      ref ! &quot;restart&quot;
+      TimeUnit.SECONDS.sleep(1)
+    }
+  }
+}</code></pre>
+<p>运行测试输出如下（简化了部分输出内容）：</p>
+<pre><code>[19:43:10,971] [akka://LifecycleTest/user/$a] - actor started.
+[19:43:10,972] [akka://LifecycleTest/user/$a] - Received message is hello
+[19:43:11,970] [akka://LifecycleTest/user/$a] - Beginning restart.
+[19:43:11,973] [akka://LifecycleTest/user/$a] - actor pre restart.
+....
+[19:43:11,977] [akka://LifecycleTest/user/$a] - actor started.
+[19:43:13,009] [akka://LifecycleTest/user/$a] - actor post stop.
+</code></pre>
 </div>
 <div>
 <a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/lifecycle.md" title="Edit this page" class="md-source-file md-edit">
@@ -166,6 +264,36 @@ Edit this page
 </div>
 </main>
 <footer class="md-footer">
+<div class="md-footer-nav">
+<nav class="md-footer-nav__inner md-grid">
+<a href="../actor/stop.html" title="怎样优雅的停止actor" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Previous
+</span>
+怎样优雅的停止actor
+</span>
+</div>
+</a>
+<a href="../streams/index.html" title="Akka 流（Streams）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Next
+</span>
+Akka 流（Streams）
+</span>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+</div>
+</a>
+</nav>
+</div>
 <div class="md-footer-meta md-typeset">
 <div class="md-footer-meta__inner md-grid">
 <div class="md-footer-copyright">

@@ -21,7 +21,7 @@ val result: Future[Hello.Response] =
 
 1. 从actor系统外部访问时，如Akka HTTP请求访问actor获取响应值
 
-##问题
+## 问题
 
 1. 在返回的Future回调内很可能意外的捕获了外部状态，因为这些回调将在与ask不同的线程上执行
 2. 一个ask只能有一个响应（ask将生成临时actor）
