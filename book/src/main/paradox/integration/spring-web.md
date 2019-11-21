@@ -8,10 +8,6 @@ Akka Streams 作为 Reactive Streams 的一种实现，可以很方便的与其�
 
 @@dependency [sbt,Maven,Gradle] { group=com.lightbend.akka artifact=akka-stream-alpakka-spring-web_$scala.binary.version$ version=$alpakka.version$ }
 
-在自定义配置：`SampleConfiguration`中实例化`ActorSystem`和`Materializer`两个 **Bean** 。
-
-@@snip [SampleConfiguration](../../../../../integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleConfiguration.java) { #SampleConfiguration }
-
 ## 编写控制器
 
 在添加了 Akka Streams 支持后，我们就可以在控制器代码里直接返回 `Source[T, Mat]` 类型的结果了。

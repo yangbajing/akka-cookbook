@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package cookbook.integration.springweb;
+package cookbook.streams.startup
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.reactive.config.EnableWebFlux;
+import akka.Done
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
 
-// #SampleApplication
-@SpringBootApplication
-public class SampleApplication {
-  public static void main(String[] args) {
-    SpringApplication.run(SampleApplication.class, args);
+import scala.concurrent.Future
+
+object Examples {
+  def simplify()(implicit mat: Materializer): Future[Done] = {
+    // #simplify
+    Source.fromIterator(() => Iterator.from(0)).map(n => n.toString).take(10).runForeach(println)
+    // #simplify
   }
 }
-// #SampleApplication
