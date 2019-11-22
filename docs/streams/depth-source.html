@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>行为切换与状态机 · Akka Cookbook</title>
+<title>深入 Source · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-行为切换与状态机
+深入 Source
 </span>
 </div>
 </div>
@@ -146,7 +146,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
     <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
     <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../actor/change-behavior-and-state-machine.html" class="active page">行为切换与状态机</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
     <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
@@ -157,7 +157,7 @@ yangbajing/akka-cookbook
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
     <li><a href="../streams/introduction.html" class="page">介绍</a></li>
-    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
+    <li><a href="../streams/depth-source.html" class="active page">深入 Source</a></li>
     <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
@@ -187,6 +187,13 @@ yangbajing/akka-cookbook
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../streams/depth-source.html#深入-source" class="header">深入 Source</a>
+  <ul>
+    <li><a href="../streams/depth-source.html#graph-source" class="header">Graph Source</a></li>
+  </ul></li>
+</ul>
 </nav>
 
 </nav>
@@ -200,62 +207,60 @@ yangbajing/akka-cookbook
 </div>
 </div>
 </div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../streams/depth-source.html#深入-source" class="header">深入 Source</a>
+  <ul>
+    <li><a href="../streams/depth-source.html#graph-source" class="header">Graph Source</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#行为切换与状态机" name="行为切换与状态机" class="anchor"><span class="anchor-link"></span></a>行为切换与状态机</h1>
-<p>Akka Typed使用<code>Behavior</code>替代了<code>Actor</code>，通过函数式的方式来构建消息处理行为，每次消息处理后都需要返回下一个（消息处理）行为。经典（Untyped）actor的<code>become</code>、<code>unbecome</code>和 <strong>FSM</strong> （状态机）都不再需要了，因为通过返回下一个行为时就已经可以实现以上功能。</p>
-<p>下面定义了一个简单的状态机actor，它有两个状态行为：<code>idle</code>和<code>active</code>，分别由<code>passive</code>和<code>running</code>两个事件消息来触发切换。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fsm/FiniteStateMachine.scala#L25-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">object FiniteStateMachine {
-  def apply(): Behavior[String] = Behaviors.setup { context =&gt;
-    new FiniteStateMachine(context).idle()
-  }
-}
-
-class FiniteStateMachine private (context: ActorContext[String]) {
-  private val pendingMessages = mutable.Queue.empty[String]
-
-  def idle(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;running&quot; =&gt;
-      active()
-    case msg =&gt;
-      context.log.info(s&quot;[idle] receive message: $msg&quot;)
-      pendingMessages enqueue msg
-      Behaviors.same
-  }
-
-  def active(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;passive&quot; =&gt;
-      idle()
-    case msg =&gt;
-      context.log.info(s&quot;[active] receive message: $msg&quot;)
-      processPendingMessages()
-      Behaviors.same
-  }
-
-  private def processPendingMessages(): Unit = {
-    while (pendingMessages.nonEmpty) {
-      val msg = pendingMessages.dequeue()
-      context.log.info(s&quot;Process pending message: $msg&quot;)
-    }
-  }
-}</code></pre>
-<p>这里使用了<code>FiniteStateMachine</code>类的方式来定义<code>Behavior</code>行为集，通过定义不同的类函数来实现在不同事件消息情况下的行为，这样还可通过类属性来保存actor的内部状态。初始时在<code>Behavior.setup</code>构造块里使用了<code>idle</code>这个行为函数，当收到<code>running</code>消息时通过返回<code>active()</code>函数实现了行为切换，就类似经典actor的<code>become</code>一样。</p>
-<p>当你的actor有多个行为函数，或代码逻辑（行）比较多时，通过这种 <strong>类</strong> 的方式来管理它们能使行代码更加清晰，这是一种良好的实践！</p><div class="callout note "><div class="callout-title">Note</div>
-<p>可以在<code>FiniteStateMachine</code>类构造块里作actor的初始化工作，也可以在<code>Behaviors.setup</code>里初始化后将数据通过构造参数传给<code>FiniteStateMachine</code>，就像<code>context</code>参数一样。</p>
-<p>但需要注意的时，如何actor重启，<code>pendingMessages</code>将不会保存之前的状态（内容），因为<code>FiniteStateMachine</code>将被重新实例化。这可以通过某种持久化机制来解决，如： <strong>Akka Persistence</strong> ；或者在 <code>PreRestart</code> 信号处理函数里自行保存数据，再在类构造时读出。</p></div>
-<p>测试代码如下：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/fsm/FiniteStateMachineTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ref = spawn(FiniteStateMachine(), &quot;fsm&quot;)
-ref ! &quot;message 1&quot;
-ref ! &quot;message 2&quot;
-ref ! &quot;running&quot;
-ref ! &quot;message 3&quot;
-ref ! &quot;message 4&quot;
-ref ! &quot;passive&quot;
-ref ! &quot;message 5&quot;</code></pre>
+<h1><a href="#深入-source" name="深入-source" class="anchor"><span class="anchor-link"></span></a>深入 Source</h1>
+<h2><a href="#graph-source" name="graph-source" class="anchor"><span class="anchor-link"></span></a>Graph Source</h2>
+<p><code>Source</code>是一组流（Streams）处理步骤，有一个打开的输出端口。<code>Source</code>可以包含任意数量已连接的内部源（<code>Source</code>）和转换操作（<code>Flow</code>）。<code>Source</code>可以通过<code>asPublisher</code>函数转换为 Reactive Streams 协议等价的<code>Publisher</code>。</p>
+<pre class="prettyprint"><code class="language-scala">final class Source[+Out, +Mat](
+    override val traversalBuilder: LinearTraversalBuilder,
+    override val shape: SourceShape[Out])
+    extends FlowOpsMat[Out, Mat]
+    with Graph[SourceShape[Out], Mat]
+</code></pre>
+<p><code>Source</code>的类签名有两个类型参数，它们都是协变的。</p>
+<ul>
+  <li><code>Out</code>：输出元素类型</li>
+  <li><code>Mat</code>：物化值类型，物化值可用于记录<code>Source</code>的内部状态或操作记录等。比如：<code>FileIO.fromPath</code>这个<code>Source</code>的物化值记录了从文件里实际读取到的字符数。</li>
+</ul>
+<p><code>Source</code>通过类构造器实现了<code>Graph</code>接口的<code>traversalBuilder</code>和<code>shape</code>两个参数，其中<code>shape</code>限制了必需为一个<code>SourceShape[Out]</code>类型。</p>
+<p><code>Source</code>还实现了<code>FlowOpsMat</code>特质，使得<code>Source</code>具有了一系列的<code>via</code>和<code>to</code>（及它们的变体）函数。</p>
+<ul>
+  <li><code>via</code>：用于连接<code>Flow</code>，它将一个流处理过程与当前<code>Source</code>连接，并返回另一个<code>Source</code>，其中<code>Flow</code>的输出端口将作为新<code>Source</code>的输出端口</li>
+  <li>
+  <p><code>viaMat</code>：相对<code>via</code>多了第二个curry参数，<code>combine</code>指定保留哪边的物化值。<code>via</code>实际上相当于：<code>viaMat(....)(Keep.left)</code></p>
+  <pre class="prettyprint"><code class="language-scala">def viaMat[T, Mat2, Mat3](flow: Graph[FlowShape[Out, T], Mat2])(
+      combine: (Mat, Mat2) =&gt; Mat3): Source[T, Mat3]
+</code></pre></li>
+  <li><code>to</code>：用于连接<code>Sink</code>，<code>Sink</code>将从上游发送的元素都聚合到一起并处理。当一个<code>Source</code>连接了<code>Sink</code>后，即形成了一个已闭合的可运行图（ <strong>RunnableGraph</strong> ），我们可以调用<code>RunnableGraph</code>的<code>run</code>函数来实际运行它。</li>
+  <li>
+  <p><code>toMat</code>：相对<code>to</code>多了第二个curry参数，<code>combine</code>指定保留哪边的物化值。<code>to</code>实际上相当于：<code>toMat(....)(Keep.left)</code></p>
+  <pre class="prettyprint"><code class="language-scala">toMat[Mat2, Mat3](sink: Graph[SinkShape[Out], Mat2])(
+      combine: (Mat, Mat2) =&gt; Mat3): RunnableGraph[Mat3]
+</code></pre></li>
+</ul>
+<p>有关<code>combine</code>函数的更多内容请见： <a href="materialize.html#Keep">物化与物化值#Keep</a></p>
+<p>通常我们都不会直接构造<code>Source</code>，而是通过<code>Source</code>的伴身对象提供了各类工具函数来创建。有关<code>Source</code>伴身对象的常用工具函数请参阅： <a href="source.html"> 创建 Source 的常用函数</a>。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/change-behavior-and-state-machine.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/depth-source.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -271,7 +276,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../actor/timer.html" title="TimerScheduler 发送消息" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../streams/introduction.html" title="介绍" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -280,17 +285,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-TimerScheduler 发送消息
+介绍
 </span>
 </div>
 </a>
-<a href="../actor/stash.html" title="StashBuffer 暂存待处理消息" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/materialize.html" title="物化与物化值" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-StashBuffer 暂存待处理消息
+物化与物化值
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

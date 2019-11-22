@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>行为切换与状态机 · Akka Cookbook</title>
+<title>深入 Flow · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-行为切换与状态机
+深入 Flow
 </span>
 </div>
 </div>
@@ -146,7 +146,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
     <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
     <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../actor/change-behavior-and-state-machine.html" class="active page">行为切换与状态机</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
     <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
@@ -159,7 +159,7 @@ yangbajing/akka-cookbook
     <li><a href="../streams/introduction.html" class="page">介绍</a></li>
     <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
     <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
-    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+    <li><a href="../streams/depth-flow.html" class="active page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
@@ -203,59 +203,11 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#行为切换与状态机" name="行为切换与状态机" class="anchor"><span class="anchor-link"></span></a>行为切换与状态机</h1>
-<p>Akka Typed使用<code>Behavior</code>替代了<code>Actor</code>，通过函数式的方式来构建消息处理行为，每次消息处理后都需要返回下一个（消息处理）行为。经典（Untyped）actor的<code>become</code>、<code>unbecome</code>和 <strong>FSM</strong> （状态机）都不再需要了，因为通过返回下一个行为时就已经可以实现以上功能。</p>
-<p>下面定义了一个简单的状态机actor，它有两个状态行为：<code>idle</code>和<code>active</code>，分别由<code>passive</code>和<code>running</code>两个事件消息来触发切换。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fsm/FiniteStateMachine.scala#L25-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">object FiniteStateMachine {
-  def apply(): Behavior[String] = Behaviors.setup { context =&gt;
-    new FiniteStateMachine(context).idle()
-  }
-}
-
-class FiniteStateMachine private (context: ActorContext[String]) {
-  private val pendingMessages = mutable.Queue.empty[String]
-
-  def idle(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;running&quot; =&gt;
-      active()
-    case msg =&gt;
-      context.log.info(s&quot;[idle] receive message: $msg&quot;)
-      pendingMessages enqueue msg
-      Behaviors.same
-  }
-
-  def active(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;passive&quot; =&gt;
-      idle()
-    case msg =&gt;
-      context.log.info(s&quot;[active] receive message: $msg&quot;)
-      processPendingMessages()
-      Behaviors.same
-  }
-
-  private def processPendingMessages(): Unit = {
-    while (pendingMessages.nonEmpty) {
-      val msg = pendingMessages.dequeue()
-      context.log.info(s&quot;Process pending message: $msg&quot;)
-    }
-  }
-}</code></pre>
-<p>这里使用了<code>FiniteStateMachine</code>类的方式来定义<code>Behavior</code>行为集，通过定义不同的类函数来实现在不同事件消息情况下的行为，这样还可通过类属性来保存actor的内部状态。初始时在<code>Behavior.setup</code>构造块里使用了<code>idle</code>这个行为函数，当收到<code>running</code>消息时通过返回<code>active()</code>函数实现了行为切换，就类似经典actor的<code>become</code>一样。</p>
-<p>当你的actor有多个行为函数，或代码逻辑（行）比较多时，通过这种 <strong>类</strong> 的方式来管理它们能使行代码更加清晰，这是一种良好的实践！</p><div class="callout note "><div class="callout-title">Note</div>
-<p>可以在<code>FiniteStateMachine</code>类构造块里作actor的初始化工作，也可以在<code>Behaviors.setup</code>里初始化后将数据通过构造参数传给<code>FiniteStateMachine</code>，就像<code>context</code>参数一样。</p>
-<p>但需要注意的时，如何actor重启，<code>pendingMessages</code>将不会保存之前的状态（内容），因为<code>FiniteStateMachine</code>将被重新实例化。这可以通过某种持久化机制来解决，如： <strong>Akka Persistence</strong> ；或者在 <code>PreRestart</code> 信号处理函数里自行保存数据，再在类构造时读出。</p></div>
-<p>测试代码如下：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/fsm/FiniteStateMachineTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ref = spawn(FiniteStateMachine(), &quot;fsm&quot;)
-ref ! &quot;message 1&quot;
-ref ! &quot;message 2&quot;
-ref ! &quot;running&quot;
-ref ! &quot;message 3&quot;
-ref ! &quot;message 4&quot;
-ref ! &quot;passive&quot;
-ref ! &quot;message 5&quot;</code></pre>
+<h1><a href="#深入-flow" name="深入-flow" class="anchor"><span class="anchor-link"></span></a>深入 Flow</h1>
+<p>TODO</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/change-behavior-and-state-machine.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/depth-flow.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -271,7 +223,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../actor/timer.html" title="TimerScheduler 发送消息" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../streams/materialize.html" title="物化与物化值" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -280,17 +232,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-TimerScheduler 发送消息
+物化与物化值
 </span>
 </div>
 </a>
-<a href="../actor/stash.html" title="StashBuffer 暂存待处理消息" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/depth-sink.html" title="深入 Sink" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-StashBuffer 暂存待处理消息
+深入 Sink
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

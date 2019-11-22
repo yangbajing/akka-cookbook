@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>行为切换与状态机 · Akka Cookbook</title>
+<title>介绍 · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-行为切换与状态机
+介绍
 </span>
 </div>
 </div>
@@ -146,7 +146,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
     <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
     <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../actor/change-behavior-and-state-machine.html" class="active page">行为切换与状态机</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
     <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
@@ -156,7 +156,7 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
   <ul>
-    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
+    <li><a href="../streams/introduction.html" class="active page">介绍</a></li>
     <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
     <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
@@ -187,6 +187,15 @@ yangbajing/akka-cookbook
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../streams/introduction.html#介绍" class="header">介绍</a>
+  <ul>
+    <li><a href="../streams/introduction.html#第一个示例" class="header">第一个示例</a></li>
+    <li><a href="../streams/introduction.html#source-flow-sink" class="header">Source、Flow、Sink</a></li>
+    <li><a href="../streams/introduction.html#graph" class="header">Graph</a></li>
+  </ul></li>
+</ul>
 </nav>
 
 </nav>
@@ -200,62 +209,110 @@ yangbajing/akka-cookbook
 </div>
 </div>
 </div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../streams/introduction.html#介绍" class="header">介绍</a>
+  <ul>
+    <li><a href="../streams/introduction.html#第一个示例" class="header">第一个示例</a></li>
+    <li><a href="../streams/introduction.html#source-flow-sink" class="header">Source、Flow、Sink</a></li>
+    <li><a href="../streams/introduction.html#graph" class="header">Graph</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#行为切换与状态机" name="行为切换与状态机" class="anchor"><span class="anchor-link"></span></a>行为切换与状态机</h1>
-<p>Akka Typed使用<code>Behavior</code>替代了<code>Actor</code>，通过函数式的方式来构建消息处理行为，每次消息处理后都需要返回下一个（消息处理）行为。经典（Untyped）actor的<code>become</code>、<code>unbecome</code>和 <strong>FSM</strong> （状态机）都不再需要了，因为通过返回下一个行为时就已经可以实现以上功能。</p>
-<p>下面定义了一个简单的状态机actor，它有两个状态行为：<code>idle</code>和<code>active</code>，分别由<code>passive</code>和<code>running</code>两个事件消息来触发切换。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fsm/FiniteStateMachine.scala#L25-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">object FiniteStateMachine {
-  def apply(): Behavior[String] = Behaviors.setup { context =&gt;
-    new FiniteStateMachine(context).idle()
-  }
-}
+<h1><a href="#介绍" name="介绍" class="anchor"><span class="anchor-link"></span></a>介绍</h1>
+<p>Akka Streams是 <a href="http://reactive-streams.org/"><strong>Reactive Streams</strong></a> 的一种实现，提供了对反应式编程（见：<a href="https://www.reactivemanifesto.org/zh-CN">《反应式宣言》</a>）的支持。</p>
+<h2><a href="#第一个示例" name="第一个示例" class="anchor"><span class="anchor-link"></span></a>第一个示例</h2>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/main/scala/cookbook/streams/startup/Examples.scala#L28" target="_blank" title="Go to snippet source"></a><code class="language-scala">Source.fromIterator(() =&gt; Iterator.from(0)).map(n =&gt; n.toString).take(10).runForeach(println)</code></pre>
+<p>运行上面的示例，将在终端从0开始按递增数字每个数字并将其转换成字符串打印10行，每个字符串一行。</p>
+<p><strong>明细版</strong></p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/main/scala/cookbook/streams/startup/Startup.scala#L20-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.Materializer
+import akka.stream.scaladsl.{ Flow, Keep, Sink, Source }
 
-class FiniteStateMachine private (context: ActorContext[String]) {
-  private val pendingMessages = mutable.Queue.empty[String]
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 
-  def idle(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;running&quot; =&gt;
-      active()
-    case msg =&gt;
-      context.log.info(s&quot;[idle] receive message: $msg&quot;)
-      pendingMessages enqueue msg
-      Behaviors.same
-  }
+object Startup {
+  def main(args: Array[String]): Unit = {
+    val system = ActorSystem(Behaviors.ignore, &quot;streams&quot;)
+    implicit val mat = Materializer(system)
 
-  def active(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;passive&quot; =&gt;
-      idle()
-    case msg =&gt;
-      context.log.info(s&quot;[active] receive message: $msg&quot;)
-      processPendingMessages()
-      Behaviors.same
-  }
+    val source = Source.fromIterator(() =&gt; Iterator.from(0))
+    val flow = Flow[Int].map(n =&gt; n.toString)
+    val flowTake = Flow[String].take(10)
+    val sink = Sink.foreach[String](str =&gt; println(str))
+    val graph = source.via(flow).via(flowTake).toMat(sink)(Keep.right)
 
-  private def processPendingMessages(): Unit = {
-    while (pendingMessages.nonEmpty) {
-      val msg = pendingMessages.dequeue()
-      context.log.info(s&quot;Process pending message: $msg&quot;)
-    }
+    val future: Future[Done] = graph.run()
+    val result = Await.result(future, 10.seconds)
+    println(s&quot;Final result is $result&quot;)
   }
 }</code></pre>
-<p>这里使用了<code>FiniteStateMachine</code>类的方式来定义<code>Behavior</code>行为集，通过定义不同的类函数来实现在不同事件消息情况下的行为，这样还可通过类属性来保存actor的内部状态。初始时在<code>Behavior.setup</code>构造块里使用了<code>idle</code>这个行为函数，当收到<code>running</code>消息时通过返回<code>active()</code>函数实现了行为切换，就类似经典actor的<code>become</code>一样。</p>
-<p>当你的actor有多个行为函数，或代码逻辑（行）比较多时，通过这种 <strong>类</strong> 的方式来管理它们能使行代码更加清晰，这是一种良好的实践！</p><div class="callout note "><div class="callout-title">Note</div>
-<p>可以在<code>FiniteStateMachine</code>类构造块里作actor的初始化工作，也可以在<code>Behaviors.setup</code>里初始化后将数据通过构造参数传给<code>FiniteStateMachine</code>，就像<code>context</code>参数一样。</p>
-<p>但需要注意的时，如何actor重启，<code>pendingMessages</code>将不会保存之前的状态（内容），因为<code>FiniteStateMachine</code>将被重新实例化。这可以通过某种持久化机制来解决，如： <strong>Akka Persistence</strong> ；或者在 <code>PreRestart</code> 信号处理函数里自行保存数据，再在类构造时读出。</p></div>
-<p>测试代码如下：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/fsm/FiniteStateMachineTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ref = spawn(FiniteStateMachine(), &quot;fsm&quot;)
-ref ! &quot;message 1&quot;
-ref ! &quot;message 2&quot;
-ref ! &quot;running&quot;
-ref ! &quot;message 3&quot;
-ref ! &quot;message 4&quot;
-ref ! &quot;passive&quot;
-ref ! &quot;message 5&quot;</code></pre>
+<p>这个版本拆分了各个步骤：</p>
+<ol>
+  <li><code>source: Source[Int, NotUsed]</code>：源，生产数据元素待下游消费</li>
+  <li><code>flow: Flow[Int, String, NotUsed]</code>：流，将数字转换成字符串</li>
+  <li><code>flowTake: Flow[String, String, NotUsed]</code>：流，限制只取头10个元素</li>
+  <li><code>sink: Sink[String, Future[Done]]</code>：汇，生产的数据最终流到这里并被消费</li>
+  <li><code>graph: RunnableGraph[Future[Done]]</code>：将<code>source</code>、<code>flow</code>、<code>flowTake</code>、<code>sink</code>各部分连接起来就形成了一个可运行的执行蓝图</li>
+</ol>
+<p>Akka Streams是lazy的，每次运行都全新的，中间状态将不会被保留。当调用<code>graph</code>的<code>.run</code>函数运行时需要上下文内有一个隐式参数：<code>Materializer</code>，它将负责实际执行这个蓝图（创建actor来执行）。</p><div class="callout note "><div class="callout-title">Note</div>
+<p>可以通过<code>ActorSystem</code>隐式获取全局默认的<code>Materializer</code>，这在通常情况下是很好的选择，除非你有特别的理由需要自定义<code>Materializer</code>。</p>
+<pre class="prettyprint"><code class="language-scala">implicit val system: ActorSystem = _
+</code></pre>
+<p><code>akka.actor.typed.ActorSystem[T]</code>和<code>akka.actor.ActorSystem</code>在<code>Materializer</code>的伴身对象里都有隐式函数来获取<code>Materializer</code>。</p></div>
+<h2><a href="#source-flow-sink" name="source-flow-sink" class="anchor"><span class="anchor-link"></span></a>Source、Flow、Sink</h2>
+<p>Akka Streams 将流处理逻辑抽像了 <strong>Source</strong>、**Flow**和**Sink** 三部分概念。</p>
+<ul>
+  <li><code>Source: [OUT, Mat]</code>：源，上游。生产数据，默认需要由下游调用<code>pull</code>请求触发。</li>
+  <li><code>Flow: [IN, OUT, Mat]</code>：流程，中间数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。</li>
+  <li><code>Sink: [IN, Mat]</code>：汇，下游。汇集上游发送的数据。</li>
+</ul>
+<h2><a href="#graph" name="graph" class="anchor"><span class="anchor-link"></span></a>Graph</h2>
+<p>Akka Streams 使用 <strong>Graph</strong> （图）来抽像流处理的逻辑。</p>
+<pre class="prettyprint"><code class="language-scala">trait Graph[+S &lt;: Shape, +M] {
+
+  type Shape = S @uncheckedVariance
+
+  def shape: S
+
+  private[stream] def traversalBuilder: TraversalBuilder
+
+  def withAttributes(attr: Attributes): Graph[S, M]
+
+  // ....
+}
+</code></pre>
+<h4><a href="#shape" name="shape" class="anchor"><span class="anchor-link"></span></a>Shape</h4>
+<p>一个图可以有形状，形状描述图的入口（inlets、输入端口）和出口（outlets、输出端口）。</p>
+<pre class="prettyprint"><code class="language-scala">abstract class Shape {
+  def inlets: immutable.Seq[Inlet[_]]
+  def outlets: immutable.Seq[Outlet[_]]
+  // ....
+}
+</code></pre>
+<p>具有未连接的端口的图是一个部分图，图可以嵌套、组合。当图里所有端口都有连接，我们称这个图已闭合（<code>ClosedShape</code>），这样的图就可以成为一个可运行的图（<code>RunnableGraph</code>）。</p>
+<h4><a href="#runnablegraph" name="runnablegraph" class="anchor"><span class="anchor-link"></span></a>RunnableGraph</h4>
+<p><code>RunnableGraph</code>是可运行的图，调用它的<code>run</code>函数将实际执行</p>
+<pre class="prettyprint"><code class="language-scala">final case class RunnableGraph[+Mat](override val traversalBuilder: TraversalBuilder) extends Graph[ClosedShape, Mat] {}
+</code></pre>
+<p>可运行图必须是逻辑上已闭合的图，它不能有未连接的端口。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/change-behavior-and-state-machine.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/introduction.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -271,7 +328,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../actor/timer.html" title="TimerScheduler 发送消息" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../streams/index.html" title="Akka 流（Streams）" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -280,17 +337,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-TimerScheduler 发送消息
+Akka 流（Streams）
 </span>
 </div>
 </a>
-<a href="../actor/stash.html" title="StashBuffer 暂存待处理消息" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/depth-source.html" title="深入 Source" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-StashBuffer 暂存待处理消息
+深入 Source
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

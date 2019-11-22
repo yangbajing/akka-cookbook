@@ -12,7 +12,9 @@ Akka Streams内置了 `FileIO` 工具库，可对文件以流的方式进行读�
 
 @@snip [FileIOTest](../../../../../cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala) { #to-path }
 
-这里使用了较复杂的方式来写入换行符`LINE_SEPARATER`，使用了`merge`来将两个源（Source）交叉合并的方式。其实也可以在`map(n => ByteString(n.toString))`将数字转换成字符串时直接把换行符给附加上去，就像这样：`map(n => ByteString(n.toString) ++ LINE_SEPARATOR)`。
+`intersperse`转换函数接受3个参数，分别在流开始前、每个元素后、流结束后添加一个指定值，就类型集合类型上的`mkString(start: String, sep: String, end: String): String`函数一样。这里通过此函数实现了在每写一个元素后将换行符也写入文件功能。
+
+*其实也可以在`map(n => ByteString(n.toString))`将数字转换成字符串时直接把换行符给附加上去，就像这样：`map(n => ByteString(n.toString) ++ LINE_SEPARATOR)`。*
 
 @@@warning
 需要注意`Source.repeat(....).take(....)`这里的`take`函数，在这个例子里是不可或缺的，若忘记限制`repeat`流的长度，则整个流将无限调用下去，直到写满你的磁盘。
@@ -41,8 +43,8 @@ def fromPath(f: Path, chunkSize: Int, startPosition: Long): Source[ByteString, F
 - `chunkSize`：每次从文件里指定字节的块（缓冲）大小（字节）
 - `startPosition`：指定读取指针偏移量（字节）
 
-@@@note
+@@@warning
 使用`Framing.delimiter`从文件流里读取数据时需要注意一个问题，若文件不以你指定的分隔值结尾将会抛出异常：`Caused by: akka.stream.scaladsl.Framing$FramingException: Stream finished but there was a truncated final frame in the buffer`。当流读到文件末尾还未能找到指定的分隔值而不能结束分帧（framing）操作，而这时上游已经发送了完成（ **Finish** ）信号，而`Framing`还有未完成的buffer则会抛出此异常。
 
-你将`Source.repeat(LINE_SEPARATOR)`的`take`函数参数指定为`99`再次运行测试代码就可重写这个问题。
+你将`intersperse`的第3个参数指定为`ByteString.empty`再次运行测试，就可重现这个问题。
 @@@

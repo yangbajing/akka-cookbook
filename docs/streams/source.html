@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>行为切换与状态机 · Akka Cookbook</title>
+<title>创建 Source 的常用函数 · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-行为切换与状态机
+创建 Source 的常用函数
 </span>
 </div>
 </div>
@@ -146,7 +146,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
     <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
     <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../actor/change-behavior-and-state-machine.html" class="active page">行为切换与状态机</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
     <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
@@ -161,7 +161,7 @@ yangbajing/akka-cookbook
     <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
-    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/source.html" class="active page">创建 Source 的常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
     <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
@@ -187,6 +187,19 @@ yangbajing/akka-cookbook
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../streams/source.html#创建-source-的常用函数" class="header">创建 Source 的常用函数</a>
+  <ul>
+    <li><a href="../streams/source.html#frompublisher" class="header"><code>fromPublisher</code></a></li>
+    <li><a href="../streams/source.html#assubscriber" class="header"><code>asSubscriber</code></a></li>
+    <li><a href="../streams/source.html#fromiterator" class="header"><code>fromIterator</code></a></li>
+    <li><a href="../streams/source.html#cycle" class="header"><code>cycle</code></a></li>
+    <li><a href="../streams/source.html#fromgraph" class="header"><code>fromGraph</code></a></li>
+    <li><a href="../streams/source.html#apply" class="header"><code>apply</code></a></li>
+    <li><a href="../streams/source.html#queue" class="header"><code>queue</code></a></li>
+  </ul></li>
+</ul>
 </nav>
 
 </nav>
@@ -200,62 +213,102 @@ yangbajing/akka-cookbook
 </div>
 </div>
 </div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../streams/source.html#创建-source-的常用函数" class="header">创建 Source 的常用函数</a>
+  <ul>
+    <li><a href="../streams/source.html#frompublisher" class="header"><code>fromPublisher</code></a></li>
+    <li><a href="../streams/source.html#assubscriber" class="header"><code>asSubscriber</code></a></li>
+    <li><a href="../streams/source.html#fromiterator" class="header"><code>fromIterator</code></a></li>
+    <li><a href="../streams/source.html#cycle" class="header"><code>cycle</code></a></li>
+    <li><a href="../streams/source.html#fromgraph" class="header"><code>fromGraph</code></a></li>
+    <li><a href="../streams/source.html#apply" class="header"><code>apply</code></a></li>
+    <li><a href="../streams/source.html#queue" class="header"><code>queue</code></a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#行为切换与状态机" name="行为切换与状态机" class="anchor"><span class="anchor-link"></span></a>行为切换与状态机</h1>
-<p>Akka Typed使用<code>Behavior</code>替代了<code>Actor</code>，通过函数式的方式来构建消息处理行为，每次消息处理后都需要返回下一个（消息处理）行为。经典（Untyped）actor的<code>become</code>、<code>unbecome</code>和 <strong>FSM</strong> （状态机）都不再需要了，因为通过返回下一个行为时就已经可以实现以上功能。</p>
-<p>下面定义了一个简单的状态机actor，它有两个状态行为：<code>idle</code>和<code>active</code>，分别由<code>passive</code>和<code>running</code>两个事件消息来触发切换。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fsm/FiniteStateMachine.scala#L25-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">object FiniteStateMachine {
-  def apply(): Behavior[String] = Behaviors.setup { context =&gt;
-    new FiniteStateMachine(context).idle()
-  }
-}
-
-class FiniteStateMachine private (context: ActorContext[String]) {
-  private val pendingMessages = mutable.Queue.empty[String]
-
-  def idle(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;running&quot; =&gt;
-      active()
-    case msg =&gt;
-      context.log.info(s&quot;[idle] receive message: $msg&quot;)
-      pendingMessages enqueue msg
-      Behaviors.same
-  }
-
-  def active(): Behavior[String] = Behaviors.receiveMessage {
-    case &quot;passive&quot; =&gt;
-      idle()
-    case msg =&gt;
-      context.log.info(s&quot;[active] receive message: $msg&quot;)
-      processPendingMessages()
-      Behaviors.same
-  }
-
-  private def processPendingMessages(): Unit = {
-    while (pendingMessages.nonEmpty) {
-      val msg = pendingMessages.dequeue()
-      context.log.info(s&quot;Process pending message: $msg&quot;)
-    }
-  }
-}</code></pre>
-<p>这里使用了<code>FiniteStateMachine</code>类的方式来定义<code>Behavior</code>行为集，通过定义不同的类函数来实现在不同事件消息情况下的行为，这样还可通过类属性来保存actor的内部状态。初始时在<code>Behavior.setup</code>构造块里使用了<code>idle</code>这个行为函数，当收到<code>running</code>消息时通过返回<code>active()</code>函数实现了行为切换，就类似经典actor的<code>become</code>一样。</p>
-<p>当你的actor有多个行为函数，或代码逻辑（行）比较多时，通过这种 <strong>类</strong> 的方式来管理它们能使行代码更加清晰，这是一种良好的实践！</p><div class="callout note "><div class="callout-title">Note</div>
-<p>可以在<code>FiniteStateMachine</code>类构造块里作actor的初始化工作，也可以在<code>Behaviors.setup</code>里初始化后将数据通过构造参数传给<code>FiniteStateMachine</code>，就像<code>context</code>参数一样。</p>
-<p>但需要注意的时，如何actor重启，<code>pendingMessages</code>将不会保存之前的状态（内容），因为<code>FiniteStateMachine</code>将被重新实例化。这可以通过某种持久化机制来解决，如： <strong>Akka Persistence</strong> ；或者在 <code>PreRestart</code> 信号处理函数里自行保存数据，再在类构造时读出。</p></div>
-<p>测试代码如下：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/fsm/FiniteStateMachineTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ref = spawn(FiniteStateMachine(), &quot;fsm&quot;)
-ref ! &quot;message 1&quot;
-ref ! &quot;message 2&quot;
-ref ! &quot;running&quot;
-ref ! &quot;message 3&quot;
-ref ! &quot;message 4&quot;
-ref ! &quot;passive&quot;
-ref ! &quot;message 5&quot;</code></pre>
+<h1><a href="#创建-source-的常用函数" name="创建-source-的常用函数" class="anchor"><span class="anchor-link"></span></a>创建 Source 的常用函数</h1>
+<h2><a href="#frompublisher" name="frompublisher" class="anchor"><span class="anchor-link"></span></a><code>fromPublisher</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.fromPublisher[T](publisher: Publisher[T]): Source[T, NotUsed]
+</code></pre>
+<p>从 Reactive Streams 的<code>Publisher[T]</code>接口生成一个<code>Source</code>，当于实现了 Reactive Streams 协议规范的流处理库、框架互进行操作时非常有用。</p>
+<h2><a href="#assubscriber" name="assubscriber" class="anchor"><span class="anchor-link"></span></a><code>asSubscriber</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.asSubscriber[T]: Source[T, Subscriber[T]]
+</code></pre>
+<p>创建一个新的<code>Source</code>，它的物化值为<code>Subscriber[T]</code>，这样你可以调用<code>Subscriber</code>上的API来消费上游发送的数据。</p>
+<h2><a href="#fromiterator" name="fromiterator" class="anchor"><span class="anchor-link"></span></a><code>fromIterator</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.fromIterator[T](f: () =&gt; Iterator[T]): Source[T, NotUsed]
+</code></pre>
+<p>从一个<code>Iterator</code> <strong>生成迭代器</strong> 创建<code>Source</code>，只有当下游调用<code>pull</code>函数请求时，上游（<code>Source</code>）才会生产数据，这里既才会调用<code>Iterator</code>的<code>next</code>方法生成整数。若迭代器不为空，则<code>Source</code>将一真可生成数据。如：<code>Source.fromIterator(() =&gt; Iterator.from(0))</code>，它将创建一个从数字<code>0</code>开始的无限源（<code>Source</code>）。</p>
+<h2><a href="#cycle" name="cycle" class="anchor"><span class="anchor-link"></span></a><code>cycle</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.cycle[T](f: () =&gt; Iterator[T]): Source[T, NotUsed]
+</code></pre>
+<p>根据迭代器循环生成元素，下游可无限请求<code>Source</code>生成数据。</p>
+<h2><a href="#fromgraph" name="fromgraph" class="anchor"><span class="anchor-link"></span></a><code>fromGraph</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.fromGraph[T, M](g: Graph[SourceShape[T], M]): Source[T, M]
+</code></pre>
+<p>从一个<code>SourceShape</code>图生成<code>Source</code>，当需要自定义实现一个<code>Source</code>时需要通过此函数将图转换成可使用的<code>Source</code>。</p>
+<h2><a href="#apply" name="apply" class="anchor"><span class="anchor-link"></span></a><code>apply</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.apply[T](iterable: immutable.Iterable[T]): Source[T, NotUsed]
+</code></pre>
+<p>从一个有限可迭代的集合生成一个<code>Source</code>。</p>
+<h2><a href="#queue" name="queue" class="anchor"><span class="anchor-link"></span></a><code>queue</code></h2>
+<pre class="prettyprint"><code class="language-scala">Source.queue[T](bufferSize: Int, overflowStrategy: OverflowStrategy):
+    Source[T, SourceQueueWithComplete[T]]
+</code></pre>
+<ul>
+  <li><code>bufferSize</code>：设置队列最大可保存数据（若下游一直不<code>pull</code>数据）</li>
+  <li><code>overflowStrategy</code>：当队列满时的溢出策略</li>
+</ul>
+<p>创建一个队列源，它的物化值是一个队列，可通过此队列向<code>Source</code>传入指定类型的数据。</p>
+<p><em>示例代码：</em></p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/SourceTest.scala#L37-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">val (queue, result) = Source.queue[Int](10, OverflowStrategy.dropNew).toMat(Sink.seq)(Keep.both).run()
+queue.offer(10)
+queue.offer(10)
+queue.offer(10)
+queue.complete()
+result.futureValue should be(Seq(10, 10, 10))</code></pre>
+<ul>
+  <li><code>Source.tick[T](initialDelay: FiniteDuration, interval: FiniteDuration, tick: T): Source[T, Cancellable]</code>：</li>
+  <li><code>Source.single[T](element: T): Source[T, NotUsed]</code>：</li>
+  <li><code>Source.lazySingle[T](create: () =&gt; T): Source[T, NotUsed]</code>：</li>
+  <li><code>Source.unfold[S, E](s: S)(f: S =&gt; Option[(S, E)]): Source[E, NotUsed]</code>：</li>
+  <li><code>Source.unfoldAsync[S, E](s: S)(f: S =&gt; Future[Option[(S, E)]]): Source[E, NotUsed]</code>：</li>
+  <li><code>Source.unfoldResource[T, S](create: () =&gt; S, read: (S) =&gt; Option[T], close: (S) =&gt; Unit): Source[T, NotUsed]</code>：</li>
+  <li><code>unfoldResourceAsync[T, S](
+     create: () =&gt; Future[S],
+     read: (S) =&gt; Future[Option[T]],
+     close: (S) =&gt; Future[Done]): Source[T, NotUsed]</code>：</li>
+  <li><code>Source.repeat[T](element: T): Source[T, NotUsed]</code>：<code>repeat</code>由<code>unfold</code>函数实现</li>
+  <li><code>Source.maybe[T]: Source[T, Promise[Option[T]]]</code>：</li>
+  <li><code>Source.future[T](futureElement: Future[T]): Source[T, NotUsed]</code>：</li>
+  <li><code>Source.lazyFuture[T](create: () =&gt; Future[T]): Source[T, NotUsed]</code>：</li>
+  <li><code>Source.futureSource[T, M](futureSource: Future[Source[T, M]]): Source[T, Future[M]]</code>：</li>
+  <li><code>Source.lazyFutureSource[T, M](create: () =&gt; Future[Source[T, M]]): Source[T, Future[M]]</code>：</li>
+  <li><code>Source.combine[T, U](first: Source[T, _], second: Source[T, _], rest: Source[T, _]*)(
+            strategy: Int =&gt; Graph[UniformFanInShape[T, U], NotUsed]): Source[U, NotUsed]</code>：</li>
+  <li><code>Source.zipN[T](sources: immutable.Seq[Source[T, _]]): Source[immutable.Seq[T], NotUsed]</code>：</li>
+  <li><code>Source.zipWithN[T, O](zipper: immutable.Seq[T] =&gt; O)(sources: immutable.Seq[Source[T, _]]): Source[O, NotUsed]</code>：</li>
+  <li><code>Source.actorRef[T](
+        completionMatcher: PartialFunction[Any, CompletionStrategy],
+        failureMatcher: PartialFunction[Any, Throwable],
+        bufferSize: Int,
+        overflowStrategy: OverflowStrategy): Source[T, ActorRef]</code>：</li>
+</ul>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/change-behavior-and-state-machine.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/source.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -271,7 +324,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../actor/timer.html" title="TimerScheduler 发送消息" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../streams/depth-sink.html" title="深入 Sink" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -280,17 +333,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-TimerScheduler 发送消息
+深入 Sink
 </span>
 </div>
 </a>
-<a href="../actor/stash.html" title="StashBuffer 暂存待处理消息" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/group.html" title="Streams 分组" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-StashBuffer 暂存待处理消息
+Streams 分组
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

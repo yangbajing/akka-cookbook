@@ -1,4 +1,4 @@
-# 起步
+# 介绍
 
 Akka Streams是 [**Reactive Streams**](http://reactive-streams.org/) 的一种实现，提供了对反应式编程（见：[《反应式宣言》](https://www.reactivemanifesto.org/zh-CN)）的支持。
 
@@ -20,7 +20,23 @@ Akka Streams是 [**Reactive Streams**](http://reactive-streams.org/) 的一种�
 4. `sink: Sink[String, Future[Done]]`：汇，生产的数据最终流到这里并被消费
 5. `graph: RunnableGraph[Future[Done]]`：将`source`、`flow`、`flowTake`、`sink`各部分连接起来就形成了一个可运行的执行蓝图
 
-Akka Streams是lazy的，每次运行都全新的，中间状态将不会把保存。当调用`graph`的`.run`函数运行时需要上下文内有一个隐式参数：`Materializer`，它将负责实际执行这个蓝图。`Materializer`将创建一个actor异步执行。
+Akka Streams是lazy的，每次运行都全新的，中间状态将不会被保留。当调用`graph`的`.run`函数运行时需要上下文内有一个隐式参数：`Materializer`，它将负责实际执行这个蓝图（创建actor来执行）。
+
+@@@note
+可以通过`ActorSystem`隐式获取全局默认的`Materializer`，这在通常情况下是很好的选择，除非你有特别的理由需要自定义`Materializer`。
+```scala
+implicit val system: ActorSystem = _
+```
+`akka.actor.typed.ActorSystem[T]`和`akka.actor.ActorSystem`在`Materializer`的伴身对象里都有隐式函数来获取`Materializer`。
+@@@
+
+## Source、Flow、Sink
+
+Akka Streams 将流处理逻辑抽像了 **Source**、**Flow**和**Sink** 三部分概念。
+
+- `Source: [OUT, Mat]`：源，上游。生产数据，默认需要由下游调用`pull`请求触发。
+- `Flow: [IN, OUT, Mat]`：流程，中间数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。
+- `Sink: [IN, Mat]`：汇，下游。汇集上游发送的数据。
 
 ## Graph
 
@@ -41,7 +57,9 @@ trait Graph[+S <: Shape, +M] {
 }
 ```
 
-每个图都会有一个形状（Shape）组成，形状描述的图的入口（inlets、输入端口）和出口（outlets、输出端口）。
+#### Shape
+
+一个图可以有形状，形状描述图的入口（inlets、输入端口）和出口（outlets、输出端口）。
 
 ```scala
 abstract class Shape {
@@ -51,7 +69,7 @@ abstract class Shape {
 }
 ```
 
-多个形状的输入与输出端口可相互连接，使多个图（通过形状）连接到一起形成了可重复使用的蓝图。当图里所有开关的端口都有连接，我们称这个图已闭合（`ClosedShape`），这样的图就可以成为一个可运行的图（`RunnableGraph`）。
+具有未连接的端口的图是一个部分图，图可以嵌套、组合。当图里所有端口都有连接，我们称这个图已闭合（`ClosedShape`），这样的图就可以成为一个可运行的图（`RunnableGraph`）。
 
 #### RunnableGraph
 

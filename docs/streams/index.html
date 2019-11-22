@@ -156,8 +156,17 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../streams/index.html" class="active page">Akka 流（Streams）</a>
   <ul>
+    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
+    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
+    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
+    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
+    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
+    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
   <li><a href="../storage/index.html" class="page">访问存储</a>
   <ul>
@@ -197,12 +206,51 @@ yangbajing/akka-cookbook
 <h1><a href="#akka-流-streams-" name="akka-流-streams-" class="anchor"><span class="anchor-link"></span></a>Akka 流（Streams）</h1>
 <div class="toc ">
 <ul>
+  <li><a href="../streams/introduction.html" class="page">介绍</a>
+  <ul>
+    <li><a href="../streams/introduction.html#第一个示例" class="header">第一个示例</a></li>
+    <li><a href="../streams/introduction.html#source-flow-sink" class="header">Source、Flow、Sink</a></li>
+    <li><a href="../streams/introduction.html#graph" class="header">Graph</a>
+    <ul>
+      <li><a href="../streams/introduction.html#shape" class="header">Shape</a></li>
+      <li><a href="../streams/introduction.html#runnablegraph" class="header">RunnableGraph</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../streams/depth-source.html" class="page">深入 Source</a>
+  <ul>
+    <li><a href="../streams/depth-source.html#graph-source" class="header">Graph Source</a></li>
+  </ul></li>
+  <li><a href="../streams/materialize.html" class="page">物化与物化值</a>
+  <ul>
+    <li><a href="../streams/materialize.html#materializer-物化器-" class="header">Materializer（物化器）</a></li>
+    <li><a href="../streams/materialize.html#materialized-value-物化值-" class="header">Materialized value（物化值）</a></li>
+    <li><a href="../streams/materialize.html#keep" class="header">Keep</a></li>
+  </ul></li>
+  <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+  <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
+  <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a>
+  <ul>
+    <li><a href="../streams/source.html#frompublisher" class="header"><code>fromPublisher</code></a></li>
+    <li><a href="../streams/source.html#assubscriber" class="header"><code>asSubscriber</code></a></li>
+    <li><a href="../streams/source.html#fromiterator" class="header"><code>fromIterator</code></a></li>
+    <li><a href="../streams/source.html#cycle" class="header"><code>cycle</code></a></li>
+    <li><a href="../streams/source.html#fromgraph" class="header"><code>fromGraph</code></a></li>
+    <li><a href="../streams/source.html#apply" class="header"><code>apply</code></a></li>
+    <li><a href="../streams/source.html#queue" class="header"><code>queue</code></a></li>
+  </ul></li>
+  <li><a href="../streams/group.html" class="page">Streams 分组</a>
+  <ul>
+    <li><a href="../streams/group.html#grouped" class="header">grouped</a></li>
+    <li><a href="../streams/group.html#groupedwithin" class="header">groupedWithin</a></li>
+  </ul></li>
+  <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
   <li><a href="../streams/file.html" class="page">访问文件</a>
   <ul>
     <li><a href="../streams/file.html#fileio-topath-写数据到文件" class="header">FileIO.toPath 写数据到文件</a></li>
     <li><a href="../streams/file.html#fileio-frompath-从文件读数据" class="header">FileIO.fromPath 从文件读数据</a></li>
   </ul></li>
   <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+  <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
 </ul>
 </div>
 </div>
@@ -236,13 +284,13 @@ Actor 生命周期
 </span>
 </div>
 </a>
-<a href="../streams/file.html" title="访问文件" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/introduction.html" title="介绍" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-访问文件
+介绍
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

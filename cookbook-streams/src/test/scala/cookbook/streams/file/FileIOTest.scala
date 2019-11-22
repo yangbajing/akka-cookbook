@@ -36,7 +36,7 @@ class FileIOTest extends ScalaTestWithActorTestKit with WordSpecLike {
         .fromIterator(() => Iterator.from(0))
         .map(n => ByteString(n.toString))
         .take(TAKE_SIZE)
-        .merge(Source.repeat(LINE_SEPARATOR).take(TAKE_SIZE))
+        .intersperse(ByteString.empty, LINE_SEPARATOR, LINE_SEPARATOR)
         .runWith(FileIO.toPath(file))
       val ioResult = f.futureValue
       ioResult.count should be > 0L
