@@ -19,7 +19,7 @@ final class Source[+Out, +Mat](
 
 `Source`通过类构造器实现了`Graph`接口的`traversalBuilder`和`shape`两个参数，其中`shape`限制了必需为一个`SourceShape[Out]`类型。
 
-`Source`还实现了`FlowOpsMat`特质，使得`Source`具有了一系列的`via`和`to`（及它们的变体）函数。
+`Source`还实现了`FlowOpsMat`特质，使得`Source`具有了一系列的`via`、`to`（及它们的变体）函数和丰富和流程转换函数（Flow操作符）。
 
 - `via`：用于连接`Flow`，它将一个流处理过程与当前`Source`连接，并返回另一个`Source`，其中`Flow`的输出端口将作为新`Source`的输出端口
 - `viaMat`：相对`via`多了第二个curry参数，`combine`指定保留哪边的物化值。`via`实际上相当于：`viaMat(....)(Keep.left)`
