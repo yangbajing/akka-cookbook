@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -242,7 +244,7 @@ yangbajing/akka-cookbook
 }</code></pre></dd></dl>
 <h2><a href="#编写控制器" name="编写控制器" class="anchor"><span class="anchor-link"></span></a>编写控制器</h2>
 <p>在添加了 Akka Streams 支持后，我们就可以在控制器代码里直接返回 <code>Source[T, Mat]</code> 类型的结果了。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleController.java#L20-L31" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.NotUsed;
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleController.java#L20-L31" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.NotUsed;
 import akka.stream.javadsl.Source;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -256,7 +258,7 @@ public class SampleController {
 }</code></pre>
 <h2><a href="#运行程序" name="运行程序" class="anchor"><span class="anchor-link"></span></a>运行程序</h2>
 <p><code>SampleApplication.java</code> 代码如下，如通常的Spring Boot程序并无起二致。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleApplication.java#L24-L29" target="_blank" title="Go to snippet source"></a><code class="language-java">@SpringBootApplication
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleApplication.java#L23-L28" target="_blank" title="Go to snippet source"></a><code class="language-java">@SpringBootApplication
 public class SampleApplication {
   public static void main(String[] args) {
     SpringApplication.run(SampleApplication.class, args);
@@ -278,7 +280,7 @@ Hello world!
 <p>可以看到响应头里有：<code>Transfer-Encoding: chunked</code>，这个结果是以流的形式将数据一块一块返回的。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/integration/spring-web.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/integration/spring-web.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

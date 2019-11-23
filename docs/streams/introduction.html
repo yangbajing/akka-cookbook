@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -233,10 +235,14 @@ yangbajing/akka-cookbook
 <h1><a href="#介绍" name="介绍" class="anchor"><span class="anchor-link"></span></a>介绍</h1>
 <p>Akka Streams是 <a href="http://reactive-streams.org/"><strong>Reactive Streams</strong></a> 的一种实现，提供了对反应式编程（见：<a href="https://www.reactivemanifesto.org/zh-CN">《反应式宣言》</a>）的支持。</p>
 <h2><a href="#第一个示例" name="第一个示例" class="anchor"><span class="anchor-link"></span></a>第一个示例</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/main/scala/cookbook/streams/startup/Examples.scala#L28" target="_blank" title="Go to snippet source"></a><code class="language-scala">Source.fromIterator(() =&gt; Iterator.from(0)).map(n =&gt; n.toString).take(10).runForeach(println)</code></pre>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/startup/Examples.scala#L28-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">Source
+  .fromIterator(() =&gt; Iterator.from(0))
+  .map(n =&gt; n.toString)
+  .take(10)
+  .runForeach(println)</code></pre>
 <p>运行上面的示例，将在终端从0开始按递增数字每个数字并将其转换成字符串打印10行，每个字符串一行。</p>
 <p><strong>明细版</strong></p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/main/scala/cookbook/streams/startup/Startup.scala#L20-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/startup/Startup.scala#L20-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.Materializer
@@ -278,7 +284,7 @@ object Startup {
 <p>Akka Streams 将流处理逻辑抽像了 <strong>Source</strong>、**Flow**和**Sink** 三部分概念。</p>
 <ul>
   <li><code>Source: [OUT, Mat]</code>：源，上游。生产数据，默认需要由下游调用<code>pull</code>请求触发。</li>
-  <li><code>Flow: [IN, OUT, Mat]</code>：流程，中间数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。</li>
+  <li><code>Flow: [IN, OUT, Mat]</code>：流程、转换，数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。</li>
   <li><code>Sink: [IN, Mat]</code>：汇，下游。汇集上游发送的数据。</li>
 </ul>
 <h2><a href="#graph" name="graph" class="anchor"><span class="anchor-link"></span></a>Graph</h2>
@@ -312,7 +318,7 @@ object Startup {
 <p>可运行图必须是逻辑上已闭合的图，它不能有未连接的端口。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/introduction.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/introduction.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

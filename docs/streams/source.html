@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="active page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -273,7 +275,10 @@ yangbajing/akka-cookbook
 </ul>
 <p>创建一个队列源，它的物化值是一个队列，可通过此队列向<code>Source</code>传入指定类型的数据。</p>
 <p><em>示例代码：</em></p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/SourceTest.scala#L37-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">val (queue, result) = Source.queue[Int](10, OverflowStrategy.dropNew).toMat(Sink.seq)(Keep.both).run()
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/SourceTest.scala#L40-L48" target="_blank" title="Go to snippet source"></a><code class="language-scala">val (queue, result) = Source
+  .queue[Int](10, OverflowStrategy.dropNew)
+  .toMat(Sink.seq)(Keep.both)
+  .run()
 queue.offer(10)
 queue.offer(10)
 queue.offer(10)
@@ -308,7 +313,7 @@ result.futureValue should be(Seq(10, 10, 10))</code></pre>
 </ul>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/source.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/source.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -337,13 +342,13 @@ Previous
 </span>
 </div>
 </a>
-<a href="../streams/group.html" title="Streams 分组" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/flow.html" title="执行转换的 Flow 常用函数" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Streams 分组
+执行转换的 Flow 常用函数
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

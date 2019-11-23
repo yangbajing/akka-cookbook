@@ -25,8 +25,10 @@ class StringProcessLogger extends ProcessLogger {
   def outputs: Vector[String] = _outputs
   def errputs: Vector[String] = _errputs
 
-  def outOrErrString: String = if (outputs.isEmpty) errputs.mkString("\n") else outputs.mkString("\n")
-  def outStringAll: String = outputs.mkString("\n") + "\n\n" + errputs.mkString("\n")
+  def outOrErrString: String =
+    if (outputs.isEmpty) errputs.mkString("\n") else outputs.mkString("\n")
+  def outStringAll: String =
+    outputs.mkString("\n") + "\n\n" + errputs.mkString("\n")
 
   override def out(s: => String): Unit = {
     _outputs :+= s

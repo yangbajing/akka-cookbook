@@ -37,11 +37,14 @@ class DigestUtilsTest
   val PROJECT_BASE = sys.props("user.dir")
 
   test("digest") {
-    fromPath(s"$PROJECT_BASE/README.md") mustBe fromPathFuture(s"$PROJECT_BASE/README.md")
+    fromPath(s"$PROJECT_BASE/README.md") mustBe fromPathFuture(
+      s"$PROJECT_BASE/README.md")
   }
 
-  private def fromPath(path: String) = DigestUtils.sha256HexFromPath(Paths.get(path))
-  private def fromPathFuture(path: String) = Await.result(DigestUtils.reactiveSha256Hex(Paths.get(path)), 10.seconds)
+  private def fromPath(path: String) =
+    DigestUtils.sha256HexFromPath(Paths.get(path))
+  private def fromPathFuture(path: String) =
+    Await.result(DigestUtils.reactiveSha256Hex(Paths.get(path)), 10.seconds)
 
   override protected def afterAll(): Unit = {
     system.dispatcher

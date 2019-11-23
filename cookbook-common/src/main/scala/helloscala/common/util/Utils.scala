@@ -43,11 +43,16 @@ import scala.util.matching.Regex
 object Utils extends StrictLogging {
   val REGEX_DIGIT: Regex = """[\d,]+""".r
   val random: SecureRandom = new SecureRandom()
-  private lazy val _timeBasedUuid = Generators.timeBasedGenerator(EthernetAddress.fromInterface())
-  private lazy val _randomBasedUuid = Generators.randomBasedGenerator(new SecureRandom())
+  private lazy val _timeBasedUuid =
+    Generators.timeBasedGenerator(EthernetAddress.fromInterface())
+  private lazy val _randomBasedUuid =
+    Generators.randomBasedGenerator(new SecureRandom())
 
   @tailrec
-  final def getValueFromFunctions[T](functions: Iterable[() => T], value: T, valueStopFunc: T => Boolean): T = {
+  final def getValueFromFunctions[T](
+      functions: Iterable[() => T],
+      value: T,
+      valueStopFunc: T => Boolean): T = {
     if (valueStopFunc(value)) value
     else if (functions.isEmpty) value
     else getValueFromFunctions(functions.tail, functions.head(), valueStopFunc)
@@ -73,19 +78,21 @@ object Utils extends StrictLogging {
       case _: Exception => throw e
     }
 
-  def require(predicate: Boolean): Unit = require(predicate, "requirement failed.")
+  def require(predicate: Boolean): Unit =
+    require(predicate, "requirement failed.")
 
   def require(predicate: Boolean, msg: String): Unit = {
     if (!predicate)
       throw HSInternalErrorException(msg)
   }
 
-  def try2option[T](value: Try[T], log: Throwable => Unit): Option[T] = value match {
-    case Success(v) => Some(v)
-    case Failure(e) =>
-      log(e)
-      None
-  }
+  def try2option[T](value: Try[T], log: Throwable => Unit): Option[T] =
+    value match {
+      case Success(v) => Some(v)
+      case Failure(e) =>
+        log(e)
+        None
+    }
 
   def using[T <: AutoCloseable, R](res: T)(func: T => R): R = {
     assert(res != null, "Resource res must not null")
@@ -134,7 +141,8 @@ object Utils extends StrictLogging {
    */
   @inline def getPid: Long =
     try {
-      java.lang.Long.parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
+      java.lang.Long
+        .parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
     } catch {
       case NonFatal(e) =>
         logger.error("getPid failure", e)
@@ -246,12 +254,20 @@ object Utils extends StrictLogging {
 
   def propertiesToMap(props: Properties): Map[String, String] = {
     import scala.jdk.CollectionConverters._
-    props.stringPropertyNames().asScala.map(name => name -> props.getProperty(name)).toMap
+    props
+      .stringPropertyNames()
+      .asScala
+      .map(name => name -> props.getProperty(name))
+      .toMap
   }
 
   def propertiesToMapObject(props: Properties): Map[String, Object] = {
     import scala.jdk.CollectionConverters._
-    props.stringPropertyNames().asScala.map(name => name -> props.get(name)).toMap
+    props
+      .stringPropertyNames()
+      .asScala
+      .map(name => name -> props.get(name))
+      .toMap
   }
 
   def closeQuiet(io: AutoCloseable): Unit = {

@@ -20,7 +20,13 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ ActorSystem, Behavior, PostStop, Props, SpawnProtocol }
+import akka.actor.typed.{
+  ActorSystem,
+  Behavior,
+  PostStop,
+  Props,
+  SpawnProtocol
+}
 import akka.util.Timeout
 import helloscala.common.util.ActorUtils
 import org.slf4j.Logger

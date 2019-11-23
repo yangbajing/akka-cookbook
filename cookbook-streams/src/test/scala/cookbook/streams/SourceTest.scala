@@ -25,8 +25,11 @@ class SourceTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "Cycle Source" must {
     "continuously generate the same sequence" in {
       //#cycle
-      Source.cycle(() => List(1, 2, 3).iterator).take(10).runWith(Sink.seq).futureValue should be(
-        Seq(1, 2, 3, 1, 2, 3, 1, 2, 3, 1))
+      Source
+        .cycle(() => List(1, 2, 3).iterator)
+        .take(10)
+        .runWith(Sink.seq)
+        .futureValue should be(Seq(1, 2, 3, 1, 2, 3, 1, 2, 3, 1))
       //#cycle
     }
   }
@@ -34,7 +37,10 @@ class SourceTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "Queue Source" must {
     "generate fixed sequence" in {
       // #queue
-      val (queue, result) = Source.queue[Int](10, OverflowStrategy.dropNew).toMat(Sink.seq)(Keep.both).run()
+      val (queue, result) = Source
+        .queue[Int](10, OverflowStrategy.dropNew)
+        .toMat(Sink.seq)(Keep.both)
+        .run()
       queue.offer(10)
       queue.offer(10)
       queue.offer(10)

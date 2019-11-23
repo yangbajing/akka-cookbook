@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -218,7 +220,14 @@ yangbajing/akka-cookbook
   </ul></li>
   <li><a href="../streams/depth-source.html" class="page">深入 Source</a>
   <ul>
-    <li><a href="../streams/depth-source.html#graph-source" class="header">Graph Source</a></li>
+    <li><a href="../streams/depth-source.html#source" class="header">Source</a></li>
+    <li><a href="../streams/depth-source.html#sourceshape" class="header">SourceShape</a></li>
+    <li><a href="../streams/depth-source.html#构建-source" class="header">构建 <code>Source</code></a>
+    <ul>
+      <li><a href="../streams/depth-source.html#graphstage" class="header">GraphStage</a></li>
+      <li><a href="../streams/depth-source.html#createlogicandmaterializedvalue" class="header">createLogicAndMaterializedValue</a></li>
+    </ul></li>
+    <li><a href="../streams/depth-source.html#小结" class="header">小结</a></li>
   </ul></li>
   <li><a href="../streams/materialize.html" class="page">物化与物化值</a>
   <ul>
@@ -238,12 +247,14 @@ yangbajing/akka-cookbook
     <li><a href="../streams/source.html#apply" class="header"><code>apply</code></a></li>
     <li><a href="../streams/source.html#queue" class="header"><code>queue</code></a></li>
   </ul></li>
+  <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+  <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
   <li><a href="../streams/group.html" class="page">Streams 分组</a>
   <ul>
     <li><a href="../streams/group.html#grouped" class="header">grouped</a></li>
     <li><a href="../streams/group.html#groupedwithin" class="header">groupedWithin</a></li>
   </ul></li>
-  <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+  <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
   <li><a href="../streams/file.html" class="page">访问文件</a>
   <ul>
     <li><a href="../streams/file.html#fileio-topath-写数据到文件" class="header">FileIO.toPath 写数据到文件</a></li>
@@ -255,7 +266,7 @@ yangbajing/akka-cookbook
 </div>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/index.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/index.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

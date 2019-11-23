@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="active page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -231,12 +233,12 @@ yangbajing/akka-cookbook
 <h1><a href="#访问文件" name="访问文件" class="anchor"><span class="anchor-link"></span></a>访问文件</h1>
 <p>Akka Streams内置了 <code>FileIO</code> 工具库，可对文件以流的方式进行读、写。</p>
 <p><code>FileIO</code>提供了<code>toPath</code>和<code>fromPath</code>两个函数。<code>toPath</code>是一个Sink，它接收上游流过来的元素（<code>ByteString</code>）并将其写入（追加）文件；<code>fromPath</code>是一个Source，它将按下游的（要求）从文件读取数据。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L28-L30" target="_blank" title="Go to snippet source"></a><code class="language-scala">private val LINE_SEPARATOR = ByteString(&quot;\n&quot;)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L28-L30" target="_blank" title="Go to snippet source"></a><code class="language-scala">private val LINE_SEPARATOR = ByteString(&quot;\n&quot;)
 private val file = Files.createTempFile(&quot;cookbook&quot;, &quot;txt&quot;)
 private val TAKE_SIZE = 100</code></pre>
 <h2><a href="#fileio-topath-写数据到文件" name="fileio-topath-写数据到文件" class="anchor"><span class="anchor-link"></span></a>FileIO.toPath 写数据到文件</h2>
 <p>这里构造了0到99（包含）个数字，并按一行一个的方式写入文件。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L35-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">val f = Source
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L35-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">val f = Source
   .fromIterator(() =&gt; Iterator.from(0))
   .map(n =&gt; ByteString(n.toString))
   .take(TAKE_SIZE)
@@ -253,7 +255,7 @@ ioResult.count should be &gt; 0L</code></pre>
 </code></pre>
 <h2><a href="#fileio-frompath-从文件读数据" name="fileio-frompath-从文件读数据" class="anchor"><span class="anchor-link"></span></a>FileIO.fromPath 从文件读数据</h2>
 <p>使用<code>Framing.delimiter</code>按指定的分隔标准从文件流读取数据（元素）。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L48-L55" target="_blank" title="Go to snippet source"></a><code class="language-scala">val f = FileIO
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/file/FileIOTest.scala#L48-L55" target="_blank" title="Go to snippet source"></a><code class="language-scala">val f = FileIO
   .fromPath(file)
   .via(Framing.delimiter(LINE_SEPARATOR, 8192))
   .filterNot(_.isEmpty)
@@ -272,7 +274,7 @@ ints should be(0 until 100)</code></pre>
 <p>你将<code>intersperse</code>的第3个参数指定为<code>ByteString.empty</code>再次运行测试，就可重现这个问题。</p></div>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/file.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/file.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -288,7 +290,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../streams/throttle.html" title="限制 Streams 发送元素的速率" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../streams/throttle.html" title="基于时间的处理" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -297,7 +299,7 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-限制 Streams 发送元素的速率
+基于时间的处理
 </span>
 </div>
 </a>

@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -231,10 +233,12 @@ yangbajing/akka-cookbook
 <h1><a href="#适配响应类型到-actor" name="适配响应类型到-actor" class="anchor"><span class="anchor-link"></span></a>适配响应类型到 actor</h1>
 <p>通常情况下，发送actor的消息类型与接收actor的响应消息类型不匹配（不然就会退化成大部分actor都继承同一个trait，这样就失去了 Typed 的意义！）。这种情况下，我们提供一个正确类型的ActorRef[T]，并将接收actor返回的响应消息T包装成发送actor可以处理的类型。</p>
 <p>先定义一个消息包装类：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L30-L31" target="_blank" title="Go to snippet source"></a><code class="language-scala">sealed trait Command
-private final case class WrappedBackendResponse(response: Backend.Response) extends Command</code></pre>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L36-L38" target="_blank" title="Go to snippet source"></a><code class="language-scala">sealed trait Command
+private final case class WrappedBackendResponse(response: Backend.Response)
+    extends Command</code></pre>
 <p>消息适配器代码：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L38" target="_blank" title="Go to snippet source"></a><code class="language-scala">val backendAdapter = context.messageAdapter[Backend.Response](resp =&gt; WrappedBackendResponse(resp))</code></pre>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L45-L46" target="_blank" title="Go to snippet source"></a><code class="language-scala">val backendAdapter = context.messageAdapter[Backend.Response](resp =&gt;
+  WrappedBackendResponse(resp))</code></pre>
 <p>应该为不同的消息类型注册独立的消息适配器，同一个消息类型多次注册的消息适配器只有最后一个生效。</p>
 <p>如果响应的消息类与给定消息适配器匹配或是其消息适配器消息类型的子类型，则使用它。若有多个消息适配器符合条件，则将选用最后注册的那个。</p>
 <p>消息适配器（<code>context.messageAdapter</code>返回的<code>ActorRef[T]</code>）的生命周期同context所在actor。建议在Behaviors.step或AbstractBehavior构造函数中注册适配器，但也可以在稍后注册它们。</p>
@@ -252,7 +256,7 @@ private final case class WrappedBackendResponse(response: Backend.Response) exte
 </ol>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/adapted-response.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/adapted-response.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

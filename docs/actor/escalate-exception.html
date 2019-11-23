@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -233,8 +235,10 @@ yangbajing/akka-cookbook
   <li>监听子actor的终止异常，再重新抛出，这里父actor可以选择将导致子actor失败的原始直接抛出或做个封装。</li>
 </ol>
 <h2><a href="#示例代码" name="示例代码" class="anchor"><span class="anchor-link"></span></a>示例代码</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fault/WatchActorMain.scala#L27-L102" target="_blank" title="Go to snippet source"></a><code class="language-scala">final case class EscalateException(message: String) extends RuntimeException(message)
-final case class ActorException(ref: ActorRef[Nothing], cause: Throwable) extends RuntimeException(cause)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/fault/WatchActorMain.scala#L27-L107" target="_blank" title="Go to snippet source"></a><code class="language-scala">final case class EscalateException(message: String)
+    extends RuntimeException(message)
+final case class ActorException(ref: ActorRef[Nothing], cause: Throwable)
+    extends RuntimeException(cause)
 
 object Child {
   sealed trait Command
@@ -269,12 +273,14 @@ object Parent {
     val child2 = context.spawn(Child(), &quot;child2&quot;)
     context.watch(child2)
     child2 ! Child.ThrowNormalException
-    context.system.scheduler.scheduleOnce(1.second, () =&gt; child1 ! Child.ThrowEscalateException)
+    context.system.scheduler
+      .scheduleOnce(1.second, () =&gt; child1 ! Child.ThrowEscalateException)
     Behaviors.receiveSignal {
       case (_, ChildFailed(ref, e: EscalateException)) =&gt;
         throw ActorException(ref, e)
       case (_, ChildFailed(ref, e)) =&gt;
-        context.log.warn(s&quot;Received child actor ${ref.path} terminated signal, original exception is $e&quot;)
+        context.log.warn(
+          s&quot;Received child actor ${ref.path} terminated signal, original exception is $e&quot;)
         Behaviors.same
     }
   }
@@ -287,7 +293,8 @@ object Root {
     context.watch(parent)
     Behaviors.receiveSignal {
       case (_, ChildFailed(ref, e)) =&gt;
-        context.log.info(s&quot;Received child actor ${ref.path} failed signal, original exception is $e&quot;)
+        context.log.info(
+          s&quot;Received child actor ${ref.path} failed signal, original exception is $e&quot;)
         Behaviors.same
       case (_, Terminated(ref)) =&gt;
         context.log.info(s&quot;Received actor ${ref.path} terminated signal.&quot;)
@@ -327,7 +334,7 @@ object WatchActorMain {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/escalate-exception.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/escalate-exception.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>限制 Streams 发送元素的速率 · Akka Cookbook</title>
+<title>基于时间的处理 · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-限制 Streams 发送元素的速率
+基于时间的处理
 </span>
 </div>
 </div>
@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="active page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="active page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -203,7 +205,7 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#限制-streams-发送元素的速率" name="限制-streams-发送元素的速率" class="anchor"><span class="anchor-link"></span></a>限制 Streams 发送元素的速率</h1>
+<h1><a href="#基于时间的处理" name="基于时间的处理" class="anchor"><span class="anchor-link"></span></a>基于时间的处理</h1>
 <p>很多时候我们都想限制上游发送元素到下游的（生产）速度，Akka Streams内建了对此的支持。通过<code>Flow.throttle</code>的各个版本提供了多种策略的限流功能。</p>
 <pre class="prettyprint"><code class="language-scala">Source
   .fromIterator(() =&gt; Iterator.from(0))
@@ -212,7 +214,7 @@ yangbajing/akka-cookbook
 <p><code>throttle</code>限制每500毫秒内最多只生产5个元素（可发送5个到下游）。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/throttle.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/throttle.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -191,7 +193,10 @@ yangbajing/akka-cookbook
 <ul>
   <li><a href="../streams/depth-source.html#深入-source" class="header">深入 Source</a>
   <ul>
-    <li><a href="../streams/depth-source.html#graph-source" class="header">Graph Source</a></li>
+    <li><a href="../streams/depth-source.html#source" class="header">Source</a></li>
+    <li><a href="../streams/depth-source.html#sourceshape" class="header">SourceShape</a></li>
+    <li><a href="../streams/depth-source.html#构建-source" class="header">构建 <code>Source</code></a></li>
+    <li><a href="../streams/depth-source.html#小结" class="header">小结</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -215,7 +220,10 @@ yangbajing/akka-cookbook
 <ul>
   <li><a href="../streams/depth-source.html#深入-source" class="header">深入 Source</a>
   <ul>
-    <li><a href="../streams/depth-source.html#graph-source" class="header">Graph Source</a></li>
+    <li><a href="../streams/depth-source.html#source" class="header">Source</a></li>
+    <li><a href="../streams/depth-source.html#sourceshape" class="header">SourceShape</a></li>
+    <li><a href="../streams/depth-source.html#构建-source" class="header">构建 <code>Source</code></a></li>
+    <li><a href="../streams/depth-source.html#小结" class="header">小结</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -227,7 +235,7 @@ yangbajing/akka-cookbook
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
 <h1><a href="#深入-source" name="深入-source" class="anchor"><span class="anchor-link"></span></a>深入 Source</h1>
-<h2><a href="#graph-source" name="graph-source" class="anchor"><span class="anchor-link"></span></a>Graph Source</h2>
+<h2><a href="#source" name="source" class="anchor"><span class="anchor-link"></span></a>Source</h2>
 <p><code>Source</code>是一组流（Streams）处理步骤，有一个打开的输出端口。<code>Source</code>可以包含任意数量已连接的内部源（<code>Source</code>）和转换操作（<code>Flow</code>）。<code>Source</code>可以通过<code>asPublisher</code>函数转换为 Reactive Streams 协议等价的<code>Publisher</code>。</p>
 <pre class="prettyprint"><code class="language-scala">final class Source[+Out, +Mat](
     override val traversalBuilder: LinearTraversalBuilder,
@@ -241,7 +249,7 @@ yangbajing/akka-cookbook
   <li><code>Mat</code>：物化值类型，物化值可用于记录<code>Source</code>的内部状态或操作记录等。比如：<code>FileIO.fromPath</code>这个<code>Source</code>的物化值记录了从文件里实际读取到的字符数。</li>
 </ul>
 <p><code>Source</code>通过类构造器实现了<code>Graph</code>接口的<code>traversalBuilder</code>和<code>shape</code>两个参数，其中<code>shape</code>限制了必需为一个<code>SourceShape[Out]</code>类型。</p>
-<p><code>Source</code>还实现了<code>FlowOpsMat</code>特质，使得<code>Source</code>具有了一系列的<code>via</code>和<code>to</code>（及它们的变体）函数。</p>
+<p><code>Source</code>还实现了<code>FlowOpsMat</code>特质，使得<code>Source</code>具有了一系列的<code>via</code>、<code>to</code>（及它们的变体）函数和丰富和流程转换函数（Flow操作符）。</p>
 <ul>
   <li><code>via</code>：用于连接<code>Flow</code>，它将一个流处理过程与当前<code>Source</code>连接，并返回另一个<code>Source</code>，其中<code>Flow</code>的输出端口将作为新<code>Source</code>的输出端口</li>
   <li>
@@ -258,9 +266,91 @@ yangbajing/akka-cookbook
 </ul>
 <p>有关<code>combine</code>函数的更多内容请见： <a href="materialize.html#Keep">物化与物化值#Keep</a></p>
 <p>通常我们都不会直接构造<code>Source</code>，而是通过<code>Source</code>的伴身对象提供了各类工具函数来创建。有关<code>Source</code>伴身对象的常用工具函数请参阅： <a href="source.html"> 创建 Source 的常用函数</a>。</p>
+<h2><a href="#sourceshape" name="sourceshape" class="anchor"><span class="anchor-link"></span></a>SourceShape</h2>
+<pre class="prettyprint"><code class="language-scala">final case class SourceShape[+T](out: Outlet[T @uncheckedVariance]) extends Shape {
+  override val inlets: immutable.Seq[Inlet[_]] = EmptyImmutableSeq
+  override val outlets: immutable.Seq[Outlet[_]] = out :: Nil
+
+  override def deepCopy(): SourceShape[T] = SourceShape(out.carbonCopy())
+}
+</code></pre>
+<p><code>SourceShape</code>使用了<code>final</code>做修饰，这就确定了<code>Source</code>的形状（<code>shape</code>）只能为<code>SourceShape</code>，而且限制为没有输入端口，只有一个输出端口的形状；唯一可定义的地方就是它的输出端口发送出数据的类型。</p>
+<h2><a href="#构建-source" name="构建-source" class="anchor"><span class="anchor-link"></span></a>构建 <code>Source</code></h2>
+<p>一般不会通过<code>new</code>的方式直接创建一个<code>Source</code>出来，而是通过调用<code>Source.fromGraph</code>从一个预定义好的图创建，如：</p>
+<pre class="prettyprint"><code class="language-scala">def fromPath(
+    f: Path, 
+    chunkSize: Int, 
+    startPosition: Long): Source[ByteString, Future[IOResult]] =
+  Source
+    .fromGraph(new FileSource(f, chunkSize, startPosition))
+    .withAttributes(DefaultAttributes.fileSource)
+</code></pre>
+<p>这里通过Akka Streams自带的<code>FileSource</code>讲述Source图的定义过程。<code>FileSource</code>通过自定文件创建一个异步的文件读取源（Source）。</p>
+<h3><a href="#graphstage" name="graphstage" class="anchor"><span class="anchor-link"></span></a>GraphStage</h3>
+<p><strong>GraphStage</strong> 代表一个可重复使用的流处理操作图（a reusable graph stream processing operator），常用的 <strong>GraphStage</strong> 有两个：</p>
+<ul>
+  <li><code>GraphStage</code>：不需要物化值的操作图，这样的图构造出的 <strong>Source</strong> 签名类似：<code>Source[Out, NotUsed]</code>；</li>
+  <li><code>GraphStageWithMaterializedValue</code>：有物化值的操作图，这样的图构造的 <strong>Source</strong> 签名类似：<code>Source[Out, Mat]</code>。</li>
+</ul>
+<pre class="prettyprint"><code class="language-scala">abstract class GraphStageWithMaterializedValue[+S &lt;: Shape, +M]
+    extends Graph[S, M] {
+  @throws(classOf[Exception])
+  def createLogicAndMaterializedValue(inheritedAttributes: Attributes): (GraphStageLogic, M)
+
+  protected def initialAttributes: Attributes = Attributes.none
+}
+
+abstract class GraphStage[S &lt;: Shape] 
+    extends GraphStageWithMaterializedValue[S, NotUsed] {
+  final override def createLogicAndMaterializedValue(inheritedAttributes: Attributes): (GraphStageLogic, NotUsed) =
+    (createLogic(inheritedAttributes), NotUsed)
+
+  @throws(classOf[Exception])
+  def createLogic(inheritedAttributes: Attributes): GraphStageLogic
+}
+</code></pre>
+<p><code>GraphStageWithMaterializedValue</code>有一个抽像方法待实现，它返回图处理逻辑和物化值的元组，类型为：<code>(GraphStageLogic, M)</code>。<code>GraphStage</code>继承了<code>GraphStageWithMaterializedValue</code>，它实现了<code>createLogicAndMaterializedValue</code>方法并将物化值固定为<code>NotUsed</code>，同时提供<code>createLogic</code>供实现类创建图处理逻辑。</p>
+<pre class="prettyprint"><code class="language-scala">final case class IOResult(count: Long)
+
+private[akka] final class FileSource(
+      path: Path,
+      chunkSize: Int,
+      startPosition: Long)
+    extends GraphStageWithMaterializedValue[SourceShape[ByteString], Future[IOResult]] {
+  require(chunkSize &gt; 0, &quot;chunkSize must be greater than 0&quot;)
+  val out = Outlet[ByteString](&quot;FileSource.out&quot;)
+
+  override val shape = SourceShape(out)
+  // ....
+}
+</code></pre>
+<p><code>FileSource</code>要保存从文件实际读取字符数，所有它通过继承<code>GraphStageWithMaterializedValue</code>将计数通过物化值向下游传递。同时这个计数值不能阻塞整个流处理过程，所以物化值类型为：<code>Future[IOResult]</code>。</p>
+<p><code>Source[Out, Mat]</code>的类型签名只有输出类型，也许你会奇怪它实际要处理的数据源来自哪里？看到这里<code>FileSource(path: Path, ....)</code>的构造函数签名即可明白，它实际要处理的数据源就是<code>path</code>指定的文件路径，通常在实现自己的<code>Source</code>时，我们都要继承<code>Graph</code>的某个抽像子类，再在主构造函数里传入它要处理的实际数据源。</p><div class="callout note "><div class="callout-title">Note</div>
+<p><code>IOResult</code>的<code>count</code>变量是文件读取的位置（字节），实际读取文件字节数需要通过<code>count - startPosition</code>来获得，因为有可能并不是从文件头开始读取。</p></div>
+<h3><a href="#createlogicandmaterializedvalue" name="createlogicandmaterializedvalue" class="anchor"><span class="anchor-link"></span></a>createLogicAndMaterializedValue</h3>
+<pre class="prettyprint"><code class="language-scala">  override def createLogicAndMaterializedValue(inheritedAttributes: Attributes): (GraphStageLogic, Future[IOResult]) = {
+    val ioResultPromise = Promise[IOResult]()
+    val logic: GraphStageLogic = new GraphStageLogic(shape) with OutHandler {
+      val buffer = ByteBuffer.allocate(chunkSize)
+      val maxReadAhead = inheritedAttributes.get[InputBuffer](InputBuffer(16, 16)).max
+      var channel: FileChannel = _
+      var position = startPosition
+      var chunkCallback: Try[Int] =&gt; Unit = _
+      var eofEncountered = false
+      var availableChunks: Vector[ByteString] = Vector.empty[ByteString]
+
+      setHandler(out, this)
+      // ....
+    }
+    (logic, ioResultPromise.future)
+  }
+</code></pre>
+<p>变量<code>logic</code>和<code>ioResultPromise</code>，将作为<code>createLogicAndMaterializedValue</code>函数的返回值。<code>login</code>匿名实现了从<code>path</code>文件读取数据并发送到下游的功能逻辑，在图成功或失败完成时将<code>position</code>（读取到文件的位置偏移处（字节））</p>
+<h2><a href="#小结" name="小结" class="anchor"><span class="anchor-link"></span></a>小结</h2>
+<p>完整<code>FileSource</code>源码见：<a href="https://github.com/akka/akka/blob/master/akka-stream/src/main/scala/akka/stream/impl/io/IOSources.scala">https://github.com/akka/akka/blob/master/akka-stream/src/main/scala/akka/stream/impl/io/IOSources.scala</a>。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/depth-source.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/depth-source.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

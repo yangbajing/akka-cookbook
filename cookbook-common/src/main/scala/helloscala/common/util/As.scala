@@ -93,7 +93,10 @@ object AsInt {
   }
 
   def toInt(s: CharSequence): Option[Int] =
-    AsLong.REGEX_DIGIT.findFirstIn(s).map(_.replaceAll(",", "").toInt).orElse(Try(s.toString.toInt).toOption)
+    AsLong.REGEX_DIGIT
+      .findFirstIn(s)
+      .map(_.replaceAll(",", "").toInt)
+      .orElse(Try(s.toString.toInt).toOption)
 }
 
 object AsLong {
@@ -109,7 +112,10 @@ object AsLong {
   }
 
   def toLong(s: CharSequence): Option[Long] =
-    REGEX_DIGIT.findFirstIn(s).map(_.replaceAll(",", "").toLong).orElse(Try(s.toString.toLong).toOption)
+    REGEX_DIGIT
+      .findFirstIn(s)
+      .map(_.replaceAll(",", "").toLong)
+      .orElse(Try(s.toString.toLong).toOption)
 }
 
 object AsFloat {
@@ -207,17 +213,23 @@ object AsLocalDateTime {
     case ldt: LocalDateTime   => Some(ldt)
     case AsZonedDateTime(zdt) => Some(zdt.toLocalDateTime)
     case s: String =>
-      Try(TimeUtils.toLocalDateTime(s)).orElse(Try(LocalDateTime.parse(s))).toOption
+      Try(TimeUtils.toLocalDateTime(s))
+        .orElse(Try(LocalDateTime.parse(s)))
+        .toOption
     case _ => None
   }
 }
 
 object AsZonedDateTime {
   def unapply(v: Any): Option[ZonedDateTime] = v match {
-    case null                  => None
-    case zdt: ZonedDateTime    => Some(zdt)
-    case s: String             => Try(ZonedDateTime.parse(s)).orElse(Try(TimeUtils.toZonedDateTime(s.toLong))).toOption
-    case epochMillis: Long     => Try(TimeUtils.toZonedDateTime(epochMillis)).toOption
+    case null               => None
+    case zdt: ZonedDateTime => Some(zdt)
+    case s: String =>
+      Try(ZonedDateTime.parse(s))
+        .orElse(Try(TimeUtils.toZonedDateTime(s.toLong)))
+        .toOption
+    case epochMillis: Long =>
+      Try(TimeUtils.toZonedDateTime(epochMillis)).toOption
     case AsOffsetDateTime(odt) => Some(odt.toZonedDateTime)
     case _                     => None
   }
@@ -227,8 +239,12 @@ object AsOffsetDateTime {
   def unapply(v: Any): Option[OffsetDateTime] = v match {
     case null                => None
     case odt: OffsetDateTime => Some(odt)
-    case s: String           => Try(TimeUtils.toOffsetDateTime(s)).orElse(Try(TimeUtils.toOffsetDateTime(s.toLong))).toOption
-    case epochMillis: Long   => Try(TimeUtils.toOffsetDateTime(epochMillis)).toOption
-    case _                   => None
+    case s: String =>
+      Try(TimeUtils.toOffsetDateTime(s))
+        .orElse(Try(TimeUtils.toOffsetDateTime(s.toLong)))
+        .toOption
+    case epochMillis: Long =>
+      Try(TimeUtils.toOffsetDateTime(epochMillis)).toOption
+    case _ => None
   }
 }

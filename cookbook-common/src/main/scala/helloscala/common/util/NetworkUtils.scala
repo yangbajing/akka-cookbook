@@ -26,13 +26,16 @@ import scala.jdk.CollectionConverters._
 
 object NetworkUtils {
   private val validNetworkNamePrefixes = List("eth", "enp", "wlp")
-  def validNetworkName(name: String) = validNetworkNamePrefixes.exists(prefix => name.startsWith(prefix))
+  def validNetworkName(name: String) =
+    validNetworkNamePrefixes.exists(prefix => name.startsWith(prefix))
 
-  def interfaces(): Vector[NetworkInterface] = NetworkInterface.getNetworkInterfaces.asScala.toVector
+  def interfaces(): Vector[NetworkInterface] =
+    NetworkInterface.getNetworkInterfaces.asScala.toVector
 
   def onlineNetworkInterfaces() = {
     interfaces().filterNot(ni =>
-      ni.isLoopback || !ni.isUp || ni.isVirtual || ni.isPointToPoint || !validNetworkName(ni.getName))
+      ni.isLoopback || !ni.isUp || ni.isVirtual || ni.isPointToPoint || !validNetworkName(
+        ni.getName))
   }
 
   def onlineInterfaceAddress(): Vector[InterfaceAddress] = {
@@ -40,12 +43,18 @@ object NetworkUtils {
   }
 
   def firstOnlineInet4Address(): Option[InetAddress] = {
-    onlineInterfaceAddress().view.filter(ia => ia.getAddress.isInstanceOf[Inet4Address]).map(_.getAddress).headOption
+    onlineInterfaceAddress().view
+      .filter(ia => ia.getAddress.isInstanceOf[Inet4Address])
+      .map(_.getAddress)
+      .headOption
   }
 
-  def toInetSocketAddress(address: String, defaultPort: Int): InetSocketAddress = address.split(':') match {
-    case Array(host, AsInt(port)) => InetSocketAddress.createUnresolved(host, port)
-    case Array(host)              => InetSocketAddress.createUnresolved(host, defaultPort)
-    case _                        => throw new ExceptionInInitializerError(s"无效的通信地址：$address")
+  def toInetSocketAddress(
+      address: String,
+      defaultPort: Int): InetSocketAddress = address.split(':') match {
+    case Array(host, AsInt(port)) =>
+      InetSocketAddress.createUnresolved(host, port)
+    case Array(host) => InetSocketAddress.createUnresolved(host, defaultPort)
+    case _           => throw new ExceptionInInitializerError(s"无效的通信地址：$address")
   }
 }

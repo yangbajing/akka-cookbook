@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="active page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -231,13 +233,18 @@ yangbajing/akka-cookbook
 <h1><a href="#streams-分组" name="streams-分组" class="anchor"><span class="anchor-link"></span></a>Streams 分组</h1>
 <h2><a href="#grouped" name="grouped" class="anchor"><span class="anchor-link"></span></a>grouped</h2>
 <p>通过<code>grouped</code>函数可将上游发送的元素按指定个数分组，这在很场景下可作为一个优化策略。比如：批量写入数据库。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L29-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;grouped&quot; in {
-  val list = Source.fromIterator(() =&gt; Iterator.from(0)).grouped(100).take(2).runWith(Sink.seq).futureValue
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L29-L37" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;grouped&quot; in {
+  val list = Source
+    .fromIterator(() =&gt; Iterator.from(0))
+    .grouped(100)
+    .take(2)
+    .runWith(Sink.seq)
+    .futureValue
   list should be(Vector(0 until 100, 100 until 200))
 }</code></pre>
 <h2><a href="#groupedwithin" name="groupedwithin" class="anchor"><span class="anchor-link"></span></a>groupedWithin</h2>
 <p>若上游长时间没有元素被发送，很有可能下游将被永久的挂在那里，形成一种假死的状态。这时可通过<code>groupedWithin</code>函数传递一个超时时间，它将在指定的分组数量或超时时间两者之一达到时形成一个分组并将批量数据传给下游。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L35-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;groupedWithin&quot; in {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L40-L49" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;groupedWithin&quot; in {
   val f = Source
     .fromIterator(() =&gt; Iterator.from(0))
     .throttle(5, 500.millis)
@@ -249,7 +256,7 @@ yangbajing/akka-cookbook
 }</code></pre>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/streams/group.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/group.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -265,7 +272,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../streams/source.html" title="创建 Source 的常用函数" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../streams/sink.html" title="汇聚数据的 Sink 常用函数" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -274,17 +281,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-创建 Source 的常用函数
+汇聚数据的 Sink 常用函数
 </span>
 </div>
 </a>
-<a href="../streams/throttle.html" title="限制 Streams 发送元素的速率" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../streams/throttle.html" title="基于时间的处理" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-限制 Streams 发送元素的速率
+基于时间的处理
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

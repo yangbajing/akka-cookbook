@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -231,23 +233,23 @@ yangbajing/akka-cookbook
 <h1><a href="#怎样优雅的停止actor" name="怎样优雅的停止actor" class="anchor"><span class="anchor-link"></span></a>怎样优雅的停止actor</h1>
 <h2><a href="#返回-behaviors-stopped" name="返回-behaviors-stopped" class="anchor"><span class="anchor-link"></span></a>返回 Behaviors.stopped</h2>
 <p>每处理一个消息，actor都将返回一个行为，可以通过返回 <code>Behaviors.stopped</code> 行为来告诉Actor系统此actor应被自动停止。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L39-L41" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, Stop) =&gt;
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L45-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, Stop) =&gt;
   context.log.info(s&quot;Receive message: $Stop, will stopped.&quot;)
   Behaviors.stopped</code></pre>
 <p><code>Behaviors.stopped</code>被执行时将触发 <code>PostStop</code> 信号。</p>
 <h2><a href="#graceful-stop" name="graceful-stop" class="anchor"><span class="anchor-link"></span></a>Graceful Stop</h2>
 <p>通常，<code>PostStop</code>信号被作为非正常停止看待，若想在正常停止（Graceful Stop）时触发一些清理操作，可将清理函数（<code>cleanup</code>）传给<code>Behaviors.stopped</code>的重载版本。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L44-L46" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, GracefulStop) =&gt;
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L50-L52" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, GracefulStop) =&gt;
   context.log.info(s&quot;Receive message: $GracefulStop, will stopped.&quot;)
   Behaviors.stopped(() =&gt; cleanup(context.log))</code></pre>
 <p>当 <code>PostStop</code> 信号被处理后，<code>cleanup</code>清理函数将紧接着执行。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L56-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">def cleanup(log: Logger): Unit = {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L62-L64" target="_blank" title="Go to snippet source"></a><code class="language-scala">def cleanup(log: Logger): Unit = {
   log.info(&quot;Perform cleanup action.&quot;)
 }</code></pre><div class="callout note "><div class="callout-title">Note</div>
 <p>Akka Typed不再提供<code>PoisonPill</code>消息来停止actor，推荐使用自定义消息并反回<code>Behaviors.stopped</code>行为来停止actor。</p></div>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/stop.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/stop.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

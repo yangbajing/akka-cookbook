@@ -75,7 +75,9 @@ object DigestUtils {
 //  def _sha(path: Path, md: MessageDigest): Array[Byte] =
 //    _sha(path, md /*, ByteBuffer.allocate(DEFAULT_BYTE_BUFFER_SIZE)*/ )
 
-  def _sha(path: Path, md: MessageDigest /*, buf: ByteBuffer*/ ): Array[Byte] = {
+  def _sha(
+      path: Path,
+      md: MessageDigest /*, buf: ByteBuffer*/ ): Array[Byte] = {
     val channel = Files.newInputStream(path)
     val buf = Array.ofDim[Byte](8192)
     try {
@@ -135,12 +137,20 @@ object DigestUtils {
 
   def sha512Hex(path: Path): String = StringUtils.hex2Str(sha512(path))
 
-  def reactiveSha256Hex(path: Path)(implicit mat: Materializer, ec: ExecutionContext): Future[String] = {
+  def reactiveSha256Hex(path: Path)(
+      implicit mat: Materializer,
+      ec: ExecutionContext): Future[String] = {
     reactiveSha256(path).map(bytes => StringUtils.hex2Str(bytes))
   }
 
-  def reactiveSha256(path: Path)(implicit mat: Materializer, ec: ExecutionContext): Future[Array[Byte]] = {
+  def reactiveSha256(path: Path)(
+      implicit mat: Materializer,
+      ec: ExecutionContext): Future[Array[Byte]] = {
     val md = digestSha256()
-    FileIO.fromPath(path).map(bytes => md.update(bytes.asByteBuffer)).runWith(Sink.ignore).map(_ => md.digest())
+    FileIO
+      .fromPath(path)
+      .map(bytes => md.update(bytes.asByteBuffer))
+      .runWith(Sink.ignore)
+      .map(_ => md.digest())
   }
 }

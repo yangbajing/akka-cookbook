@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="streams/file.html" class="page">访问文件</a></li>
     <li><a href="streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -236,7 +238,7 @@ yangbajing/akka-cookbook
 <p>Akka Typed Actor从2.4开始直到2.5可以商用，进而Akka 2.6已经把Akka Typed Actor做为推荐的Actor使用模式。Typed Actor与原先的Untyped Actor最大且直观的区别就是<code>ActorRef</code>有类型了，其签名也改成了<code>akka.actor.typed.ActorRef[T]</code>。</p>
 <h2><a href="#helloworld" name="helloworld" class="anchor"><span class="anchor-link"></span></a>HelloWorld</h2>
 <p>第一个示例是一个 Ping-Pong，从一个actor发送消息到另一个actor，并收到回复。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala#L23-L50" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala#L23-L51" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
   sealed trait Command
   final case object Start extends Command
   final case class PongCommand(message: String) extends Command
@@ -254,7 +256,8 @@ yangbajing/akka-cookbook
 
 object Pong {
   sealed trait Command
-  final case class PingCommand(message: String, replyTo: ActorRef[Ping.Command]) extends Command
+  final case class PingCommand(message: String, replyTo: ActorRef[Ping.Command])
+      extends Command
   def apply(): Behavior[Command] = Behaviors.receive[Command] {
     case (context, PingCommand(message, replyTo)) =&gt;
       context.log.info(s&quot;Receive ping message: $message&quot;)
@@ -263,7 +266,7 @@ object Pong {
   }
 }</code></pre>
 <p>运行actor需要有一个ActorSystem，这面的代码将执行这个示例。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala#L56-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">val system: ActorSystem[Ping.Command] = ActorSystem(Ping(), &quot;helloworld&quot;)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/introduction/HelloWorld.scala#L57-L59" target="_blank" title="Go to snippet source"></a><code class="language-scala">val system: ActorSystem[Ping.Command] = ActorSystem(Ping(), &quot;helloworld&quot;)
 system ! Ping.Start
 system.terminate()</code></pre>
 <p>运行示例程序，可看到如何输出：</p>
@@ -289,7 +292,7 @@ system.terminate()</code></pre>
 </ul>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/introduction.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/introduction.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
