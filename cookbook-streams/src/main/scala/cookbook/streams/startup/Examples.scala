@@ -25,7 +25,11 @@ import scala.concurrent.Future
 object Examples {
   def simplify()(implicit mat: Materializer): Future[Done] = {
     // #simplify
-    Source.fromIterator(() => Iterator.from(0)).map(n => n.toString).take(10).runForeach(println)
+    Source
+      .fromIterator(() => Iterator.from(0))
+      .map(n => n.toString)
+      .take(10)
+      .runForeach(println)
     // #simplify
   }
 }

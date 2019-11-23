@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -245,7 +247,7 @@ yangbajing/akka-cookbook
 <p>使用固定速率时，如果先前的消息延迟太长，它将补偿后续任务的延迟。在这种情况下，实际的发送间隔将不同于传递给 <strong>固定速率</strong> 方法的间隔。</p>
 <p>如果任务延迟超过间隔时间，则在前一个任务之后立即发送后续消息。这还会导致在长时间的垃圾收集暂停或JVM暂停时的其他原因之后，当进程再次唤醒时，将执行所有“错过”的任务。例如，间隔<code>1</code>秒的 <strong>固定速率</strong> 和暂停<code>30</code>秒的进程将导致连续快速发送30条消息以赶上之前错过的调度。从长远来看，执行频率正好是指定间隔的倒数。</p>
 <p>固定速率执行适用于对绝对时间敏感或执行固定数量执行的总时间很重要的重复活动，例如每秒计时一次并持续10秒的倒计时计时器。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/timer/Timer.scala#L24-L54" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Timer {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/timer/Timer.scala#L24-L54" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Timer {
   sealed trait Command
   case object ReceiveTimeout extends Command
   case object SingleTrigger extends Command
@@ -277,7 +279,7 @@ yangbajing/akka-cookbook
       })
 }</code></pre>
 <p>测试程序：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/timer/TimerTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TimerTest extends ScalaTestWithActorTestKit with FunSuiteLike {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/timer/TimerTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TimerTest extends ScalaTestWithActorTestKit with FunSuiteLike {
   test(&quot;Timer&quot;) {
     val ref = spawn(Timer())
     TimeUnit.SECONDS.sleep(5)
@@ -296,7 +298,7 @@ yangbajing/akka-cookbook
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/timer.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/timer.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

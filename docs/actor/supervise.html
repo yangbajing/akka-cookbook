@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -248,7 +250,7 @@ yangbajing/akka-cookbook
   <li><strong>Failure</strong>：对于 <strong>失败</strong>，应用 <strong>让它崩溃</strong> 模式是有用的。以一个干净地、可预测的全新状态恢复运行比通过大量的逻辑判断和try catch语句而污染了代码更有效。</li>
 </ul>
 <h2><a href="#示例" name="示例" class="anchor"><span class="anchor-link"></span></a>示例</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fault/FaultTolerance.scala#L28-L56" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class RestartException(message: String) extends RuntimeException(message)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/fault/FaultTolerance.scala#L28-L56" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class RestartException(message: String) extends RuntimeException(message)
 case class StopException(message: String) extends RuntimeException(message)
 
 sealed trait Command
@@ -299,7 +301,7 @@ Actor[akka://fault-tolerance/user#0] Received signal PostStop
 <p>Akka Typed的监管策略里没有了经典（Untyped）actor的 <strong>Escalate</strong> 策略。就是说Akka Typed默认是不支持异常冒泡的，需要**watch**子actor，并监听<code>ChildFailed</code>信号并再手动重新抛出异常，或者不处理子actor的终止信息而自动抛出<code>DeathPactException</code>异常。关于这方面的内容请参阅： <a href="escalate-exception.html">怎样向上冒泡异常</a>。</p>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/supervise.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/supervise.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

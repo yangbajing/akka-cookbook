@@ -162,8 +162,10 @@ yangbajing/akka-cookbook
     <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
     <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
     <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
     <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">限制 Streams 发送元素的速率</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
@@ -205,12 +207,14 @@ yangbajing/akka-cookbook
 <div class="md-content__searchable">
 <h1><a href="#stashbuffer-暂存待处理消息" name="stashbuffer-暂存待处理消息" class="anchor"><span class="anchor-link"></span></a>StashBuffer 暂存待处理消息</h1>
 <p>在之前状态机的例子，在 <strong>idle</strong> 状态时通过<code>pendingMessages</code>属性来暂存待处理消息。这是一种很常见的业务状态，比如：等待数据库连接建立、等待后端服务启动完成等，都需要在这段时间内将请求的消息暂存下来，待服务可用时对其处理。Akka内置了对此的功能：<code>StashBuffer[T]</code>，它可以减少actor内你自己的定义可变状态属性，使代码更清晰、健壮……</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/main/scala/cookbook/actor/fsm/StashFSM.scala#L23-L45" target="_blank" title="Go to snippet source"></a><code class="language-scala">object StashFSM {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/fsm/StashFSM.scala#L23-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala">object StashFSM {
   def apply(): Behavior[String] = Behaviors.setup { context =&gt;
     Behaviors.withStash(1024)(stash =&gt; new StashFSM(stash, context).idle())
   }
 }
-class StashFSM private (stash: StashBuffer[String], context: ActorContext[String]) {
+class StashFSM private (
+    stash: StashBuffer[String],
+    context: ActorContext[String]) {
   def idle(): Behavior[String] = Behaviors.receiveMessage {
     case &quot;running&quot; =&gt;
       stash.unstashAll(active())
@@ -230,7 +234,7 @@ class StashFSM private (stash: StashBuffer[String], context: ActorContext[String
 }</code></pre>
 <p>当actor还未准备好服务时，通过<code>stash.stash(msg)</code>将消息暂存。待actor可以服务时，使用<code>stash.unstashAll(active())</code>来调用新的行为函数将所有暂存的消息按FIFO依次重放。</p>
 <p>通过使用 <strong>StashBuffer</strong> ，不需要在actor内部自行使用一个集合变量来暂存消息，也不需要单独定义一个函数来处理这些暂存消息。只需要定义你本当需要的业务代码，待actor可用（可服务）时重放所有暂存消息即可。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/cookbook-actor/src/test/scala/cookbook/actor/fsm/StashFSMTest.scala#L23-L36" target="_blank" title="Go to snippet source"></a><code class="language-scala">class StashFSMTest extends ScalaTestWithActorTestKit with FunSuiteLike {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/fsm/StashFSMTest.scala#L23-L36" target="_blank" title="Go to snippet source"></a><code class="language-scala">class StashFSMTest extends ScalaTestWithActorTestKit with FunSuiteLike {
   test(&quot;StashFSM&quot;) {
     val ref = spawn(StashFSM(), &quot;fsm&quot;)
     ref ! &quot;message 1&quot;
@@ -253,7 +257,7 @@ class StashFSM private (stash: StashBuffer[String], context: ActorContext[String
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/1.0.0/book/src/main/paradox/actor/stash.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/stash.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

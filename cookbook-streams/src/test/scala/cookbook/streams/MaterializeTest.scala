@@ -31,8 +31,10 @@ class MaterializeTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "Materializer" must {
     "keep" in {
       // #keep
-      val source: Source[ByteString, Future[IOResult]] = FileIO.fromPath(Paths.get("/tmp/file.txt"))
-      val sink: Sink[ByteString, Future[IOResult]] = FileIO.toPath(Paths.get("/tmp/file2.txt"))
+      val source: Source[ByteString, Future[IOResult]] =
+        FileIO.fromPath(Paths.get("/tmp/file.txt"))
+      val sink: Sink[ByteString, Future[IOResult]] =
+        FileIO.toPath(Paths.get("/tmp/file2.txt"))
       val graph: Source[ByteString, Future[IOResult]] = source // (1)
         .via(Framing.delimiter(ByteString("\n"), 8192))
         .filterNot(_.isEmpty)

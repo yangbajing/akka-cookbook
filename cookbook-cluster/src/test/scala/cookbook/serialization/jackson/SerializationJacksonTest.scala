@@ -25,22 +25,28 @@ object SerializationJacksonTest {
   case class User(name: String, sex: Int)
   case class Error(status: Int, message: String)
 }
-class SerializationJacksonTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class SerializationJacksonTest
+    extends ScalaTestWithActorTestKit
+    with WordSpecLike {
   import SerializationJacksonTest._
-  private lazy val objectMapper = JacksonObjectMapperProvider(system.toClassic).getOrCreate("jackson-json", None)
+  private lazy val objectMapper = JacksonObjectMapperProvider(system.toClassic)
+    .getOrCreate("jackson-json", None)
   "serialization-jackson" should {
     "either" in {
       val right: Either[Error, User] = Right(User("羊八井", 1))
       val rightText = objectMapper.writeValueAsString(right)
       println(rightText)
       rightText should be("""{"r":{"name":"羊八井","sex":1}}""")
-      objectMapper.readValue(rightText, classOf[Right[Error, User]]) should be(right)
+      objectMapper.readValue(rightText, classOf[Right[Error, User]]) should be(
+        right)
 
       val left: Either[Error, User] = Left(Error(400, "Bad Request."))
       val leftText = objectMapper.writeValueAsString(left)
       println(leftText)
       leftText should be("""{"l":{"status":400,"message":"Bad Request."}}""")
-      objectMapper.treeToValue(objectMapper.readTree(leftText), classOf[Either[Error, User]]) should be(left)
+      objectMapper.treeToValue(
+        objectMapper.readTree(leftText),
+        classOf[Either[Error, User]]) should be(left)
     }
   }
 }

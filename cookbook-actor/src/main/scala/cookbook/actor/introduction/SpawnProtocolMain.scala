@@ -28,7 +28,8 @@ object SpawnProtocolMain {
     // #spawn-protocol
     implicit val system = ActorSystem(SpawnProtocol(), "spawn-protocol")
     implicit val timeout = Timeout(2.seconds)
-    val pingF = system.ask[ActorRef[Ping.Command]](replyTo => SpawnProtocol.Spawn(Ping(), "ping", Props.empty, replyTo))
+    val pingF = system.ask[ActorRef[Ping.Command]](replyTo =>
+      SpawnProtocol.Spawn(Ping(), "ping", Props.empty, replyTo))
     val ping = Await.result(pingF, 2.seconds)
     ping ! Ping.Start
     system.terminate()

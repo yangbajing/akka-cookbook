@@ -27,7 +27,12 @@ import scala.concurrent.duration._
 // #root-actor
 object RootActor {
   sealed trait Command
-  case class Spawn[T](behavior: Behavior[T], name: String, props: Props, replyTo: ActorRef[ActorRef[T]]) extends Command
+  case class Spawn[T](
+      behavior: Behavior[T],
+      name: String,
+      props: Props,
+      replyTo: ActorRef[ActorRef[T]])
+      extends Command
   // 在此添加其它业务消息
 
   def apply(): Behavior[Command] = Behaviors.receive {
@@ -42,7 +47,8 @@ object CustomSpawnMain {
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem(RootActor(), "root-actor")
     implicit val timeout = Timeout(2.seconds)
-    val pingF = system.ask[ActorRef[Ping.Command]](replyTo => RootActor.Spawn(Ping(), "ping", Props.empty, replyTo))
+    val pingF = system.ask[ActorRef[Ping.Command]](replyTo =>
+      RootActor.Spawn(Ping(), "ping", Props.empty, replyTo))
     val ping = Await.result(pingF, 2.seconds)
     ping ! Ping.Start
     system.terminate()

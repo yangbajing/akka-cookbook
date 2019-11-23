@@ -26,11 +26,11 @@ sbt:akka-cookbook> cookbook-actor/runMain cookbook.actor.introduction.HelloWorld
 
 ## Behavior
 
-Akka Typed不再需要通过类的形式来实现Actor接口定义，而是函数的形式来定义actor。可以看到，定义的actor类型为`Behavior[T]`（形为），通过`Behaviors.receiveMessage[T](T => Behavior[T]): Receive[T]`函数来处理接收到的消息，而`Receive`继承了`Behavior trait`。通过函数签名可以看到，每次接收到消息并对其处理完成后，都必需要返回一个新的形为。
+Akka Typed不再需要通过类的形式来实现Actor接口定义，而是函数的形式来定义actor。可以看到，定义的actor类型为`Behavior[T]`（形为），通过`Behaviors.receiveMessage[T](T => Behavior[T]): Receive[T]`函数来处理接收到的消息，而`Receive`继承了`Behavior trait`。通过函数签名可以看到，每次接收到消息并对其处理完成后，都必须要返回一个新的形为。
 
 `apply(): Behavior[Command]`函数签名里的范性参数类型`Command`限制了这个actor将只接收`Command`或`Command`子类型的消息，编译器将在编译期对传给actor的消息做类型检查，相对于从前的untyped actor可以向actor传入任何类型的消息，这可以限制的减少程序中的bug。特别是在程序规模很大，当你定义了成百上千个消息时。
 
-也因为有类型的actor，在Akka Typed中没有了隐式发送的`sender: ActorRef`，必需在发送的消息里面包含回复字段，就如`PingCommand`消息定义里的`replyTo: ActorRef[Ping.Command]`字段一样。actor在处理完消息后可以通过它向发送者回复处理结果。
+也因为有类型的actor，在Akka Typed中没有了隐式发送的`sender: ActorRef`，必须在发送的消息里面包含回复字段，就如`PingCommand`消息定义里的`replyTo: ActorRef[Ping.Command]`字段一样。actor在处理完消息后可以通过它向发送者回复处理结果。
 
 ## ActorRef
 

@@ -36,27 +36,35 @@ class TimeUtilsTest extends FunSuite with MustMatchers {
   }
 
   test("testToSqlDate") {
-    TimeUtils.toSqlDate(LocalDate.of(2019, 2, 28)) mustBe java.sql.Date.valueOf("2019-2-28")
+    TimeUtils.toSqlDate(LocalDate.of(2019, 2, 28)) mustBe java.sql.Date
+      .valueOf("2019-2-28")
   }
 
   test("testToSqlTimestamp") {
-    val sqlTimestamp = TimeUtils.toSqlTimestamp(LocalDateTime.of(2019, 4, 15, 11, 22, 33))
+    val sqlTimestamp =
+      TimeUtils.toSqlTimestamp(LocalDateTime.of(2019, 4, 15, 11, 22, 33))
     sqlTimestamp mustBe java.sql.Timestamp.valueOf("2019-04-15 11:22:33")
   }
 
   test("testNowEnd") {
     val nowEnd = TimeUtils.nowEnd()
-    nowEnd mustBe LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59, 999999999))
+    nowEnd mustBe LocalDateTime.of(
+      LocalDate.now(),
+      LocalTime.of(23, 59, 59, 999999999))
   }
 
   test("testToLocalDateTime") {
     val instant = Instant.now()
-    val ldt = LocalDateTime.ofInstant(instant, TimeUtils.ZONE_CHINA_OFFSET /*ZoneId.systemDefault()*/ )
+    val ldt = LocalDateTime.ofInstant(
+      instant,
+      TimeUtils.ZONE_CHINA_OFFSET /*ZoneId.systemDefault()*/ )
     TimeUtils.toLocalDateTime(java.util.Date.from(instant)) mustBe ldt
     TimeUtils.toLocalDateTime(instant.toEpochMilli) mustBe ldt
-    TimeUtils.toLocalDateTime("2019-4-9 12:9:9") mustBe LocalDateTime.of(2019, 4, 9, 12, 9, 9)
+    TimeUtils.toLocalDateTime("2019-4-9 12:9:9") mustBe LocalDateTime.of(2019,
+      4, 9, 12, 9, 9)
     TimeUtils.toLocalDateTime(instant) mustBe ldt
-    TimeUtils.toLocalDateTime("2019-5-11", "12:8:4") mustBe LocalDateTime.of(2019, 5, 11, 12, 8, 4)
+    TimeUtils.toLocalDateTime("2019-5-11", "12:8:4") mustBe LocalDateTime.of(
+        2019, 5, 11, 12, 8, 4)
   }
 
   test("testNowTimestamp") {
@@ -76,7 +84,9 @@ class TimeUtilsTest extends FunSuite with MustMatchers {
 
     val ts = System.currentTimeMillis()
     TimeUtils.toOffsetDateTime(ts) mustBe
-    OffsetDateTime.ofInstant(Instant.ofEpochMilli(ts), TimeUtils.ZONE_CHINA_OFFSET)
+    OffsetDateTime.ofInstant(
+      Instant.ofEpochMilli(ts),
+      TimeUtils.ZONE_CHINA_OFFSET)
 
     TimeUtils.toOffsetDateTime("2019-4-9", "11:22:33", ZoneOffset.UTC) mustBe
     OffsetDateTime.of(2019, 4, 9, 11, 22, 33, 0, ZoneOffset.UTC)
@@ -86,7 +96,8 @@ class TimeUtilsTest extends FunSuite with MustMatchers {
   }
 
   test("testToZonedDateTime") {
-    val zdt = ZonedDateTime.of(2019, 4, 9, 11, 7, 22, 0, ZoneId.of("Asia/Shanghai"))
+    val zdt =
+      ZonedDateTime.of(2019, 4, 9, 11, 7, 22, 0, ZoneId.of("Asia/Shanghai"))
     TimeUtils.toZonedDateTime("2019-04-09T11:07:22+08:00[Asia/Shanghai]") mustBe zdt
     TimeUtils.toZonedDateTime("2019-4-9T11:07:22+08[Asia/Shanghai]") mustBe zdt
     TimeUtils.toZonedDateTime("2019-4-9 11:7:22+08[Asia/Shanghai]") mustBe zdt
@@ -101,7 +112,9 @@ class TimeUtilsTest extends FunSuite with MustMatchers {
 
   test("testToEpochMilli") {
     val ldt = LocalDateTime.of(2019, 4, 9, 16, 18, 4)
-    TimeUtils.toEpochMilli(ldt) mustBe ldt.toInstant(TimeUtils.ZONE_CHINA_OFFSET).toEpochMilli
+    TimeUtils.toEpochMilli(ldt) mustBe ldt
+      .toInstant(TimeUtils.ZONE_CHINA_OFFSET)
+      .toEpochMilli
     TimeUtils.toEpochMilli(ldt.atOffset(TimeUtils.ZONE_CHINA_OFFSET)) mustBe
     ldt.toInstant(TimeUtils.ZONE_CHINA_OFFSET).toEpochMilli
     TimeUtils.toEpochMilli(ldt.atZone(TimeUtils.ZONE_CHINA_OFFSET)) mustBe

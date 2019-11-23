@@ -19,7 +19,13 @@ package cookbook.actor.requestresponse
 import java.util.concurrent.TimeUnit
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ ActorRef, ActorSystem, Behavior, Props, SpawnProtocol }
+import akka.actor.typed.{
+  ActorRef,
+  ActorSystem,
+  Behavior,
+  Props,
+  SpawnProtocol
+}
 import akka.util.Timeout
 import helloscala.common.util.ActorUtils
 
@@ -28,14 +34,16 @@ import scala.concurrent.duration._
 object Request {
   // #command
   sealed trait Command
-  private final case class WrappedBackendResponse(response: Backend.Response) extends Command
+  private final case class WrappedBackendResponse(response: Backend.Response)
+      extends Command
   // #command
 
   final case object Start extends Command
 
   def apply(): Behavior[Command] = Behaviors.setup[Command] { context =>
     // #adapted-message
-    val backendAdapter = context.messageAdapter[Backend.Response](resp => WrappedBackendResponse(resp))
+    val backendAdapter = context.messageAdapter[Backend.Response](resp =>
+      WrappedBackendResponse(resp))
     // #adapted-message
 
     // #request-response
@@ -58,7 +66,8 @@ object Request {
 
 object Backend {
   sealed trait Command
-  final case class StartJob(job: String, replyTo: ActorRef[Response]) extends Command
+  final case class StartJob(job: String, replyTo: ActorRef[Response])
+      extends Command
 
   sealed trait Response
   case object JobStarted extends Response
