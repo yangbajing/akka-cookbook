@@ -248,7 +248,7 @@ yangbajing/akka-cookbook
   <li><code>Out</code>：输出元素类型</li>
   <li><code>Mat</code>：物化值类型，物化值可用于记录<code>Source</code>的内部状态或操作记录等。比如：<code>FileIO.fromPath</code>这个<code>Source</code>的物化值记录了从文件里实际读取到的字符数。</li>
 </ul>
-<p><code>Source</code>通过类构造器实现了<code>Graph</code>接口的<code>traversalBuilder</code>和<code>shape</code>两个参数，其中<code>shape</code>限制了必需为一个<code>SourceShape[Out]</code>类型。</p>
+<p><code>Source</code>通过类构造器实现了<code>Graph</code>接口的<code>traversalBuilder</code>和<code>shape</code>两个参数，其中<code>shape</code>限制了必须为一个<code>SourceShape[Out]</code>类型。</p>
 <p><code>Source</code>还实现了<code>FlowOpsMat</code>特质，使得<code>Source</code>具有了一系列的<code>via</code>、<code>to</code>（及它们的变体）函数和丰富和流程转换函数（Flow操作符）。</p>
 <ul>
   <li><code>via</code>：用于连接<code>Flow</code>，它将一个流处理过程与当前<code>Source</code>连接，并返回另一个<code>Source</code>，其中<code>Flow</code>的输出端口将作为新<code>Source</code>的输出端口</li>

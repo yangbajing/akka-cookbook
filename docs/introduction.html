@@ -279,9 +279,9 @@ system.terminate()</code></pre>
 [success] Total time: 1 s, completed Nov 19, 2019 19:24:39 PM
 </code></pre>
 <h2><a href="#behavior" name="behavior" class="anchor"><span class="anchor-link"></span></a>Behavior</h2>
-<p>Akka Typed不再需要通过类的形式来实现Actor接口定义，而是函数的形式来定义actor。可以看到，定义的actor类型为<code>Behavior[T]</code>（形为），通过<code>Behaviors.receiveMessage[T](T =&gt; Behavior[T]): Receive[T]</code>函数来处理接收到的消息，而<code>Receive</code>继承了<code>Behavior trait</code>。通过函数签名可以看到，每次接收到消息并对其处理完成后，都必需要返回一个新的形为。</p>
+<p>Akka Typed不再需要通过类的形式来实现Actor接口定义，而是函数的形式来定义actor。可以看到，定义的actor类型为<code>Behavior[T]</code>（形为），通过<code>Behaviors.receiveMessage[T](T =&gt; Behavior[T]): Receive[T]</code>函数来处理接收到的消息，而<code>Receive</code>继承了<code>Behavior trait</code>。通过函数签名可以看到，每次接收到消息并对其处理完成后，都必须要返回一个新的形为。</p>
 <p><code>apply(): Behavior[Command]</code>函数签名里的范性参数类型<code>Command</code>限制了这个actor将只接收<code>Command</code>或<code>Command</code>子类型的消息，编译器将在编译期对传给actor的消息做类型检查，相对于从前的untyped actor可以向actor传入任何类型的消息，这可以限制的减少程序中的bug。特别是在程序规模很大，当你定义了成百上千个消息时。</p>
-<p>也因为有类型的actor，在Akka Typed中没有了隐式发送的<code>sender: ActorRef</code>，必需在发送的消息里面包含回复字段，就如<code>PingCommand</code>消息定义里的<code>replyTo: ActorRef[Ping.Command]</code>字段一样。actor在处理完消息后可以通过它向发送者回复处理结果。</p>
+<p>也因为有类型的actor，在Akka Typed中没有了隐式发送的<code>sender: ActorRef</code>，必须在发送的消息里面包含回复字段，就如<code>PingCommand</code>消息定义里的<code>replyTo: ActorRef[Ping.Command]</code>字段一样。actor在处理完消息后可以通过它向发送者回复处理结果。</p>
 <h2><a href="#actorref" name="actorref" class="anchor"><span class="anchor-link"></span></a>ActorRef</h2>
 <p><code>ActorRef[T]</code>是<code>Behavior[T]</code>被ActorSystem构造后创建的actor的引用，与经典<code>ActorRef</code>的区别显而易见，它拥有了一个类型参数<code>T</code>，<code>T</code>限定了这个actor只能处理<code>T</code>或它的子类型。这相对经典actor是一大进步，特别是在你的actor系统规模很大时，若没有一个静态的类型约束你将十之八九会迷失在消息的海洋……</p>
 <h2><a href="#构造-actorsystem" name="构造-actorsystem" class="anchor"><span class="anchor-link"></span></a>构造 ActorSystem</h2>

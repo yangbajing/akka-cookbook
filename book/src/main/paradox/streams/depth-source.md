@@ -17,7 +17,7 @@ final class Source[+Out, +Mat](
 - `Out`：输出元素类型
 - `Mat`：物化值类型，物化值可用于记录`Source`的内部状态或操作记录等。比如：`FileIO.fromPath`这个`Source`的物化值记录了从文件里实际读取到的字符数。
 
-`Source`通过类构造器实现了`Graph`接口的`traversalBuilder`和`shape`两个参数，其中`shape`限制了必需为一个`SourceShape[Out]`类型。
+`Source`通过类构造器实现了`Graph`接口的`traversalBuilder`和`shape`两个参数，其中`shape`限制了必须为一个`SourceShape[Out]`类型。
 
 `Source`还实现了`FlowOpsMat`特质，使得`Source`具有了一系列的`via`、`to`（及它们的变体）函数和丰富和流程转换函数（Flow操作符）。
 
