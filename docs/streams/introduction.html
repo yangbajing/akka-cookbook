@@ -284,7 +284,7 @@ object Startup {
 <p>Akka Streams 将流处理逻辑抽像了 <strong>Source</strong>、**Flow**和**Sink** 三部分概念。</p>
 <ul>
   <li><code>Source: [OUT, Mat]</code>：源，上游。生产数据，默认需要由下游调用<code>pull</code>请求触发。</li>
-  <li><code>Flow: [IN, OUT, Mat]</code>：流程、转换，数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。</li>
+  <li><code>Flow: [IN, OUT, Mat]</code>：流程、转换，数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。连接<code>Flow</code>转入端的称为<code>Flow</code>的上游，连接转出端的称为<code>Flow</code>的上游。当<code>Source</code>通过<code>viaMat</code>函数把<code>Flow</code>连接起来，返回值是一个新的<code>Source</code>，<code>Flow</code>的输出端既是这个新<code>Source</code>的输出端。</li>
   <li><code>Sink: [IN, Mat]</code>：汇，下游。汇集上游发送的数据。</li>
 </ul>
 <h2><a href="#graph" name="graph" class="anchor"><span class="anchor-link"></span></a>Graph</h2>

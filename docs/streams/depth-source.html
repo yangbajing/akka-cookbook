@@ -195,7 +195,8 @@ yangbajing/akka-cookbook
   <ul>
     <li><a href="../streams/depth-source.html#source" class="header">Source</a></li>
     <li><a href="../streams/depth-source.html#sourceshape" class="header">SourceShape</a></li>
-    <li><a href="../streams/depth-source.html#构建-source" class="header">构建 <code>Source</code></a></li>
+    <li><a href="../streams/depth-source.html#source-怎么生产数据-" class="header">Source 怎么生产数据？</a></li>
+    <li><a href="../streams/depth-source.html#filesource-实例讲解" class="header">FileSource 实例讲解</a></li>
     <li><a href="../streams/depth-source.html#小结" class="header">小结</a></li>
   </ul></li>
 </ul>
@@ -222,7 +223,8 @@ yangbajing/akka-cookbook
   <ul>
     <li><a href="../streams/depth-source.html#source" class="header">Source</a></li>
     <li><a href="../streams/depth-source.html#sourceshape" class="header">SourceShape</a></li>
-    <li><a href="../streams/depth-source.html#构建-source" class="header">构建 <code>Source</code></a></li>
+    <li><a href="../streams/depth-source.html#source-怎么生产数据-" class="header">Source 怎么生产数据？</a></li>
+    <li><a href="../streams/depth-source.html#filesource-实例讲解" class="header">FileSource 实例讲解</a></li>
     <li><a href="../streams/depth-source.html#小结" class="header">小结</a></li>
   </ul></li>
 </ul>
@@ -275,22 +277,12 @@ yangbajing/akka-cookbook
 }
 </code></pre>
 <p><code>SourceShape</code>使用了<code>final</code>做修饰，这就确定了<code>Source</code>的形状（<code>shape</code>）只能为<code>SourceShape</code>，而且限制为没有输入端口，只有一个输出端口的形状；唯一可定义的地方就是它的输出端口发送出数据的类型。</p>
-<h2><a href="#构建-source" name="构建-source" class="anchor"><span class="anchor-link"></span></a>构建 <code>Source</code></h2>
-<p>一般不会通过<code>new</code>的方式直接创建一个<code>Source</code>出来，而是通过调用<code>Source.fromGraph</code>从一个预定义好的图创建，如：</p>
-<pre class="prettyprint"><code class="language-scala">def fromPath(
-    f: Path, 
-    chunkSize: Int, 
-    startPosition: Long): Source[ByteString, Future[IOResult]] =
-  Source
-    .fromGraph(new FileSource(f, chunkSize, startPosition))
-    .withAttributes(DefaultAttributes.fileSource)
-</code></pre>
-<p>这里通过Akka Streams自带的<code>FileSource</code>讲述Source图的定义过程。<code>FileSource</code>通过自定文件创建一个异步的文件读取源（Source）。</p>
-<h3><a href="#graphstage" name="graphstage" class="anchor"><span class="anchor-link"></span></a>GraphStage</h3>
-<p><strong>GraphStage</strong> 代表一个可重复使用的流处理操作图（a reusable graph stream processing operator），常用的 <strong>GraphStage</strong> 有两个：</p>
+<h2><a href="#source-怎么生产数据-" name="source-怎么生产数据-" class="anchor"><span class="anchor-link"></span></a>Source 怎么生产数据？</h2>
+<p><code>Source</code>是怎么生产数据并发送到下游的呢？是在<code>GraphStageLogic</code>里调用<code>push</code>函数将数据推送到下游的。<code>GraphStageLogic</code>用于定义图处理实际逻辑，它需要通过<code>GraphStageWithMaterializedValue</code>抽像类提供的方法创建，而这人抽像类继承了<code>Graph</code>特质。</p>
+<p>通常我们不会直接使用<code>Graph</code>来构建自己的图结构，而是会使用<code>GraphStageWithMaterializedValue</code>（或它的某个子类，接下来统称它们为 <strong>GraphStage</strong> ）。 <strong>GraphStage</strong> 是一个可重复使用的流处理操作图（a reusable graph stream processing operator），常用的 <strong>GraphStage</strong> 有两个：</p>
 <ul>
-  <li><code>GraphStage</code>：不需要物化值的操作图，这样的图构造出的 <strong>Source</strong> 签名类似：<code>Source[Out, NotUsed]</code>；</li>
   <li><code>GraphStageWithMaterializedValue</code>：有物化值的操作图，这样的图构造的 <strong>Source</strong> 签名类似：<code>Source[Out, Mat]</code>。</li>
+  <li><code>GraphStage</code>：不需要物化值的操作图，这样的图构造出的 <strong>Source</strong> 签名类似：<code>Source[Out, NotUsed]</code>；</li>
 </ul>
 <pre class="prettyprint"><code class="language-scala">abstract class GraphStageWithMaterializedValue[+S &lt;: Shape, +M]
     extends Graph[S, M] {
@@ -310,6 +302,21 @@ abstract class GraphStage[S &lt;: Shape]
 }
 </code></pre>
 <p><code>GraphStageWithMaterializedValue</code>有一个抽像方法待实现，它返回图处理逻辑和物化值的元组，类型为：<code>(GraphStageLogic, M)</code>。<code>GraphStage</code>继承了<code>GraphStageWithMaterializedValue</code>，它实现了<code>createLogicAndMaterializedValue</code>方法并将物化值固定为<code>NotUsed</code>，同时提供<code>createLogic</code>供实现类创建图处理逻辑。</p>
+<p>回到<code>GraphStageLogic</code>的<code>push</code>函数，通过它将数据元素发送到指定的输出端口。通常我们可以在<code>onPull</code>事件响应函数里调用它，<code>onPull</code>函数将由下游通过<code>pull</code>函数触发。</p>
+<pre class="prettyprint"><code class="language-scala">final protected def push[T](out: Outlet[T], elem: T): Unit
+</code></pre>
+<p>向指定的输出端口发射数据元素，在<code>pull</code>事件到达之前调用此方法两次将失败，在任何时间只能有一个未完成的推送请求。方法<code>isAvailable</code>可用于检查输出端口是否已准备好被推送。</p>
+<h2><a href="#filesource-实例讲解" name="filesource-实例讲解" class="anchor"><span class="anchor-link"></span></a>FileSource 实例讲解</h2>
+<p>一般不会通过<code>new</code>的方式直接创建一个<code>Source</code>出来，而是通过调用<code>Source.fromGraph</code>从一个预定义好的图创建，如：</p>
+<pre class="prettyprint"><code class="language-scala">def fromPath(
+    f: Path, 
+    chunkSize: Int, 
+    startPosition: Long): Source[ByteString, Future[IOResult]] =
+  Source
+    .fromGraph(new FileSource(f, chunkSize, startPosition))
+    .withAttributes(DefaultAttributes.fileSource)
+</code></pre>
+<p>这里通过Akka Streams自带的<code>FileSource</code>讲述Source图的定义过程。<code>FileSource</code>通过自定文件创建一个异步的文件读取源（Source）。</p>
 <pre class="prettyprint"><code class="language-scala">final case class IOResult(count: Long)
 
 private[akka] final class FileSource(
@@ -335,7 +342,6 @@ private[akka] final class FileSource(
       val maxReadAhead = inheritedAttributes.get[InputBuffer](InputBuffer(16, 16)).max
       var channel: FileChannel = _
       var position = startPosition
-      var chunkCallback: Try[Int] =&gt; Unit = _
       var eofEncountered = false
       var availableChunks: Vector[ByteString] = Vector.empty[ByteString]
 
@@ -346,6 +352,113 @@ private[akka] final class FileSource(
   }
 </code></pre>
 <p>变量<code>logic</code>和<code>ioResultPromise</code>，将作为<code>createLogicAndMaterializedValue</code>函数的返回值。<code>login</code>匿名实现了从<code>path</code>文件读取数据并发送到下游的功能逻辑，在图成功或失败完成时将<code>position</code>（读取到文件的位置偏移处（字节））</p>
+<h3><a href="#graphstagelogic-详解" name="graphstagelogic-详解" class="anchor"><span class="anchor-link"></span></a>GraphStageLogic 详解</h3>
+<p><strong>图属性变量</strong></p>
+<pre class="prettyprint"><code class="language-scala">val buffer = ByteBuffer.allocate(chunkSize)
+val maxReadAhead = inheritedAttributes.get[InputBuffer](InputBuffer(16, 16)).max
+var channel: FileChannel = _
+var position = startPosition
+var eofEncountered = false
+var availableChunks: Vector[ByteString] = Vector.empty[ByteString]
+</code></pre>
+<ul>
+  <li><code>buffer</code>：每次从文件里读取数据块缓存，读取的数据块将追加到<code>availableChunks</code></li>
+  <li><code>maxReadAhead</code>：<code>availableChunks</code>长度，限制最多可向前读取的最大次数</li>
+  <li><code>channel</code>：低层<code>FileChannel</code></li>
+  <li><code>position</code>：当前文件读取打针位置</li>
+  <li><code>eofEncoutered</code>：是否读到文件尾</li>
+  <li><code>availableChunks</code>：缓存的未处理数据块</li>
+</ul>
+<p><strong>图的初始化</strong></p>
+<pre class="prettyprint"><code class="language-scala">  override def preStart(): Unit = {
+    try {
+      // this is a bit weird but required to keep existing semantics
+      if (!Files.exists(path)) throw new NoSuchFileException(path.toString)
+
+      require(!Files.isDirectory(path), s&quot;Path &#39;$path&#39; is a directory&quot;)
+      require(Files.isReadable(path), s&quot;Missing read permission for &#39;$path&#39;&quot;)
+
+      channel = FileChannel.open(path, StandardOpenOption.READ)
+      channel.position(position)
+    } catch {
+      case ex: Exception =&gt;
+        ioResultPromise.trySuccess(IOResult(position, Failure(ex)))
+        throw ex
+    }
+  }
+</code></pre>
+<p>校验<code>path</code>指定的文件是否存在、是否可读，并以指定的偏移量位置打开 <code>FileChannel</code>。</p>
+<p><strong>onPull</strong></p>
+<pre class="prettyprint"><code class="language-scala">  override def onPull(): Unit = {
+    if (availableChunks.size &lt; maxReadAhead &amp;&amp; !eofEncountered)
+      availableChunks = readAhead(maxReadAhead, availableChunks)
+    //if already read something and try
+    if (availableChunks.nonEmpty) {
+      emitMultiple(out, availableChunks.iterator, () =&gt; if (eofEncountered) success() else setHandler(out, handler))
+      availableChunks = Vector.empty[ByteString]
+    } else if (eofEncountered) success()
+  }
+</code></pre>
+<ol>
+  <li>当收到下游拉取数据请求时，通过<code>readAhead</code>函数从<code>channel</code>中读取尽量多的数据块</li>
+  <li>当<code>availableChunks</code>不为空，通过<code>emitMultiple</code>函数高效的将多个可用数据块 push 到下游。</li>
+</ol>
+<pre class="prettyprint"><code class="language-scala">final protected def emitMultiple[T](out: Outlet[T], elems: Iterator[T], andThen: () =&gt; Unit): Unit
+</code></pre>
+<p><code>emitMultiple</code>函数可以简化需要发射多个元素的工作，它将在多个元素发射完成后恢复原有的处理程序（<code>OutHandler</code>），这样就不需要自己手动管理多个元素的发射状态。</p>
+<p><strong>readAhead，读取数据</strong> </p>
+<pre class="prettyprint"><code class="language-scala">  private def success(): Unit = {
+    completeStage()
+    ioResultPromise.trySuccess(IOResult(position, Success(Done)))
+  }
+  /** BLOCKING I/O READ */
+  @tailrec def readAhead(maxChunks: Int, chunks: Vector[ByteString]): Vector[ByteString] =
+    if (chunks.size &lt; maxChunks &amp;&amp; !eofEncountered) {
+      val readBytes = try channel.read(buffer, position)
+      catch {
+        case NonFatal(ex) =&gt;
+          failStage(ex)
+          ioResultPromise.trySuccess(IOResult(position, Failure(ex)))
+          throw ex
+      }
+
+      if (readBytes &gt; 0) {
+        buffer.flip()
+        position += readBytes
+        val newChunks = chunks :+ ByteString.fromByteBuffer(buffer)
+        buffer.clear()
+
+        if (readBytes &lt; chunkSize) {
+          eofEncountered = true
+          newChunks
+        } else readAhead(maxChunks, newChunks)
+      } else {
+        eofEncountered = true
+        chunks
+      }
+    } else chunks
+</code></pre>
+<p><code>readAhead</code>是一个尾递归函数，编译器在编译时会将其优化成循环调用，这样可避免栈溢出和性能问题。<code>readAhead</code>首先判断<code>chunks</code>是否未满或还有文件可读，若是则进行文件数据读取，否直接返回<code>chunks</code>。当<code>channel.read</code>返回的实际读出字节数<code>readBytes</code>大于0且不小于<code>chunkSize</code>，代表文件还有数据可继续读取，这时递归<code>readAhead</code>函数；否则设置 <code>eofEncoutered</code>为<code>true</code>并返回<code>newChunks</code>。</p>
+<p><strong>onDownstreamFinish</strong></p>
+<pre class="prettyprint"><code class="language-scala">  override def onDownstreamFinish(cause: Throwable): Unit = {
+    cause match {
+      case _: SubscriptionWithCancelException.NonFailureCancellation =&gt;
+        success()
+      case ex =&gt;
+        ioResultPromise.tryFailure(
+          new IOOperationIncompleteException(&quot;Downstream failed before reaching file end&quot;, position, ex))
+        completeStage()
+    }
+  }
+</code></pre>
+<p>当下游取消（cancel）时，会触发<code>onDownstreamFinish</code>函数，并通过<code>cause</code>参数告知下游取消时的异常，在此也完成当前<code>Source</code>。</p>
+<p><strong>postStop</strong></p>
+<pre class="prettyprint"><code class="language-scala">  override def postStop(): Unit = {
+    ioResultPromise.trySuccess(IOResult(position, Success(Done)))
+    if ((channel ne null) &amp;&amp; channel.isOpen) channel.close()
+  }
+</code></pre>
+<p>在图停止后做清理工作，关闭打开的文件。</p>
 <h2><a href="#小结" name="小结" class="anchor"><span class="anchor-link"></span></a>小结</h2>
 <p>完整<code>FileSource</code>源码见：<a href="https://github.com/akka/akka/blob/master/akka-stream/src/main/scala/akka/stream/impl/io/IOSources.scala">https://github.com/akka/akka/blob/master/akka-stream/src/main/scala/akka/stream/impl/io/IOSources.scala</a>。</p>
 </div>

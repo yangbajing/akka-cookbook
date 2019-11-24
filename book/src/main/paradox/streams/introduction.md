@@ -35,7 +35,7 @@ implicit val system: ActorSystem = _
 Akka Streams 将流处理逻辑抽像了 **Source**、**Flow**和**Sink** 三部分概念。
 
 - `Source: [OUT, Mat]`：源，上游。生产数据，默认需要由下游调用`pull`请求触发。
-- `Flow: [IN, OUT, Mat]`：流程、转换，数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。
+- `Flow: [IN, OUT, Mat]`：流程、转换，数据转换步骤。可对流过的数据元素作各种转换操作，如：格式化、类型转换，过滤……甚至可以自定义一个流处理图来实现更复杂的功能。连接`Flow`转入端的称为`Flow`的上游，连接转出端的称为`Flow`的上游。当`Source`通过`viaMat`函数把`Flow`连接起来，返回值是一个新的`Source`，`Flow`的输出端既是这个新`Source`的输出端。
 - `Sink: [IN, Mat]`：汇，下游。汇集上游发送的数据。
 
 ## Graph
