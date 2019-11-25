@@ -182,6 +182,14 @@ yangbajing/akka-cookbook
     <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
+  <ul>
+    <li><a href="../grpc/grpc.html" class="page">gRPC服务</a></li>
+    <li><a href="../grpc/build-tool.html" class="page">构建工具</a></li>
+    <li><a href="../grpc/deployment.html" class="page">部署</a></li>
+    <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
+    <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
+  </ul></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a>
   <ul>
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
@@ -207,14 +215,12 @@ yangbajing/akka-cookbook
 <div class="md-content__searchable">
 <h1><a href="#stashbuffer-暂存待处理消息" name="stashbuffer-暂存待处理消息" class="anchor"><span class="anchor-link"></span></a>StashBuffer 暂存待处理消息</h1>
 <p>在之前状态机的例子，在 <strong>idle</strong> 状态时通过<code>pendingMessages</code>属性来暂存待处理消息。这是一种很常见的业务状态，比如：等待数据库连接建立、等待后端服务启动完成等，都需要在这段时间内将请求的消息暂存下来，待服务可用时对其处理。Akka内置了对此的功能：<code>StashBuffer[T]</code>，它可以减少actor内你自己的定义可变状态属性，使代码更清晰、健壮……</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/fsm/StashFSM.scala#L23-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala">object StashFSM {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/fsm/StashFSM.scala#L23-L45" target="_blank" title="Go to snippet source"></a><code class="language-scala">object StashFSM {
   def apply(): Behavior[String] = Behaviors.setup { context =&gt;
     Behaviors.withStash(1024)(stash =&gt; new StashFSM(stash, context).idle())
   }
 }
-class StashFSM private (
-    stash: StashBuffer[String],
-    context: ActorContext[String]) {
+class StashFSM private (stash: StashBuffer[String], context: ActorContext[String]) {
   def idle(): Behavior[String] = Behaviors.receiveMessage {
     case &quot;running&quot; =&gt;
       stash.unstashAll(active())

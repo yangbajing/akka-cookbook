@@ -182,6 +182,14 @@ yangbajing/akka-cookbook
     <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
+  <ul>
+    <li><a href="../grpc/grpc.html" class="page">gRPC服务</a></li>
+    <li><a href="../grpc/build-tool.html" class="page">构建工具</a></li>
+    <li><a href="../grpc/deployment.html" class="page">部署</a></li>
+    <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
+    <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
+  </ul></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a>
   <ul>
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
@@ -247,7 +255,7 @@ class FiniteStateMachine private (context: ActorContext[String]) {
 <p>可以在<code>FiniteStateMachine</code>类构造块里作actor的初始化工作，也可以在<code>Behaviors.setup</code>里初始化后将数据通过构造参数传给<code>FiniteStateMachine</code>，就像<code>context</code>参数一样。</p>
 <p>但需要注意的时，如何actor重启，<code>pendingMessages</code>将不会保存之前的状态（内容），因为<code>FiniteStateMachine</code>将被重新实例化。这可以通过某种持久化机制来解决，如： <strong>Akka Persistence</strong> ；或者在 <code>PreRestart</code> 信号处理函数里自行保存数据，再在类构造时读出。</p></div>
 <p>测试代码如下：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/fsm/FiniteStateMachineTest.scala#L27-L34" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ref = spawn(FiniteStateMachine(), &quot;fsm&quot;)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/fsm/FiniteStateMachineTest.scala#L25-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ref = spawn(FiniteStateMachine(), &quot;fsm&quot;)
 ref ! &quot;message 1&quot;
 ref ! &quot;message 2&quot;
 ref ! &quot;running&quot;

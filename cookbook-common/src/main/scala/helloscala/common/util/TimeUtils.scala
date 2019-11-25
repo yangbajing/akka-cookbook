@@ -106,8 +106,7 @@ object TimeUtils extends StrictLogging {
         case Array(y) =>
           (y.toInt, 1, 1)
         case _ =>
-          throw new IllegalArgumentException(
-            s"$date is invalid iso date format")
+          throw new IllegalArgumentException(s"$date is invalid iso date format")
       }
 
       if (year < 0 || year > 9999)
@@ -139,8 +138,7 @@ object TimeUtils extends StrictLogging {
           case Array(h) =>
             (h.toInt, 0, 0, 0)
           case _ =>
-            throw new IllegalArgumentException(
-              s"$time is invalid iso time format")
+            throw new IllegalArgumentException(s"$time is invalid iso time format")
         }
 
       LocalTime.of(hour, minute, second, nano)
@@ -176,8 +174,7 @@ object TimeUtils extends StrictLogging {
           if (containsDateKeys(dOrT)) toLocalDateTime(dOrT, "")
           else toLocalDateTime("", dOrT)
         case _ =>
-          throw new DateTimeException(
-            s"$ldt 是无效的日期时间格式，推荐格式：yyyy-MM-dd HH:mm:ss")
+          throw new DateTimeException(s"$ldt 是无效的日期时间格式，推荐格式：yyyy-MM-dd HH:mm:ss")
       }
     }
 
@@ -225,8 +222,7 @@ object TimeUtils extends StrictLogging {
           val time =
             TIME_REGEX
               .findFirstIn(timeAndZone)
-              .getOrElse(
-                throw new DateTimeException(s"$timeAndZone 不能截取有效的时间部分"))
+              .getOrElse(throw new DateTimeException(s"$timeAndZone 不能截取有效的时间部分"))
           val zone = Utils
             .option(timeAndZone.replaceFirst(time, ""))
             .map(zoneOf)
@@ -254,10 +250,7 @@ object TimeUtils extends StrictLogging {
   def toZonedDateTime(date: String, time: String): ZonedDateTime =
     toZonedDateTime(date, time, ZONE_CHINA_OFFSET)
 
-  def toZonedDateTime(
-      date: String,
-      time: String,
-      zoneId: ZoneId): ZonedDateTime =
+  def toZonedDateTime(date: String, time: String, zoneId: ZoneId): ZonedDateTime =
     toLocalDateTime(date, time).atZone(zoneId)
 
   def toZonedDateTime(epochMillis: Long): ZonedDateTime =

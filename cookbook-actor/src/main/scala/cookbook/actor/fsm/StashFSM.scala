@@ -25,9 +25,7 @@ object StashFSM {
     Behaviors.withStash(1024)(stash => new StashFSM(stash, context).idle())
   }
 }
-class StashFSM private (
-    stash: StashBuffer[String],
-    context: ActorContext[String]) {
+class StashFSM private (stash: StashBuffer[String], context: ActorContext[String]) {
   def idle(): Behavior[String] = Behaviors.receiveMessage {
     case "running" =>
       stash.unstashAll(active())
