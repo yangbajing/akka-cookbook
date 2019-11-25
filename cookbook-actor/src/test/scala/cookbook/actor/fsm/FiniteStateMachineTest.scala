@@ -19,9 +19,7 @@ package cookbook.actor.fsm
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import org.scalatest.FunSuiteLike
 
-class FiniteStateMachineTest
-    extends ScalaTestWithActorTestKit
-    with FunSuiteLike {
+class FiniteStateMachineTest extends ScalaTestWithActorTestKit with FunSuiteLike {
   test("FiniteStateMachine") {
     // #FiniteStateMachine
     val ref = spawn(FiniteStateMachine(), "fsm")

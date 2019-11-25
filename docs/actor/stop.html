@@ -182,6 +182,14 @@ yangbajing/akka-cookbook
     <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
+  <ul>
+    <li><a href="../grpc/grpc.html" class="page">gRPC服务</a></li>
+    <li><a href="../grpc/build-tool.html" class="page">构建工具</a></li>
+    <li><a href="../grpc/deployment.html" class="page">部署</a></li>
+    <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
+    <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
+  </ul></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a>
   <ul>
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
@@ -233,17 +241,17 @@ yangbajing/akka-cookbook
 <h1><a href="#怎样优雅的停止actor" name="怎样优雅的停止actor" class="anchor"><span class="anchor-link"></span></a>怎样优雅的停止actor</h1>
 <h2><a href="#返回-behaviors-stopped" name="返回-behaviors-stopped" class="anchor"><span class="anchor-link"></span></a>返回 Behaviors.stopped</h2>
 <p>每处理一个消息，actor都将返回一个行为，可以通过返回 <code>Behaviors.stopped</code> 行为来告诉Actor系统此actor应被自动停止。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L45-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, Stop) =&gt;
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L39-L41" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, Stop) =&gt;
   context.log.info(s&quot;Receive message: $Stop, will stopped.&quot;)
   Behaviors.stopped</code></pre>
 <p><code>Behaviors.stopped</code>被执行时将触发 <code>PostStop</code> 信号。</p>
 <h2><a href="#graceful-stop" name="graceful-stop" class="anchor"><span class="anchor-link"></span></a>Graceful Stop</h2>
 <p>通常，<code>PostStop</code>信号被作为非正常停止看待，若想在正常停止（Graceful Stop）时触发一些清理操作，可将清理函数（<code>cleanup</code>）传给<code>Behaviors.stopped</code>的重载版本。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L50-L52" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, GracefulStop) =&gt;
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L44-L46" target="_blank" title="Go to snippet source"></a><code class="language-scala">case (context, GracefulStop) =&gt;
   context.log.info(s&quot;Receive message: $GracefulStop, will stopped.&quot;)
   Behaviors.stopped(() =&gt; cleanup(context.log))</code></pre>
 <p>当 <code>PostStop</code> 信号被处理后，<code>cleanup</code>清理函数将紧接着执行。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L62-L64" target="_blank" title="Go to snippet source"></a><code class="language-scala">def cleanup(log: Logger): Unit = {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/stopped/StoppedMain.scala#L56-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">def cleanup(log: Logger): Unit = {
   log.info(&quot;Perform cleanup action.&quot;)
 }</code></pre><div class="callout note "><div class="callout-title">Note</div>
 <p>Akka Typed不再提供<code>PoisonPill</code>消息来停止actor，推荐使用自定义消息并反回<code>Behaviors.stopped</code>行为来停止actor。</p></div>

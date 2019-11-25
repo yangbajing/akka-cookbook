@@ -263,11 +263,7 @@ object Utils extends StrictLogging {
 
   def propertiesToMapObject(props: Properties): Map[String, Object] = {
     import scala.jdk.CollectionConverters._
-    props
-      .stringPropertyNames()
-      .asScala
-      .map(name => name -> props.get(name))
-      .toMap
+    props.stringPropertyNames().asScala.map(name => name -> props.get(name)).toMap
   }
 
   def closeQuiet(io: AutoCloseable): Unit = {

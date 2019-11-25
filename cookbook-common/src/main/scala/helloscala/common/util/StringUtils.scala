@@ -137,9 +137,7 @@ object StringUtils {
    * @param isLower 转换成下划线形式后是否使用小写，false将完全使用大写
    * @return 转换后字符串
    */
-  def convertPropertyToUnderscore(
-      name: String,
-      isLower: Boolean = true): String =
+  def convertPropertyToUnderscore(name: String, isLower: Boolean = true): String =
     if (isBlank(name)) {
       name
     } else {
@@ -204,8 +202,7 @@ object StringUtils {
       arr.head + arr.tail.map(item => item.head.toUpper + item.tail).mkString
     }
 
-  def convertUnderscoreNameToPropertyName(
-      obj: Map[String, Any]): Map[String, Any] =
+  def convertUnderscoreNameToPropertyName(obj: Map[String, Any]): Map[String, Any] =
     obj.map {
       case (key, value) => convertUnderscoreNameToPropertyName(key) -> value
     }
@@ -248,9 +245,7 @@ object StringUtils {
     result.toString
   }
 
-  def snakeCaseToCamelCase(
-      name: String,
-      upperInitial: Boolean = false): String = {
+  def snakeCaseToCamelCase(name: String, upperInitial: Boolean = false): String = {
     val b = new StringBuilder()
     @tailrec
     def inner(name: String, index: Int, capNext: Boolean): Unit =

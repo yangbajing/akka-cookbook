@@ -28,49 +28,44 @@ import scala.util.{ Failure, Success }
 // #ping
 object Ping {
   sealed trait Request
-  private final case class WrappedResponse(response: Pong.Response)
-      extends Request
-  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup {
-    context =>
-      implicit val timeout: Timeout = 2.seconds
-      val pong = context.spawn(Pong(), "pong")
-      context.watch(pong)
-      context.ask(
-        pong,
-        (replyTo: ActorRef[Pong.Response]) =>
-          Pong.Message("Hello Scala!", 1, replyTo)) {
-        case Success(value)     => WrappedResponse(value)
-        case Failure(exception) => throw exception
-      }
+  private final case class WrappedResponse(response: Pong.Response) extends Request
+  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup { context =>
+    implicit val timeout: Timeout = 2.seconds
+    val pong = context.spawn(Pong(), "pong")
+    context.watch(pong)
+    context.ask(
+      pong,
+      (replyTo: ActorRef[Pong.Response]) =>
+        Pong.Message("Hello Scala!", 1, replyTo)) {
+      case Success(value)     => WrappedResponse(value)
+      case Failure(exception) => throw exception
+    }
 
-      Behaviors
-        .receiveMessage[Request] {
-          case WrappedResponse(Pong.Result(message, count)) =>
-            context.log.info(s"Received pong response: $message, ${count}th.")
-            context.ask[Pong.Request, Pong.Response](
-              pong,
-              Pong.Message(message, count + 1, _)) {
-              case Success(value)     => WrappedResponse(value)
-              case Failure(exception) => throw exception
-            }
-            Behaviors.same
-        }
-        .receiveSignal {
-          case (_, Terminated(`pong`)) =>
-            context.log.info(s"Actor $pong be terminated.")
-            latch.countDown()
-            Behaviors.stopped
-        }
+    Behaviors
+      .receiveMessage[Request] {
+        case WrappedResponse(Pong.Result(message, count)) =>
+          context.log.info(s"Received pong response: $message, ${count}th.")
+          context.ask[Pong.Request, Pong.Response](
+            pong,
+            Pong.Message(message, count + 1, _)) {
+            case Success(value)     => WrappedResponse(value)
+            case Failure(exception) => throw exception
+          }
+          Behaviors.same
+      }
+      .receiveSignal {
+        case (_, Terminated(`pong`)) =>
+          context.log.info(s"Actor $pong be terminated.")
+          latch.countDown()
+          Behaviors.stopped
+      }
   }
 }
 // #ping
 
 object Pong {
   sealed trait Request
-  final case class Message(
-      message: String,
-      count: Int,
-      replyTo: ActorRef[Response])
+  final case class Message(message: String, count: Int, replyTo: ActorRef[Response])
       extends Request
   sealed trait Response
   final case class Result(message: String, count: Int) extends Response

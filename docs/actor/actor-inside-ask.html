@@ -182,6 +182,14 @@ yangbajing/akka-cookbook
     <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
+  <ul>
+    <li><a href="../grpc/grpc.html" class="page">gRPC服务</a></li>
+    <li><a href="../grpc/build-tool.html" class="page">构建工具</a></li>
+    <li><a href="../grpc/deployment.html" class="page">部署</a></li>
+    <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
+    <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
+  </ul></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a>
   <ul>
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
@@ -235,41 +243,39 @@ yangbajing/akka-cookbook
 <h1><a href="#actor之间使用ask-请求-响应模式-" name="actor之间使用ask-请求-响应模式-" class="anchor"><span class="anchor-link"></span></a>actor之间使用ask（请求-响应模式）</h1>
 <p>当请求与响应之间存在1:1映射时，可以通过调用<code>ActorContext[T]</code>上的<code>ask</code>函数来与另一个actor进行交互。</p>
 <p>构造一个传出消息，它使用<code>context.ask[Response]</code>提供的<code>ActorRef[Response]</code>作为接收响应的actor放入消息中将成功/失败（<code>Try[Response]</code>）转换为发送者actor可接收的消息类型</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/pingpong/PingPongMain.scala#L29-L65" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/pingpong/PingPongMain.scala#L29-L63" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Ping {
   sealed trait Request
-  private final case class WrappedResponse(response: Pong.Response)
-      extends Request
-  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup {
-    context =&gt;
-      implicit val timeout: Timeout = 2.seconds
-      val pong = context.spawn(Pong(), &quot;pong&quot;)
-      context.watch(pong)
-      context.ask(
-        pong,
-        (replyTo: ActorRef[Pong.Response]) =&gt;
-          Pong.Message(&quot;Hello Scala!&quot;, 1, replyTo)) {
-        case Success(value)     =&gt; WrappedResponse(value)
-        case Failure(exception) =&gt; throw exception
-      }
+  private final case class WrappedResponse(response: Pong.Response) extends Request
+  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup { context =&gt;
+    implicit val timeout: Timeout = 2.seconds
+    val pong = context.spawn(Pong(), &quot;pong&quot;)
+    context.watch(pong)
+    context.ask(
+      pong,
+      (replyTo: ActorRef[Pong.Response]) =&gt;
+        Pong.Message(&quot;Hello Scala!&quot;, 1, replyTo)) {
+      case Success(value)     =&gt; WrappedResponse(value)
+      case Failure(exception) =&gt; throw exception
+    }
 
-      Behaviors
-        .receiveMessage[Request] {
-          case WrappedResponse(Pong.Result(message, count)) =&gt;
-            context.log.info(s&quot;Received pong response: $message, ${count}th.&quot;)
-            context.ask[Pong.Request, Pong.Response](
-              pong,
-              Pong.Message(message, count + 1, _)) {
-              case Success(value)     =&gt; WrappedResponse(value)
-              case Failure(exception) =&gt; throw exception
-            }
-            Behaviors.same
-        }
-        .receiveSignal {
-          case (_, Terminated(`pong`)) =&gt;
-            context.log.info(s&quot;Actor $pong be terminated.&quot;)
-            latch.countDown()
-            Behaviors.stopped
-        }
+    Behaviors
+      .receiveMessage[Request] {
+        case WrappedResponse(Pong.Result(message, count)) =&gt;
+          context.log.info(s&quot;Received pong response: $message, ${count}th.&quot;)
+          context.ask[Pong.Request, Pong.Response](
+            pong,
+            Pong.Message(message, count + 1, _)) {
+            case Success(value)     =&gt; WrappedResponse(value)
+            case Failure(exception) =&gt; throw exception
+          }
+          Behaviors.same
+      }
+      .receiveSignal {
+        case (_, Terminated(`pong`)) =&gt;
+          context.log.info(s&quot;Actor $pong be terminated.&quot;)
+          latch.countDown()
+          Behaviors.stopped
+      }
   }
 }</code></pre>
 <p><code>context.ask</code>的响应映射函数在接收actor中运行，可以安全的访问actor内部状态， <strong>但抛出异常的话actor将会被停止</strong> 。</p>
@@ -334,48 +340,43 @@ import scala.util.{ Failure, Success }
 
 object Ping {
   sealed trait Request
-  private final case class WrappedResponse(response: Pong.Response)
-      extends Request
-  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup {
-    context =&gt;
-      implicit val timeout: Timeout = 2.seconds
-      val pong = context.spawn(Pong(), &quot;pong&quot;)
-      context.watch(pong)
-      context.ask(
-        pong,
-        (replyTo: ActorRef[Pong.Response]) =&gt;
-          Pong.Message(&quot;Hello Scala!&quot;, 1, replyTo)) {
-        case Success(value)     =&gt; WrappedResponse(value)
-        case Failure(exception) =&gt; throw exception
-      }
+  private final case class WrappedResponse(response: Pong.Response) extends Request
+  def apply(latch: CountDownLatch): Behavior[Request] = Behaviors.setup { context =&gt;
+    implicit val timeout: Timeout = 2.seconds
+    val pong = context.spawn(Pong(), &quot;pong&quot;)
+    context.watch(pong)
+    context.ask(
+      pong,
+      (replyTo: ActorRef[Pong.Response]) =&gt;
+        Pong.Message(&quot;Hello Scala!&quot;, 1, replyTo)) {
+      case Success(value)     =&gt; WrappedResponse(value)
+      case Failure(exception) =&gt; throw exception
+    }
 
-      Behaviors
-        .receiveMessage[Request] {
-          case WrappedResponse(Pong.Result(message, count)) =&gt;
-            context.log.info(s&quot;Received pong response: $message, ${count}th.&quot;)
-            context.ask[Pong.Request, Pong.Response](
-              pong,
-              Pong.Message(message, count + 1, _)) {
-              case Success(value)     =&gt; WrappedResponse(value)
-              case Failure(exception) =&gt; throw exception
-            }
-            Behaviors.same
-        }
-        .receiveSignal {
-          case (_, Terminated(`pong`)) =&gt;
-            context.log.info(s&quot;Actor $pong be terminated.&quot;)
-            latch.countDown()
-            Behaviors.stopped
-        }
+    Behaviors
+      .receiveMessage[Request] {
+        case WrappedResponse(Pong.Result(message, count)) =&gt;
+          context.log.info(s&quot;Received pong response: $message, ${count}th.&quot;)
+          context.ask[Pong.Request, Pong.Response](
+            pong,
+            Pong.Message(message, count + 1, _)) {
+            case Success(value)     =&gt; WrappedResponse(value)
+            case Failure(exception) =&gt; throw exception
+          }
+          Behaviors.same
+      }
+      .receiveSignal {
+        case (_, Terminated(`pong`)) =&gt;
+          context.log.info(s&quot;Actor $pong be terminated.&quot;)
+          latch.countDown()
+          Behaviors.stopped
+      }
   }
 }
 
 object Pong {
   sealed trait Request
-  final case class Message(
-      message: String,
-      count: Int,
-      replyTo: ActorRef[Response])
+  final case class Message(message: String, count: Int, replyTo: ActorRef[Response])
       extends Request
   sealed trait Response
   final case class Result(message: String, count: Int) extends Response

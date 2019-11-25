@@ -18,6 +18,7 @@
 * [storage](storage/index.md)
 * [integration](integration/index.md)
 * [http](http/index.md)
+* [grpc](grpc/index.md)
 * [cluster](cluster/index.md)
 * [persistence](persistence/index.md)
 

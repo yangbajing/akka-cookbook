@@ -55,8 +55,7 @@ class PidFile(val pid: Long) {
     }
 
     if (Files.exists(path) && !Files.isRegularFile(path))
-      throw new IllegalArgumentException(
-        path + " exists but is not a regular file")
+      throw new IllegalArgumentException(path + " exists but is not a regular file")
 
     val stream = Files.newOutputStream(
       path,

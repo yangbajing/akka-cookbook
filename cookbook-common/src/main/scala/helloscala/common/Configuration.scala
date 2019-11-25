@@ -122,8 +122,7 @@ final case class Configuration(underlying: Config) {
   def get[A](path: String)(implicit loader: ConfigLoader[A]): A =
     loader.load(underlying, path)
 
-  def getOrElse[A](path: String, deft: => A)(
-      implicit loader: ConfigLoader[A]): A =
+  def getOrElse[A](path: String, deft: => A)(implicit loader: ConfigLoader[A]): A =
     get[Option[A]](path).getOrElse(deft)
 
   /**
@@ -144,8 +143,7 @@ final case class Configuration(underlying: Config) {
    * Get a value that may either not exist or be null. Note that this is not generally considered idiomatic Config
    * usage. Instead you should define all config keys in a reference.conf file.
    */
-  def getOptional[A](path: String)(
-      implicit loader: ConfigLoader[A]): Option[A] =
+  def getOptional[A](path: String)(implicit loader: ConfigLoader[A]): Option[A] =
     readValue(path, get[A](path))
 
   /**
@@ -293,8 +291,7 @@ object Configuration extends StrictLogging {
         .map(_ => "-Dconfig.file")
         .orElse(Option(System.getProperty("config.resource")).map(_ =>
           "-Dconfig.resource"))
-        .orElse(Option(System.getProperty("config.url")).map(_ =>
-          "-Dconfig.url"))
+        .orElse(Option(System.getProperty("config.url")).map(_ => "-Dconfig.url"))
         .getOrElse("Jar包内部")
       logger.info(s"使用本地配置，来自：$configFrom")
       Configuration.load()
@@ -420,8 +417,7 @@ object ConfigLoader {
     ConfigLoader(_.getMemorySizeList).map(_.asScala.toVector)
 
   implicit val configLoader: ConfigLoader[Config] = ConfigLoader(_.getConfig)
-  implicit val configListLoader: ConfigLoader[ConfigList] = ConfigLoader(
-    _.getList)
+  implicit val configListLoader: ConfigLoader[ConfigList] = ConfigLoader(_.getList)
   implicit val configObjectLoader: ConfigLoader[ConfigObject] = ConfigLoader(
     _.getObject)
 

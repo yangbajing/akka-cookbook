@@ -25,12 +25,10 @@ object SerializationJacksonTest {
   case class User(name: String, sex: Int)
   case class Error(status: Int, message: String)
 }
-class SerializationJacksonTest
-    extends ScalaTestWithActorTestKit
-    with WordSpecLike {
+class SerializationJacksonTest extends ScalaTestWithActorTestKit with WordSpecLike {
   import SerializationJacksonTest._
-  private lazy val objectMapper = JacksonObjectMapperProvider(system.toClassic)
-    .getOrCreate("jackson-json", None)
+  private lazy val objectMapper =
+    JacksonObjectMapperProvider(system.toClassic).getOrCreate("jackson-json", None)
   "serialization-jackson" should {
     "either" in {
       val right: Either[Error, User] = Right(User("羊八井", 1))

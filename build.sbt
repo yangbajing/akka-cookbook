@@ -7,37 +7,76 @@ ThisBuild / scalafmtOnCompile := true
 
 lazy val root = Project(id = "akka-cookbook", base = file(".")).aggregate(
   book,
-  cookbookActor,
-  cookbookStreams,
-  cookbookCluster,
-  cookbookPersistence,
   storageCassandra,
   integrationSpring,
+  cookbookGrpc,
+  cookbookPersistence,
+  cookbookCluster,
+  cookbookStreams,
+  cookbookActor,
   cookbookCommon)
 
-lazy val book = _project("book")
-  .enablePlugins(ParadoxMaterialThemePlugin)
-  .dependsOn(cookbookActor, cookbookStreams, cookbookCommon)
-  .settings(Publishing.noPublish: _*)
-  .settings(
-    Compile / paradoxMaterialTheme ~= {
-      _.withLanguage(java.util.Locale.SIMPLIFIED_CHINESE)
-        .withRepository(uri("https://github.com/yangbajing/akka-cookbook"))
-        .withSocial(
-          uri("https://yangbajing.github.io/akka-cookbook/"),
-          uri("https://github.com/yangbajing/akka-cookbook"),
-          uri("https://weibo.com/yangbajing"))
-    },
-    paradoxProperties ++= Map(
-        "github.base_url" -> s"https://github.com/yangbajing/akka-cookbook/tree/${version.value}",
-        "version" -> version.value,
-        "scala.version" -> scalaVersion.value,
-        "scala.binary_version" -> scalaBinaryVersion.value,
-        "alpakka.version" -> versionAlpakka,
-        "scaladoc.akka.base_url" -> s"http://doc.akka.io/api/$versionAkka",
-        "akka.version" -> versionAkka))
+lazy val book =
+  _project("book")
+    .enablePlugins(ParadoxMaterialThemePlugin)
+    .dependsOn(
+      storageCassandra,
+      integrationSpring,
+      cookbookGrpc,
+      cookbookPersistence,
+      cookbookCluster,
+      cookbookStreams,
+      cookbookActor,
+      cookbookCommon)
+    .settings(Publishing.noPublish: _*)
+    .settings(
+      Compile / paradoxMaterialTheme ~= {
+        _.withLanguage(java.util.Locale.SIMPLIFIED_CHINESE)
+          .withRepository(uri("https://github.com/yangbajing/akka-cookbook"))
+          .withSocial(
+            uri("https://yangbajing.github.io/akka-cookbook/"),
+            uri("https://github.com/yangbajing/akka-cookbook"),
+            uri("https://weibo.com/yangbajing"))
+      },
+      paradoxProperties ++= Map(
+          "github.base_url" -> s"https://github.com/yangbajing/akka-cookbook/tree/${version.value}",
+          "version" -> version.value,
+          "scala.version" -> scalaVersion.value,
+          "scala.binary_version" -> scalaBinaryVersion.value,
+          "alpakka.version" -> versionAlpakka,
+          "scaladoc.akka.base_url" -> s"http://doc.akka.io/api/$versionAkka",
+          "akka.version" -> versionAkka))
 
-lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "compile->compile;test->test")
+lazy val cookbookGrpc = _project("cookbook-grpc")
+  .enablePlugins(AkkaGrpcPlugin, JavaAgent, JavaAppPackaging)
+  .dependsOn(cookbookStreams, cookbookCommon % "compile->compile;test->test")
+  .settings(
+    javaAgents += _alpnAgent % "runtime;test",
+    mainClass in assembly := Some("greeter.GreeterApplication"),
+    test in assembly := {},
+    assemblyMergeStrategy in assembly := {
+      case PathList("io", "netty", xs @ _*)               => MergeStrategy.first
+      case PathList("google", "protobuf", xs @ _*)        => MergeStrategy.first
+      case PathList("com", "google", "protobuf", xs @ _*) => MergeStrategy.first
+      case PathList("scalapb", xs @ _*)                   => MergeStrategy.first
+      case "application.conf"                             => MergeStrategy.concat
+      case "reference.conf"                               => MergeStrategy.concat
+      case "module-info.class"                            => MergeStrategy.concat
+      case "META-INF/io.netty.versions.properties"        => MergeStrategy.first
+      case "META-INF/native/libnetty-transport-native-epoll.so" =>
+        MergeStrategy.first
+      case n if n.endsWith(".txt")   => MergeStrategy.concat
+      case n if n.endsWith("NOTICE") => MergeStrategy.concat
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
+    akkaGrpcCodeGeneratorSettings += "server_power_apis",
+    libraryDependencies ++= Seq(
+        "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"))
+
+lazy val cookbookActor = _project("cookbook-actor").dependsOn(
+  cookbookCommon % "compile->compile;test->test")
 
 lazy val cookbookStreams = _project("cookbook-streams")
   .dependsOn(cookbookCommon % "compile->compile;test->test")

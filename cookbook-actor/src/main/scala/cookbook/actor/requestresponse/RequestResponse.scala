@@ -19,13 +19,7 @@ package cookbook.actor.requestresponse
 import java.util.concurrent.TimeUnit
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{
-  ActorRef,
-  ActorSystem,
-  Behavior,
-  Props,
-  SpawnProtocol
-}
+import akka.actor.typed.{ ActorRef, ActorSystem, Behavior, Props, SpawnProtocol }
 import akka.util.Timeout
 import helloscala.common.util.ActorUtils
 
@@ -42,8 +36,8 @@ object Request {
 
   def apply(): Behavior[Command] = Behaviors.setup[Command] { context =>
     // #adapted-message
-    val backendAdapter = context.messageAdapter[Backend.Response](resp =>
-      WrappedBackendResponse(resp))
+    val backendAdapter =
+      context.messageAdapter[Backend.Response](resp => WrappedBackendResponse(resp))
     // #adapted-message
 
     // #request-response

@@ -75,9 +75,7 @@ object DigestUtils {
 //  def _sha(path: Path, md: MessageDigest): Array[Byte] =
 //    _sha(path, md /*, ByteBuffer.allocate(DEFAULT_BYTE_BUFFER_SIZE)*/ )
 
-  def _sha(
-      path: Path,
-      md: MessageDigest /*, buf: ByteBuffer*/ ): Array[Byte] = {
+  def _sha(path: Path, md: MessageDigest /*, buf: ByteBuffer*/ ): Array[Byte] = {
     val channel = Files.newInputStream(path)
     val buf = Array.ofDim[Byte](8192)
     try {

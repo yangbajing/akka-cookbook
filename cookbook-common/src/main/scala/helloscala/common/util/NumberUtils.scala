@@ -87,9 +87,7 @@ object NumberUtils {
                 }
               } else {
                 if (classOf[Float] eq targetClass) {
-                  return java.lang.Float
-                    .valueOf(number.floatValue)
-                    .asInstanceOf[T]
+                  return java.lang.Float.valueOf(number.floatValue).asInstanceOf[T]
                 } else {
                   if (classOf[Double] eq targetClass) {
                     return java.lang.Double

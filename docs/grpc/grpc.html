@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="description" content="book">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
+
+<meta name="lang:clipboard.copy" content="Copy to clipboard">
+<meta name="lang:clipboard.copied" content="Copied to clipboard">
+<meta name="lang:search.language" content="">
+<meta name="lang:search.pipeline.stopwords" content="true">
+<meta name="lang:search.pipeline.trimmer" content="true">
+<meta name="lang:search.result.none" content="No matching documents">
+<meta name="lang:search.result.one" content="1 matching document">
+<meta name="lang:search.result.other" content="# matching documents">
+<meta name="lang:search.tokenizer" content="[\s\-]+">
+
+
+<meta name="description" content="book">
+<link rel="shortcut icon" href="../assets/images/favicon.png">
+<title>gRPC服务 · Akka Cookbook</title>
+<link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
+<link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
+<link rel="stylesheet" href="../lib/prettify/prettify.css">
+<script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+<style>
+body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}
+code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
+</style>
+<link rel="stylesheet" href="../assets/fonts/font-awesome.css">
+<link rel="stylesheet" href="../assets/fonts/material-icons.css">
+<link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+</head>
+<body
+>
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+<label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+<header class="md-header" data-md-component="header">
+<nav class="md-header-nav md-grid">
+<div class="md-flex">
+<div class="md-flex__cell md-flex__cell--shrink">
+<a href="../index.html" title="Akka Cookbook" class="md-header-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch">
+<div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+<span class="md-header-nav__topic">
+Akka Cookbook
+</span>
+<span class="md-header-nav__topic">
+gRPC服务
+</span>
+</div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+<label class="md-icon md-search__icon" for="__search"></label>
+<button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix>
+<div class="md-search-result" data-md-component="result">
+<div class="md-search-result__meta">
+Type to start searching
+</div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-header-nav__source">
+<a href="https://github.com/yangbajing/akka-cookbook"
+title="Go to repository"
+class="md-source"
+data-md-source="github">
+<div class="md-source__icon">
+<i class="fa fa-github"></i>
+</div>
+<div class="md-source__repository">
+yangbajing/akka-cookbook
+</div>
+</a>
+
+</div>
+</div>
+</div>
+</nav>
+</header>
+
+<div class="md-container">
+<main class="md-main">
+<div class="md-main__inner md-grid" data-md-component="container">
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
+<label class="md-nav__title md-nav__title--site" for="drawer">
+<a href="../index.html" title="Akka Cookbook" class="md-nav__button md-logo">
+<span class="md-nav__button md-logo">
+<i class="md-icon">local_library</i>
+</a>
+<a href="../index.html" title="Akka Cookbook">
+Akka Cookbook
+</a>
+</label>
+<div class="md-nav__source">
+<a href="https://github.com/yangbajing/akka-cookbook"
+title="Go to repository"
+class="md-source"
+data-md-source="github">
+<div class="md-source__icon">
+<i class="fa fa-github"></i>
+</div>
+<div class="md-source__repository">
+yangbajing/akka-cookbook
+</div>
+</a>
+
+</div>
+<ul>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
+    <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
+    <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
+    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
+  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a>
+  <ul>
+    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
+    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
+    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
+    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
+    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
+    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
+    <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
+  </ul></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a>
+  <ul>
+    <li><a href="../storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
+    <li><a href="../storage/cassandra.html" class="page">访问 Cassandra</a></li>
+    <li><a href="../storage/mongodb.html" class="page">访问 MongoDB</a></li>
+    <li><a href="../storage/elasticsearch.html" class="page">访问 Elasticsearch</a></li>
+  </ul></li>
+  <li><a href="../integration/index.html" class="page">集成</a>
+  <ul>
+    <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
+  </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
+  <ul>
+    <li><a href="../grpc/grpc.html" class="active page">gRPC服务</a></li>
+    <li><a href="../grpc/build-tool.html" class="page">构建工具</a></li>
+    <li><a href="../grpc/deployment.html" class="page">部署</a></li>
+    <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
+    <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
+  </ul></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a>
+  <ul>
+    <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
+  </ul></li>
+  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+</ul>
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../grpc/grpc.html#grpc服务" class="header">gRPC服务</a>
+  <ul>
+    <li><a href="../grpc/grpc.html#定义消息和服务" class="header">定义消息和服务</a></li>
+    <li><a href="../grpc/grpc.html#实现-grpc-服务" class="header">实现 gRPC 服务</a></li>
+    <li><a href="../grpc/grpc.html#测试-grpc-服务" class="header">测试 gRPC 服务</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</nav>
+<ul style="display: none">
+<li class="md-nav__item md-version" id="project.version">
+<label class="md-nav__link" for="__version">
+<i class="md-icon" title="Version">label_outline</i> 1.0.0
+</label>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="../grpc/grpc.html#grpc服务" class="header">gRPC服务</a>
+  <ul>
+    <li><a href="../grpc/grpc.html#定义消息和服务" class="header">定义消息和服务</a></li>
+    <li><a href="../grpc/grpc.html#实现-grpc-服务" class="header">实现 gRPC 服务</a></li>
+    <li><a href="../grpc/grpc.html#测试-grpc-服务" class="header">测试 gRPC 服务</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
+<div class="md-content">
+<article class="md-content__inner md-typeset">
+<div class="md-content__searchable">
+<h1><a href="#grpc服务" name="grpc服务" class="anchor"><span class="anchor-link"></span></a>gRPC服务</h1>
+<h2><a href="#定义消息和服务" name="定义消息和服务" class="anchor"><span class="anchor-link"></span></a>定义消息和服务</h2>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/main/protobuf/greeter/greeter.proto" target="_blank" title="Go to snippet source"></a><code class="language-proto">syntax = &quot;proto3&quot;;
+
+option java_multiple_files = true;
+
+package greeter;
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloReply {
+    string message = 1;
+}
+
+service GreeterService {
+    // req-resp
+    rpc SayHello (HelloRequest) returns (HelloReply) {}
+
+    // keep requests
+    rpc ItKeepsTalking (stream HelloRequest) returns (HelloReply) {}
+
+    // keep responses
+    rpc ItKeepsReplying (HelloRequest) returns (stream HelloReply) {}
+
+    // keep requests &amp; responses
+    rpc StreamHellos (stream HelloRequest) returns (stream HelloReply) {}
+}</code></pre>
+<p>这里定义了两个消息：<code>HelloRequest</code>、<code>HelloReply</code>和<code>GreeterService</code>服务，<code>GreeterService</code>定义了4个服务方法，分别是：</p>
+<ul>
+  <li><code>SayHello</code>：经典的请求-响应服务，发送一个请求获得一个响应；</li>
+  <li><code>ItKeepsTalking</code>：持续不断的发送多个请求，在请求停止后获得一个响应；</li>
+  <li><code>ItKeepsReplying</code>：发送一个请求，获得持续不断的多个响应；</li>
+  <li><code>StreamHelloes</code>：持续不断的发送响应的同时也可获得持续不断的响应，可以通过<code>Source.queue</code>来获得可发送数据的<code>Queue</code>和获得响应数据的<code>Source</code>。</li>
+</ul>
+<h2><a href="#实现-grpc-服务" name="实现-grpc-服务" class="anchor"><span class="anchor-link"></span></a>实现 gRPC 服务</h2>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/main/scala/greeter/GreeterServiceImpl.scala#L26-L49" target="_blank" title="Go to snippet source"></a><code class="language-scala">class GreeterServiceImpl()(implicit system: ActorSystem[_]) extends GreeterService {
+  import system.executionContext
+
+  override def sayHello(in: HelloRequest): Future[HelloReply] = {
+    Future.successful(HelloReply(s&quot;Hello, ${in.name}.&quot;))
+  }
+
+  override def itKeepsTalking(
+      in: Source[HelloRequest, NotUsed]): Future[HelloReply] = {
+    in.runWith(Sink.seq)
+      .map(ins =&gt; HelloReply(&quot;Hello, &quot; + ins.map(_.name).mkString(&quot;&quot;, &quot;, &quot;, &quot;.&quot;)))
+  }
+
+  override def itKeepsReplying(in: HelloRequest): Source[HelloReply, NotUsed] = {
+    Source
+      .fromIterator(() =&gt; Iterator.from(1))
+      .map(n =&gt; HelloReply(s&quot;Hello, ${in.name}; this is $n times.&quot;))
+  }
+
+  override def streamHellos(
+      ins: Source[HelloRequest, NotUsed]): Source[HelloReply, NotUsed] = {
+    ins.map(in =&gt; HelloReply(s&quot;Hello, ${in.name}.&quot;))
+  }
+}</code></pre>
+<p>Akka gRPC提供了基于 Akka Streams 的API，更多 Akka Streams 的内容请参阅： <a href="../streams/index.html">Akka 流（Streams）</a>。</p>
+<h2><a href="#测试-grpc-服务" name="测试-grpc-服务" class="anchor"><span class="anchor-link"></span></a>测试 gRPC 服务</h2>
+<p>通过 Scalatest 对实现的4个gRPC服务进行测试，下面是单元测试代码：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L46-L94" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;sayHello&quot; in {
+  greeterClient.sayHello(HelloRequest(&quot;Scala&quot;)).futureValue should ===(
+    HelloReply(&quot;Hello, Scala.&quot;))
+}
+
+&quot;itKeepsReplying&quot; in {
+  greeterClient
+    .itKeepsReplying(HelloRequest(&quot;Scala&quot;))
+    .take(5)
+    .runWith(Sink.seq)
+    .futureValue should ===(
+    Seq(
+      HelloReply(&quot;Hello, Scala; this is 1 times.&quot;),
+      HelloReply(&quot;Hello, Scala; this is 2 times.&quot;),
+      HelloReply(&quot;Hello, Scala; this is 3 times.&quot;),
+      HelloReply(&quot;Hello, Scala; this is 4 times.&quot;),
+      HelloReply(&quot;Hello, Scala; this is 5 times.&quot;)))
+}
+
+&quot;itKeepsTalking&quot; in {
+  val (queue, in) =
+    Source
+      .queue[HelloRequest](16, OverflowStrategy.backpressure)
+      .preMaterialize()
+  val f = greeterClient.itKeepsTalking(in)
+  Seq(&quot;Scala&quot;, &quot;Java&quot;, &quot;Groovy&quot;, &quot;Kotlin&quot;).foreach(program =&gt;
+    queue.offer(HelloRequest(program)))
+  TimeUnit.SECONDS.sleep(1)
+  queue.complete()
+  f.futureValue should ===(HelloReply(&quot;Hello, Scala, Java, Groovy, Kotlin.&quot;))
+}
+
+&quot;streamHellos&quot; in {
+  val (queue, in) =
+    Source
+      .queue[HelloRequest](16, OverflowStrategy.backpressure)
+      .preMaterialize()
+  val f = greeterClient.streamHellos(in).runWith(Sink.seq)
+  Seq(&quot;Scala&quot;, &quot;Java&quot;, &quot;Groovy&quot;, &quot;Kotlin&quot;).foreach(item =&gt;
+    queue.offer(HelloRequest(item)))
+  TimeUnit.SECONDS.sleep(1)
+  queue.complete()
+  f.futureValue should ===(
+    Seq(
+      HelloReply(&quot;Hello, Scala.&quot;),
+      HelloReply(&quot;Hello, Java.&quot;),
+      HelloReply(&quot;Hello, Groovy.&quot;),
+      HelloReply(&quot;Hello, Kotlin.&quot;)))
+}</code></pre>
+<p>在运行测试前需要先启动gRPC服务，在 Scalatest 的<code>beforeAll</code>函数内启动gRPC HTTP 2服务：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L35-L41" target="_blank" title="Go to snippet source"></a><code class="language-scala">override protected def beforeAll(): Unit = {
+  super.beforeAll()
+  val handler = GreeterServiceHandler(new GreeterServiceImpl())
+  Http().bindAndHandleAsync(handler, &quot;localhost&quot;, 8000)
+  greeterClient = GreeterServiceClient(
+    GrpcClientSettings.fromConfig(GreeterService.name))
+}</code></pre>
+<p>在构造 <code>GreeterServiceClient</code> gRCP客户端时需要提供<code>GrpcClientSettings</code>设置选项，这里通过调用<code>fromConfig</code>函数来从 <strong>HOCON</strong> 配置文件里读取gRPC服务选项，相应的<code>application-test.conf</code>配置文件内容如下：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/resources/application-test.conf" target="_blank" title="Go to snippet source"></a><code class="language-conf">akka.http.server.preview.enable-http2 = on
+akka.grpc.client {
+  &quot;greeter.GreeterService&quot; {
+    host = &quot;localhost&quot;
+    port = 8000
+    use-tls = false
+  }
+}</code></pre>
+<p>其中<code>use-tls</code>设置gRPC客户端不使用HTTPs建立连接，因为我们这个单元测试启动的gRPC HTTP服务不未启动SSL/TLS。</p>
+</div>
+<div>
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/grpc/grpc.md" title="Edit this page" class="md-source-file md-edit">
+Edit this page
+</a>
+</div>
+<div class="print-only">
+<span class="md-source-file md-version">
+1.0.0
+</span>
+</div>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-nav">
+<nav class="md-footer-nav__inner md-grid">
+<a href="../grpc/index.html" title="Akka gRPC" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+</div>
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Previous
+</span>
+Akka gRPC
+</span>
+</div>
+</a>
+<a href="../grpc/build-tool.html" title="构建工具" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+<span class="md-flex__ellipsis">
+<span class="md-footer-nav__direction">
+Next
+</span>
+构建工具
+</span>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink">
+<i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+</div>
+</a>
+</nav>
+</div>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-footer-copyright">
+Powered by
+<a href="https://github.com/lightbend/paradox">Paradox</a>
+and
+<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
+
+</div>
+<div class="md-footer-social">
+<a href="https://yangbajing.github.io/akka-cookbook/" class="md-footer-social__link fa fa-globe"></a><a href="https://github.com/yangbajing/akka-cookbook" class="md-footer-social__link fa fa-github"></a><a href="https://weibo.com/yangbajing" class="md-footer-social__link fa fa-globe"></a>
+</div>
+
+</div>
+</div>
+</footer>
+
+</div>
+<script src="../assets/javascripts/application.583bbe55.js"></script>
+<script src="../assets/javascripts/paradox-material-theme.js"></script>
+<script>app.initialize({version:"0.17",url:{base:"../."}})</script>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+window.prettyPrint && prettyPrint();
+});
+</script>
+</body>
+</html>
