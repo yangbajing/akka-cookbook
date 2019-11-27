@@ -18,6 +18,7 @@ package greeter
 
 import java.util.concurrent.TimeUnit
 
+import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.adapter._
 import akka.grpc.GrpcClientSettings
@@ -25,6 +26,8 @@ import akka.http.scaladsl.Http
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{ Sink, Source }
 import org.scalatest.WordSpecLike
+
+import scala.concurrent.duration._
 
 class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
   private implicit val classicSystem = system.toClassic
@@ -40,6 +43,19 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
       GrpcClientSettings.fromConfig(GreeterService.name))
   }
   // #GreeterService
+
+  final case class MetricRequest()
+  final case class MetricItem()
+  // #sendMetrics
+  def sendMetrics(in: MetricRequest): Source[MetricItem, NotUsed] = {
+    val (queue, source) =
+      Source.queue[MetricItem](16, OverflowStrategy.backpressure).preMaterialize()
+    Source
+      .tick(1.seconds, 1.seconds, MetricItem())
+      .runForeach(metric => queue.offer(metric))
+    source
+  }
+  // #sendMetrics
 
   "GreeterServiceClient" must {
     // #GreeterServiceClient
