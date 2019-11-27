@@ -185,7 +185,7 @@ yangbajing/akka-cookbook
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
   <ul>
     <li><a href="../grpc/grpc.html" class="active page">gRPC服务</a></li>
-    <li><a href="../grpc/build-tool.html" class="page">构建工具</a></li>
+    <li><a href="../grpc/build-tool.html" class="page">构建工具（sbt）</a></li>
     <li><a href="../grpc/deployment.html" class="page">部署</a></li>
     <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
     <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
@@ -195,6 +195,10 @@ yangbajing/akka-cookbook
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
   </ul></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../test/index.html" class="page">测试</a>
+  <ul>
+    <li><a href="../test/test-actor.html" class="page">测试actor（scalatest）</a></li>
+  </ul></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
@@ -274,7 +278,7 @@ service GreeterService {
   <li><code>SayHello</code>：经典的请求-响应服务，发送一个请求获得一个响应；</li>
   <li><code>ItKeepsTalking</code>：持续不断的发送多个请求，在请求停止后获得一个响应；</li>
   <li><code>ItKeepsReplying</code>：发送一个请求，获得持续不断的多个响应；</li>
-  <li><code>StreamHelloes</code>：持续不断的发送响应的同时也可获得持续不断的响应，可以通过<code>Source.queue</code>来获得可发送数据的<code>Queue</code>和获得响应数据的<code>Source</code>。</li>
+  <li><code>streamHellos</code>：持续不断的发送响应的同时也可获得持续不断的响应，可以通过<code>Source.queue</code>来获得可发送数据的<code>Queue</code>和获得响应数据的<code>Source</code>。</li>
 </ul>
 <h2><a href="#实现-grpc-服务" name="实现-grpc-服务" class="anchor"><span class="anchor-link"></span></a>实现 gRPC 服务</h2>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/main/scala/greeter/GreeterServiceImpl.scala#L26-L49" target="_blank" title="Go to snippet source"></a><code class="language-scala">class GreeterServiceImpl()(implicit system: ActorSystem[_]) extends GreeterService {
@@ -302,9 +306,30 @@ service GreeterService {
   }
 }</code></pre>
 <p>Akka gRPC提供了基于 Akka Streams 的API，更多 Akka Streams 的内容请参阅： <a href="../streams/index.html">Akka 流（Streams）</a>。</p>
+<p><code>itKeepsTalking</code>服务从客户端持续接收<code>HelloRequest</code>消息流，直到客户端主动停止（服务端也可以停止这个流，但这个服务语义上并未体现这一点）。这里收集客户端发送的所有元素并通过<code>Sink.seq</code>汇聚成一个序列，再构造<code>HelloReply</code>消息发送回客户端。</p>
+<p><code>itKeepsReplying</code>服务从客户端接收一个请求，持续不断的向客户端发送响应（一直到客户端主动终止）。这可以用来实现某些实时监控业务，当服务端收到对某个指标的监控请求后，服务端按一定的时间间隔持续不断的向客户端发送监控指标：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L50-L57" target="_blank" title="Go to snippet source"></a><code class="language-scala">def sendMetrics(in: MetricRequest): Source[MetricItem, NotUsed] = {
+  val (queue, source) =
+    Source.queue[MetricItem](16, OverflowStrategy.backpressure).preMaterialize()
+  Source
+    .tick(1.seconds, 1.seconds, MetricItem())
+    .runForeach(metric =&gt; queue.offer(metric))
+  source
+}</code></pre>
+<p><code>sendMetrics</code>服务模拟了一个监控指标发送，每隔1秒钟向客户端发送一个指标数据。</p>
+<p><code>streamHellos</code>服务从客户端获得持续的请求，同时可异步的向客户端返回持续的响应。我们可以基于它来实现心跳。</p>
+<pre class="prettyprint"><code class="language-scala">  def heartbeat(in: Source[Heartbeat, NotUsed]): Source[HeartbeatAck, NotUsed] = {
+    val ref: ActorRef[Heartbeat] = getClientManager(in.clientId) // 
+    in.map { req =&gt;
+      ref ! req
+      HeartbeatAck()
+    }
+  }
+</code></pre>
+<p><code>heartbeat</code>收到心跳请求后马上就像客户端返回一个<code>HeartbeatAck</code>的心跳确认请求，因为这里心跳只用于保持连接，返回一个空响应即可。而<code>ref ! req</code>将心跳请求发送给<code>ref</code>指代的一个客户端Manager业务处理actor，由actor实现心跳超时监控，可以通过配置actor的 <strong>ReceiveTimeout</strong> 来实现心跳超时判断。</p>
 <h2><a href="#测试-grpc-服务" name="测试-grpc-服务" class="anchor"><span class="anchor-link"></span></a>测试 gRPC 服务</h2>
-<p>通过 Scalatest 对实现的4个gRPC服务进行测试，下面是单元测试代码：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L46-L94" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;sayHello&quot; in {
+<p>使用 Scalatest 对实现的4个gRPC服务进行测试，下面是单元测试代码：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L62-L110" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;sayHello&quot; in {
   greeterClient.sayHello(HelloRequest(&quot;Scala&quot;)).futureValue should ===(
     HelloReply(&quot;Hello, Scala.&quot;))
 }
@@ -354,7 +379,7 @@ service GreeterService {
       HelloReply(&quot;Hello, Kotlin.&quot;)))
 }</code></pre>
 <p>在运行测试前需要先启动gRPC服务，在 Scalatest 的<code>beforeAll</code>函数内启动gRPC HTTP 2服务：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L35-L41" target="_blank" title="Go to snippet source"></a><code class="language-scala">override protected def beforeAll(): Unit = {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L38-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">override protected def beforeAll(): Unit = {
   super.beforeAll()
   val handler = GreeterServiceHandler(new GreeterServiceImpl())
   Http().bindAndHandleAsync(handler, &quot;localhost&quot;, 8000)
@@ -402,13 +427,13 @@ Akka gRPC
 </span>
 </div>
 </a>
-<a href="../grpc/build-tool.html" title="构建工具" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../grpc/build-tool.html" title="构建工具（sbt）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-构建工具
+构建工具（sbt）
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

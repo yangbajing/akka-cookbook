@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>构建工具 · Akka Cookbook</title>
+<title>构建工具（sbt） · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-构建工具
+构建工具（sbt）
 </span>
 </div>
 </div>
@@ -185,7 +185,7 @@ yangbajing/akka-cookbook
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
   <ul>
     <li><a href="../grpc/grpc.html" class="page">gRPC服务</a></li>
-    <li><a href="../grpc/build-tool.html" class="active page">构建工具</a></li>
+    <li><a href="../grpc/build-tool.html" class="active page">构建工具（sbt）</a></li>
     <li><a href="../grpc/deployment.html" class="page">部署</a></li>
     <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
     <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
@@ -195,14 +195,19 @@ yangbajing/akka-cookbook
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
   </ul></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../test/index.html" class="page">测试</a>
+  <ul>
+    <li><a href="../test/test-actor.html" class="page">测试actor（scalatest）</a></li>
+  </ul></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="../grpc/build-tool.html#构建工具" class="header">构建工具</a>
+  <li><a href="../grpc/build-tool.html#构建工具-sbt-" class="header">构建工具（sbt）</a>
   <ul>
-    <li><a href="../grpc/build-tool.html#sbt-配置" class="header">sbt 配置</a></li>
+    <li><a href="../grpc/build-tool.html#项目配置" class="header">项目配置</a></li>
     <li><a href="../grpc/build-tool.html#目录结构" class="header">目录结构</a></li>
+    <li><a href="../grpc/build-tool.html#配置选项" class="header">配置选项</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -224,10 +229,11 @@ yangbajing/akka-cookbook
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
 <ul>
-  <li><a href="../grpc/build-tool.html#构建工具" class="header">构建工具</a>
+  <li><a href="../grpc/build-tool.html#构建工具-sbt-" class="header">构建工具（sbt）</a>
   <ul>
-    <li><a href="../grpc/build-tool.html#sbt-配置" class="header">sbt 配置</a></li>
+    <li><a href="../grpc/build-tool.html#项目配置" class="header">项目配置</a></li>
     <li><a href="../grpc/build-tool.html#目录结构" class="header">目录结构</a></li>
+    <li><a href="../grpc/build-tool.html#配置选项" class="header">配置选项</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -238,8 +244,13 @@ yangbajing/akka-cookbook
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#构建工具" name="构建工具" class="anchor"><span class="anchor-link"></span></a>构建工具</h1>
-<h2><a href="#sbt-配置" name="sbt-配置" class="anchor"><span class="anchor-link"></span></a>sbt 配置</h2>
+<h1><a href="#构建工具-sbt-" name="构建工具-sbt-" class="anchor"><span class="anchor-link"></span></a>构建工具（sbt）</h1>
+<h2><a href="#项目配置" name="项目配置" class="anchor"><span class="anchor-link"></span></a>项目配置</h2>
+<p>编辑<code>project/plugins.sbt</code>，添加如下sbt插件：</p>
+<pre class="prettyprint"><code class="language-sbt">addSbtPlugin(&quot;com.lightbend.sbt&quot; % &quot;sbt-javaagent&quot; % &quot;0.1.5&quot;)
+addSbtPlugin(&quot;com.lightbend.akka.grpc&quot; % &quot;sbt-akka-grpc&quot; % &quot;0.7.2&quot;)
+</code></pre>
+<p>在<code>build.sbt</code>文件配置项目启用Akka gRPC和Java Agent：</p>
 <pre class="prettyprint"><code class="language-sbt">project
   .in(file(&quot;grpc&quot;))
   .enablePlugins(AkkaGrpcPlugin, JavaAgent)
@@ -274,6 +285,51 @@ yangbajing/akka-cookbook
     │   │       │   ├── GreeterService.scala
     │   │       │   ├── HelloReply.scala
     │   │       │   └── HelloRequest.scala
+</code></pre>
+<h2><a href="#配置选项" name="配置选项" class="anchor"><span class="anchor-link"></span></a>配置选项</h2>
+<h3><a href="#可用配置是否生成grpc服务端或客户端存根代码-" name="可用配置是否生成grpc服务端或客户端存根代码-" class="anchor"><span class="anchor-link"></span></a>可用配置是否生成gRPC服务端或客户端存根代码：</h3>
+<pre class="prettyprint"><code class="language-sbt">// 同时生成客户端和服务端（默认）
+akkaGrpcGeneratedSources := Seq(AkkaGrpc.Client, AkkaGrpc.Server)
+
+// 只生成客户端
+akkaGrpcGeneratedSources := Seq(AkkaGrpc.Client)
+
+// 只生成服务端
+akkaGrpcGeneratedSources := Seq(AkkaGrpc.Server)
+</code></pre>
+<h3><a href="#可配置生成存根代码的语言-支持scala或java-" name="可配置生成存根代码的语言-支持scala或java-" class="anchor"><span class="anchor-link"></span></a>可配置生成存根代码的语言（支持<code>Scala</code>或<code>Java</code>）：</h3>
+<pre class="prettyprint"><code class="language-sbt">// 只生成Scala（默认）
+akkaGrpcGeneratedLanguages := Seq(AkkaGrpc.Scala)
+
+// 只生成Java
+akkaGrpcGeneratedLanguages := Seq(AkkaGrpc.Java)
+
+// 同时生成Scala和Java存根，需要启用 &#39;flat_package&#39; 特性。
+// 这样生成的Scala和Java存根代码会在不同的包路径下，以避免命名冲突。
+akkaGrpcGeneratedLanguages := Seq(AkkaGrpc.Scala, AkkaGrpc.Java)
+akkaGrpcCodeGeneratorSettings := akkaGrpcCodeGeneratorSettings.value.filterNot(_ == &quot;flat_package&quot;)
+</code></pre>
+<p><em>这样做有一个优势，在你准备将gRPC做为公开SDK的底层传输协议而不是API接口时，可以选择使用Java来生成客户端代码，相对Scala来说，Java语言更通用，更适合用于SDK。</em></p>
+<h3><a href="#传递参数给-scalapb" name="传递参数给-scalapb" class="anchor"><span class="anchor-link"></span></a>传递参数给 ScalaPB</h3>
+<p>Akka-gRPC的sbt插件是基于ScalaPB的，Akka-gRPC已经设置了一些默认项目，但可以对它进行更改。可以通过<code>akkaGrpcCodeGeneratorSettings</code>配置项自定义它。比如：</p>
+<pre class="prettyprint"><code class="language-sbt">akkaGrpcCodeGeneratorSettings := akkaGrpcCodeGeneratorSettings.value.filterNot(_ == &quot;flat_package&quot;) // 不启用 flat_package
+akkaGrpcCodeGeneratorSettings += &quot;single_line_to_proto_string&quot; // 启用 single_line_to_proto_string
+</code></pre>
+<p>可以过滤掉某些<code>.proto</code>文件以不对它进行编译：</p>
+<pre class="prettyprint"><code class="language-sbt">  .settings(
+    inConfig(Compile)(Seq(
+      excludeFilter in PB.generate := &quot;descriptor.proto&quot;
+    ))
+  )
+</code></pre>
+<p>添加额外的Protobuf源码目录（默认将从<code>src/main/protobuf</code>和<code>src/main/proto</code>目录寻找<code>.proto</code>定义描述符文件。</p>
+<pre class="prettyprint"><code class="language-sbt">inConfig(Compile)(Seq(
+  PB.protoSources += sourceDirectory.value / &quot;proto_custom&quot;  // src/main/proto_custom
+))
+</code></pre>
+<h3><a href="#从依赖加载-proto文件" name="从依赖加载-proto文件" class="anchor"><span class="anchor-link"></span></a>从依赖加载<code>.proto</code>文件</h3>
+<p>为了避免在项目之间复制<code>.proto</code>文件，可以将它打包到库里面。然后在sbt的库依赖配置中使用<code>protobuf</code>配置范围，这样在<code>sbt-protoc</code>编译时就可以找到相应的<code>.proto</code>文件。</p>
+<pre class="prettyprint"><code class="language-scala">&quot;com.thesamet.scalapb&quot; %% &quot;scalapb-runtime&quot; % &quot;0.9.1&quot; % &quot;protobuf&quot;
 </code></pre>
 </div>
 <div>

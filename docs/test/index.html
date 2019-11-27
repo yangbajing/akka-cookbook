@@ -20,7 +20,7 @@
 
 <meta name="description" content="book">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>怎样向上冒泡异常 · Akka Cookbook</title>
+<title>测试 · Akka Cookbook</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Akka Cookbook
 </span>
 <span class="md-header-nav__topic">
-怎样向上冒泡异常
+测试
 </span>
 </div>
 </div>
@@ -150,7 +150,7 @@ yangbajing/akka-cookbook
     <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
     <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
-    <li><a href="../actor/escalate-exception.html" class="active page">怎样向上冒泡异常</a></li>
+    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
     <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
     <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
   </ul></li>
@@ -195,19 +195,12 @@ yangbajing/akka-cookbook
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
   </ul></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
-  <li><a href="../test/index.html" class="page">测试</a>
+  <li><a href="../test/index.html" class="active page">测试</a>
   <ul>
     <li><a href="../test/test-actor.html" class="page">测试actor（scalatest）</a></li>
   </ul></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">Table of contents</label>
-<ul>
-  <li><a href="../actor/escalate-exception.html#怎样向上冒泡异常" class="header">怎样向上冒泡异常</a>
-  <ul>
-    <li><a href="../actor/escalate-exception.html#示例代码" class="header">示例代码</a></li>
-  </ul></li>
-</ul>
 </nav>
 
 </nav>
@@ -221,132 +214,22 @@ yangbajing/akka-cookbook
 </div>
 </div>
 </div>
-<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-<div class="md-sidebar__scrollwrap">
-<div class="md-sidebar__inner">
-<nav class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">Table of contents</label>
-<ul>
-  <li><a href="../actor/escalate-exception.html#怎样向上冒泡异常" class="header">怎样向上冒泡异常</a>
-  <ul>
-    <li><a href="../actor/escalate-exception.html#示例代码" class="header">示例代码</a></li>
-  </ul></li>
-</ul>
-</nav>
-
-</div>
-</div>
-</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#怎样向上冒泡异常" name="怎样向上冒泡异常" class="anchor"><span class="anchor-link"></span></a>怎样向上冒泡异常</h1>
-<p>对于经典（Untyped）actor的 <strong>Escalate</strong> 监管策略，Akka Typed并未提供直接的支持，但有两种方式可以实现类似效果。</p>
-<ol>
-  <li>不处理子actor的终止异常（<code>Terminated</code>或<code>ChildFailed</code>信号），这样actor将自动抛出<code>akka.actor.typed.DeathPactException</code>异常。但这样会使导致失败的原始异常被吞掉，因为这个异常将告知直接父actor（这某种程度上说是一件好事，这样就不会泄露实现细节）。</li>
-  <li>监听子actor的终止异常，再重新抛出，这里父actor可以选择将导致子actor失败的原始直接抛出或做个封装。</li>
-</ol>
-<h2><a href="#示例代码" name="示例代码" class="anchor"><span class="anchor-link"></span></a>示例代码</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/fault/WatchActorMain.scala#L27-L107" target="_blank" title="Go to snippet source"></a><code class="language-scala">final case class EscalateException(message: String)
-    extends RuntimeException(message)
-final case class ActorException(ref: ActorRef[Nothing], cause: Throwable)
-    extends RuntimeException(cause)
-
-object Child {
-  sealed trait Command
-  case object ThrowNormalException extends Command
-  case object ThrowEscalateException extends Command
-  def apply(): Behavior[Command] = Behaviors.setup { context =&gt;
-    context.log.info(&quot;started.&quot;)
-    Behaviors
-      .receiveMessage[Command] {
-        case ThrowEscalateException =&gt;
-          throw EscalateException(&quot;This is escalate exception.&quot;)
-        case ThrowNormalException =&gt;
-          throw new RuntimeException(&quot;This is normal exception.&quot;)
-      }
-      .receiveSignal {
-        case (_, PreRestart) =&gt;
-          context.log.info(&quot;Pre restart.&quot;)
-          Behaviors.same
-        case (_, PostStop) =&gt;
-          context.log.info(&quot;stopped.&quot;)
-          Behaviors.same
-      }
-  }
-}
-
-object Parent {
-  sealed trait Command
-  def apply(): Behavior[Command] = Behaviors.setup { context =&gt;
-    import context.executionContext
-    val child1 = context.spawn(Child(), &quot;child1&quot;)
-    context.watch(child1)
-    val child2 = context.spawn(Child(), &quot;child2&quot;)
-    context.watch(child2)
-    child2 ! Child.ThrowNormalException
-    context.system.scheduler
-      .scheduleOnce(1.second, () =&gt; child1 ! Child.ThrowEscalateException)
-    Behaviors.receiveSignal {
-      case (_, ChildFailed(ref, e: EscalateException)) =&gt;
-        throw ActorException(ref, e)
-      case (_, ChildFailed(ref, e)) =&gt;
-        context.log.warn(
-          s&quot;Received child actor ${ref.path} terminated signal, original exception is $e&quot;)
-        Behaviors.same
-    }
-  }
-}
-
-object Root {
-  sealed trait Command
-  def apply(): Behavior[Command] = Behaviors.setup { context =&gt;
-    val parent = context.spawn(Parent(), &quot;parent&quot;)
-    context.watch(parent)
-    Behaviors.receiveSignal {
-      case (_, ChildFailed(ref, e)) =&gt;
-        context.log.info(
-          s&quot;Received child actor ${ref.path} failed signal, original exception is $e&quot;)
-        Behaviors.same
-      case (_, Terminated(ref)) =&gt;
-        context.log.info(s&quot;Received actor ${ref.path} terminated signal.&quot;)
-        Behaviors.same
-    }
-  }
-}
-
-object WatchActorMain {
-  def main(args: Array[String]): Unit = {
-    val system = ActorSystem(Root(), &quot;watch&quot;)
-    TimeUnit.SECONDS.sleep(2)
-    system.terminate()
-  }
-}</code></pre>
-<p>运行代码可以看到如下输出（输出内容已作简化）：</p>
-<pre><code>[20:25:03,475] [INFO] [cookbook.actor.fault.Child$] 
-    [akka://watch/user/parent/child2] - started.
-[20:25:03,475] [INFO] [cookbook.actor.fault.Child$]
-    [akka://watch/user/parent/child1] - started.
-....
-[20:25:03,509] [INFO] [cookbook.actor.fault.Child$]
-    [akka://watch/user/parent/child2] - stopped.
-[20:25:03,513] [WARN] [akka.actor.SupervisorStrategy]
-    [akka://watch/user/parent] - Received child actor 
-    akka://watch/user/parent/child2 failed signal, original 
-    exception is java.lang.RuntimeException: This is normal exception.
-....
-[20:25:04,490] [INFO] [cookbook.actor.fault.Child$]
-    [akka://watch/user/parent/child1] - stopped.
-....
-[20:25:04,491] [INFO] [akka.actor.SupervisorStrategy]
-    [akka://watch/user] - Received child actor 
-    akka://watch/user/parent failed signal, original 
-    exception is cookbook.actor.fault.ActorException: 
-    cookbook.actor.fault.EscalateException: This is escalate exception.
-</code></pre>
+<h1><a href="#测试" name="测试" class="anchor"><span class="anchor-link"></span></a>测试</h1>
+<div class="toc ">
+<ul>
+  <li><a href="../test/test-actor.html" class="page">测试actor（scalatest）</a>
+  <ul>
+    <li><a href="../test/test-actor.html#使用-testprobe-测试响应" class="header">使用 TestProbe 测试响应</a></li>
+    <li><a href="../test/test-actor.html#使用-ask-测试响应" class="header">使用 ask 测试响应</a></li>
+  </ul></li>
+</ul>
+</div>
 </div>
 <div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/escalate-exception.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/test/index.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -362,7 +245,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../actor/watch-actor.html" title="监视 actor 的停止状态" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../persistence/index.html" title="Akka 持久化" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -371,17 +254,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-监视 actor 的停止状态
+Akka 持久化
 </span>
 </div>
 </a>
-<a href="../actor/stop.html" title="怎样优雅的停止actor" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../test/test-actor.html" title="测试actor（scalatest）" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-怎样优雅的停止actor
+测试actor（scalatest）
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
