@@ -195,6 +195,10 @@ yangbajing/akka-cookbook
     <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
   </ul></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../test/index.html" class="page">测试</a>
+  <ul>
+    <li><a href="../test/test-actor.html" class="page">测试actor（scalatest）</a></li>
+  </ul></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">Table of contents</label>
@@ -304,7 +308,7 @@ service GreeterService {
 <p>Akka gRPC提供了基于 Akka Streams 的API，更多 Akka Streams 的内容请参阅： <a href="../streams/index.html">Akka 流（Streams）</a>。</p>
 <p><code>itKeepsTalking</code>服务从客户端持续接收<code>HelloRequest</code>消息流，直到客户端主动停止（服务端也可以停止这个流，但这个服务语义上并未体现这一点）。这里收集客户端发送的所有元素并通过<code>Sink.seq</code>汇聚成一个序列，再构造<code>HelloReply</code>消息发送回客户端。</p>
 <p><code>itKeepsReplying</code>服务从客户端接收一个请求，持续不断的向客户端发送响应（一直到客户端主动终止）。这可以用来实现某些实时监控业务，当服务端收到对某个指标的监控请求后，服务端按一定的时间间隔持续不断的向客户端发送监控指标：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L51-L58" target="_blank" title="Go to snippet source"></a><code class="language-scala">def sendMetrics(in: MetricRequest): Source[MetricItem, NotUsed] = {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L50-L57" target="_blank" title="Go to snippet source"></a><code class="language-scala">def sendMetrics(in: MetricRequest): Source[MetricItem, NotUsed] = {
   val (queue, source) =
     Source.queue[MetricItem](16, OverflowStrategy.backpressure).preMaterialize()
   Source
@@ -325,7 +329,7 @@ service GreeterService {
 <p><code>heartbeat</code>收到心跳请求后马上就像客户端返回一个<code>HeartbeatAck</code>的心跳确认请求，因为这里心跳只用于保持连接，返回一个空响应即可。而<code>ref ! req</code>将心跳请求发送给<code>ref</code>指代的一个客户端Manager业务处理actor，由actor实现心跳超时监控，可以通过配置actor的 <strong>ReceiveTimeout</strong> 来实现心跳超时判断。</p>
 <h2><a href="#测试-grpc-服务" name="测试-grpc-服务" class="anchor"><span class="anchor-link"></span></a>测试 gRPC 服务</h2>
 <p>使用 Scalatest 对实现的4个gRPC服务进行测试，下面是单元测试代码：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L63-L111" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;sayHello&quot; in {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L62-L110" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;sayHello&quot; in {
   greeterClient.sayHello(HelloRequest(&quot;Scala&quot;)).futureValue should ===(
     HelloReply(&quot;Hello, Scala.&quot;))
 }
@@ -375,7 +379,7 @@ service GreeterService {
       HelloReply(&quot;Hello, Kotlin.&quot;)))
 }</code></pre>
 <p>在运行测试前需要先启动gRPC服务，在 Scalatest 的<code>beforeAll</code>函数内启动gRPC HTTP 2服务：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L39-L45" target="_blank" title="Go to snippet source"></a><code class="language-scala">override protected def beforeAll(): Unit = {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-grpc/src/test/scala/greeter/GreeterClientTest.scala#L38-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">override protected def beforeAll(): Unit = {
   super.beforeAll()
   val handler = GreeterServiceHandler(new GreeterServiceImpl())
   Http().bindAndHandleAsync(handler, &quot;localhost&quot;, 8000)

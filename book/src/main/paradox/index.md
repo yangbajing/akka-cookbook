@@ -21,5 +21,6 @@
 * [grpc](grpc/index.md)
 * [cluster](cluster/index.md)
 * [persistence](persistence/index.md)
+* [test](test/index.md)
 
 @@@
