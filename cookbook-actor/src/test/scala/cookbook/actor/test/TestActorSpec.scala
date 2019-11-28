@@ -62,9 +62,9 @@ class TestActorSpec extends ScalaTestWithActorTestKit with WordSpecLike {
       actor ! Hello("Scala", probe.ref)
       actor ! Hello("Java", probe.ref)
 
-      probe.expectMessage(Answer("Hi, you say is Scala."))
+      probe.expectMessage(500.millis, Answer("Hi, you say is Scala."))
       probe.expectMessage(Answer("Hi, you say is Java."))
-      probe.expectNoMessage(500.millis)
+      probe.expectNoMessage(2.seconds)
     }
     // #Req-Resp-probe
 

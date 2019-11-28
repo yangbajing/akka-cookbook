@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>适配响应类型到 actor &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/actor/pattern/adapted-response.html"/>
+<script type="text/javascript" src="../../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/banner.css"/>
+<link rel="shortcut icon" href="../../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon-16x16.png"/>
+<link rel="manifest" href="../../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) start -->
+<script src="https://optanon.blob.core.windows.net/consent/159bb13d-6748-4399-806e-ac28db879785.js" type="text/javascript" charset="UTF-8"></script>
+<script type="text/javascript">
+function OptanonWrapper() { }
+</script>
+<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) end -->
+<!--Google Analytics-->
+<script type="text/plain" class="optanon-category-2">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', '']);
+_gaq.push(['_setDomainName', '']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})()
+</script>
+<!-- Google Tag Manager -->
+<script type="text/plain" class="optanon-category-2">
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KBJGH35');
+</script>
+<!--Marketo-->
+<script type="text/plain" class="optanon-category-3">
+(function() {
+var didInit = false;
+function initMunchkin() {
+if(didInit === false) {
+didInit = true;
+Munchkin.init('558-NCX-702', { 'asyncOnly': true, 'disableClickDelay': true });
+}
+}
+var s = document.createElement('script');
+s.type = 'text/javascript';
+s.async = true;
+s.src = '//munchkin.marketo.net/munchkin.js';
+s.onreadystatechange = function() {
+if (this.readyState == 'complete' || this.readyState == 'loaded') {
+initMunchkin();
+}
+};
+s.onload = initMunchkin;
+document.getElementsByTagName('head')[0].appendChild(s);
+})();
+</script>
+</head>
+
+<body id="underlay" data-toggler="nav-open">
+<div id="lightbend-banner" class="lightbend-banner akka full-width" data-category="OSS Lightbend Banner Impression" data-label="Akka Banner Impression">
+<div class="wrapper">
+<div class="brand">
+<a class="oss-track-link-label" href="https://www.yangbajing.me/" target="_blank">羊八井花园</a>
+</div>
+</div>
+</div>
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../../index.html#目录" class="header">目录</a></li>
+  <li><a href="../../introduction.html" class="page">介绍</a></li>
+  <li><a href="../../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../../actor/pattern/index.html" class="page">消息模式</a>
+    <ul>
+      <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a></li>
+      <li><a href="../../actor/pattern/adapted-response.html#适配响应类型到-actor" class="active page">适配响应类型到 actor</a>
+      <ul>
+        <li><a href="../../actor/pattern/adapted-response.html#适用范围" class="header">适用范围</a></li>
+        <li><a href="../../actor/pattern/adapted-response.html#问题" class="header">问题</a></li>
+      </ul></li>
+      <li><a href="../../actor/pattern/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    </ul></li>
+    <li><a href="../../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
+    <li><a href="../../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
+    <li><a href="../../actor/discovery.html" class="page">发现其它actor</a></li>
+    <li><a href="../../actor/shutdown.html" class="page">怎样优雅的关闭 ActorSystem</a></li>
+  </ul></li>
+  <li><a href="../../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../../integration/index.html" class="page">集成</a></li>
+  <li><a href="../../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../../test/index.html" class="page">测试</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../../index.html#目录" class="header">目录</a></li>
+  <li><a href="../../introduction.html" class="page">介绍</a></li>
+  <li><a href="../../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../../actor/pattern/index.html" class="page">消息模式</a>
+    <ul>
+      <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a></li>
+      <li><a href="../../actor/pattern/adapted-response.html#适配响应类型到-actor" class="active page">适配响应类型到 actor</a>
+      <ul>
+        <li><a href="../../actor/pattern/adapted-response.html#适用范围" class="header">适用范围</a></li>
+        <li><a href="../../actor/pattern/adapted-response.html#问题" class="header">问题</a></li>
+      </ul></li>
+      <li><a href="../../actor/pattern/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
+      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
+      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+    </ul></li>
+    <li><a href="../../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
+    <li><a href="../../actor/supervise.html" class="page">处理 actor 异常</a></li>
+    <li><a href="../../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
+    <li><a href="../../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
+    <li><a href="../../actor/discovery.html" class="page">发现其它actor</a></li>
+    <li><a href="../../actor/shutdown.html" class="page">怎样优雅的关闭 ActorSystem</a></li>
+  </ul></li>
+  <li><a href="../../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../../integration/index.html" class="page">集成</a></li>
+  <li><a href="../../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../../test/index.html" class="page">测试</a></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#适配响应类型到-actor" name="适配响应类型到-actor" class="anchor"><span class="anchor-link"></span></a>适配响应类型到 actor</h1>
+<p>通常情况下，发送actor的消息类型与接收actor的响应消息类型不匹配（不然就会退化成大部分actor都继承同一个trait，这样就失去了 Typed 的意义！）。这种情况下，我们提供一个正确类型的ActorRef[T]，并将接收actor返回的响应消息T包装成发送actor可以处理的类型。</p>
+<p>先定义一个消息包装类：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L30-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">sealed trait Command
+private final case class WrappedBackendResponse(response: Backend.Response)
+    extends Command</code></pre>
+<p>消息适配器代码：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L39-L40" target="_blank" title="Go to snippet source"></a><code class="language-scala">val backendAdapter =
+  context.messageAdapter[Backend.Response](resp =&gt; WrappedBackendResponse(resp))</code></pre>
+<p>应该为不同的消息类型注册独立的消息适配器，同一个消息类型多次注册的消息适配器只有最后一个生效。</p>
+<p>如果响应的消息类与给定消息适配器匹配或是其消息适配器消息类型的子类型，则使用它。若有多个消息适配器符合条件，则将选用最后注册的那个。</p>
+<p>消息适配器（<code>context.messageAdapter</code>返回的<code>ActorRef[T]</code>）的生命周期同context所在actor。建议在Behaviors.step或AbstractBehavior构造函数中注册适配器，但也可以在稍后注册它们。</p>
+<p>注册适配器时提供的消息映射函数（<code>resp =&gt; WrappedBackendResponse(resp)</code>）在actor中运行，可安全的访问其（actor）内部状态。 但注意不能抛出异常，否则actor将被停止！</p>
+<h2><a href="#适用范围" name="适用范围" class="anchor"><span class="anchor-link"></span></a>适用范围</h2>
+<ol>
+  <li>在不同的actor消息协议间进行转换</li>
+  <li>订阅响应消息的actor，并将响应转换成发送actor可接收的类型</li>
+</ol>
+<h2><a href="#问题" name="问题" class="anchor"><span class="anchor-link"></span></a>问题</h2>
+<ol>
+  <li>难以检测消息是否送达或已被处理</li>
+  <li>每个响应消息只能进行一次自适应，如果注册了新的适配器则旧的将被替换。如果不同的目标actor使用相同的响应类型，则它们自动选择哪个适配器更合适。这需要在消息中编码某种相关性来解决</li>
+  <li>除非协议已经包含提供上下文的方法，例如在响应中返回发送的请求ID。否则交互就不能绑定到某个上下文中。</li>
+</ol>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../../actor/pattern/request-response.html"><i class="icon-prev"></i> <span class="link-prev">请求-响应模式</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../../actor/pattern/actor-inside-ask.html">actor之间使用ask（请求-响应模式） <i class="icon-next"></i></a>
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+Found an error in this documentation? The source code for this page can be found <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/pattern/adapted-response.md">here</a>.
+Please feel free to edit and contribute a pull request.
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2019 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../../js/groups.js"></script>
+<script type="text/javascript" src="../../js/page.js"></script>
+<script type="text/javascript" src="../../js/magellan.js"></script>
+<script type="text/javascript" src="../../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>

@@ -18,7 +18,7 @@ lazy val root = Project(id = "akka-cookbook", base = file(".")).aggregate(
 
 lazy val book =
   _project("book")
-    .enablePlugins(ParadoxMaterialThemePlugin)
+    .enablePlugins(AkkaParadoxPlugin)
     .dependsOn(
       storageCassandra,
       integrationSpring,
@@ -30,21 +30,27 @@ lazy val book =
       cookbookCommon)
     .settings(Publishing.noPublish: _*)
     .settings(
-      Compile / paradoxMaterialTheme ~= {
-        _.withLanguage(java.util.Locale.SIMPLIFIED_CHINESE)
-          .withRepository(uri("https://github.com/yangbajing/akka-cookbook"))
-          .withSocial(
-            uri("https://yangbajing.github.io/akka-cookbook/"),
-            uri("https://github.com/yangbajing/akka-cookbook"),
-            uri("https://weibo.com/yangbajing"))
-      },
-      paradoxProperties ++= Map(
-          "github.base_url" -> s"https://github.com/yangbajing/akka-cookbook/tree/${version.value}",
+      resolvers += Resolver.jcenterRepo,
+      publish / skip := true,
+      paradoxRoots := List("index.html"),
+      paradoxGroups := Map("Language" -> Seq("Scala", "Java")),
+      sourceDirectory in Compile in paradoxTheme := sourceDirectory.value / "main" / "paradox" / "_template",
+      Compile / paradoxProperties ++= Map(
+          "project.name" -> "Akka Cookbook",
+          "canonical.base_url" -> "https://www.yangbajing.me/akka-cookbook",
+          "github.base_url" -> s"https://github.com/yangbajing/akka-cookbook/tree/master",
           "version" -> version.value,
+          "scaladoc.akka.base_url" -> "https://doc.akka.io/api/akka/2.6",
+          "scaladoc.akka.http.base_url" -> "https://doc.akka.io/api/akka-http/current",
+          "javadoc.akka.base_url" -> "https://doc.akka.io/japi/akka/2.6",
+          "javadoc.akka.http.base_url" -> "https://doc.akka.io/japi/akka-http/current",
           "scala.version" -> scalaVersion.value,
           "scala.binary_version" -> scalaBinaryVersion.value,
+          "extref.wikipedia.base_url" -> "https://en.wikipedia.org/wiki/%s",
           "alpakka.version" -> versionAlpakka,
           "scaladoc.akka.base_url" -> s"http://doc.akka.io/api/$versionAkka",
+          "algolia.docsearch.api_key" -> "bc8e6a27d54d01e7d322395f061bf539",
+          "algolia.docsearch.index_name" -> "akka-cookbook",
           "akka.version" -> versionAkka))
 
 lazy val cookbookGrpc = _project("cookbook-grpc")

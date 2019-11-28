@@ -34,7 +34,7 @@ final class Source[+Out, +Mat](
           combine: (Mat, Mat2) => Mat3): RunnableGraph[Mat3]
     ```
 
-有关`combine`函数的更多内容请见： @ref[物化与物化值#Keep](materialize.md#Keep)
+有关`combine`函数的更多内容请见： @ref[物化与物化值#Keep](materialize.md)
 
 通常我们都不会直接构造`Source`，而是通过`Source`的伴身对象提供了各类工具函数来创建。有关`Source`伴身对象的常用工具函数请参阅： @ref[ 创建 Source 的常用函数](source.md)。
 

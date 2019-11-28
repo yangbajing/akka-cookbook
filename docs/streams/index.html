@@ -1,160 +1,115 @@
 <!DOCTYPE html>
-<html lang="zh" class="no-js">
+<html class="no-js" lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta name="description" content="book">
-<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
-
-<meta name="lang:clipboard.copy" content="Copy to clipboard">
-<meta name="lang:clipboard.copied" content="Copied to clipboard">
-<meta name="lang:search.language" content="">
-<meta name="lang:search.pipeline.stopwords" content="true">
-<meta name="lang:search.pipeline.trimmer" content="true">
-<meta name="lang:search.result.none" content="No matching documents">
-<meta name="lang:search.result.one" content="1 matching document">
-<meta name="lang:search.result.other" content="# matching documents">
-<meta name="lang:search.tokenizer" content="[\s\-]+">
-
-
-<meta name="description" content="book">
-<link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>Akka 流（Streams） · Akka Cookbook</title>
-<link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
-<link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
-<link rel="stylesheet" href="../lib/prettify/prettify.css">
-<script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
-<style>
-body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}
-code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
-</style>
-<link rel="stylesheet" href="../assets/fonts/font-awesome.css">
-<link rel="stylesheet" href="../assets/fonts/material-icons.css">
-<link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+<title>Akka 流（Streams） &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/streams/index.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) start -->
+<script src="https://optanon.blob.core.windows.net/consent/159bb13d-6748-4399-806e-ac28db879785.js" type="text/javascript" charset="UTF-8"></script>
+<script type="text/javascript">
+function OptanonWrapper() { }
+</script>
+<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) end -->
+<!--Google Analytics-->
+<script type="text/plain" class="optanon-category-2">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', '']);
+_gaq.push(['_setDomainName', '']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})()
+</script>
+<!-- Google Tag Manager -->
+<script type="text/plain" class="optanon-category-2">
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KBJGH35');
+</script>
+<!--Marketo-->
+<script type="text/plain" class="optanon-category-3">
+(function() {
+var didInit = false;
+function initMunchkin() {
+if(didInit === false) {
+didInit = true;
+Munchkin.init('558-NCX-702', { 'asyncOnly': true, 'disableClickDelay': true });
+}
+}
+var s = document.createElement('script');
+s.type = 'text/javascript';
+s.async = true;
+s.src = '//munchkin.marketo.net/munchkin.js';
+s.onreadystatechange = function() {
+if (this.readyState == 'complete' || this.readyState == 'loaded') {
+initMunchkin();
+}
+};
+s.onload = initMunchkin;
+document.getElementsByTagName('head')[0].appendChild(s);
+})();
+</script>
 </head>
-<body
->
-<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-<label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-<header class="md-header" data-md-component="header">
-<nav class="md-header-nav md-grid">
-<div class="md-flex">
-<div class="md-flex__cell md-flex__cell--shrink">
-<a href="../index.html" title="Akka Cookbook" class="md-header-nav__button md-logo">
-<i class="md-icon">local_library</i>
-</a>
-</div>
-<div class="md-flex__cell md-flex__cell--shrink">
-<label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
-</div>
-<div class="md-flex__cell md-flex__cell--stretch">
-<div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
-<span class="md-header-nav__topic">
-Akka Cookbook
-</span>
-<span class="md-header-nav__topic">
-Akka 流（Streams）
-</span>
-</div>
-</div>
-<div class="md-flex__cell md-flex__cell--shrink">
-<label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-<div class="md-search" data-md-component="search" role="dialog">
-<label class="md-search__overlay" for="__search"></label>
-<div class="md-search__inner" role="search">
-<form class="md-search__form" name="search">
-<input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
-<label class="md-icon md-search__icon" for="__search"></label>
-<button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">&#xE5CD;</button>
-</form>
-<div class="md-search__output">
-<div class="md-search__scrollwrap" data-md-scrollfix>
-<div class="md-search-result" data-md-component="result">
-<div class="md-search-result__meta">
-Type to start searching
-</div>
-<ol class="md-search-result__list"></ol>
-</div>
-</div>
-</div>
-</div>
-</div>
 
+<body id="underlay" data-toggler="nav-open">
+<div id="lightbend-banner" class="lightbend-banner akka full-width" data-category="OSS Lightbend Banner Impression" data-label="Akka Banner Impression">
+<div class="wrapper">
+<div class="brand">
+<a class="oss-track-link-label" href="https://www.yangbajing.me/" target="_blank">羊八井花园</a>
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
-<div class="md-header-nav__source">
-<a href="https://github.com/yangbajing/akka-cookbook"
-title="Go to repository"
-class="md-source"
-data-md-source="github">
-<div class="md-source__icon">
-<i class="fa fa-github"></i>
 </div>
-<div class="md-source__repository">
-yangbajing/akka-cookbook
 </div>
-</a>
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
 
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
 </div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
 </div>
+<div class="nav-header-version">
+Version 1.0.0
 </div>
-</nav>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
 </header>
-
-<div class="md-container">
-<main class="md-main">
-<div class="md-main__inner md-grid" data-md-component="container">
-<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-<div class="md-sidebar__scrollwrap">
-<div class="md-sidebar__inner">
-<nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
-<label class="md-nav__title md-nav__title--site" for="drawer">
-<a href="../index.html" title="Akka Cookbook" class="md-nav__button md-logo">
-<span class="md-nav__button md-logo">
-<i class="md-icon">local_library</i>
-</a>
-<a href="../index.html" title="Akka Cookbook">
-Akka Cookbook
-</a>
-</label>
-<div class="md-nav__source">
-<a href="https://github.com/yangbajing/akka-cookbook"
-title="Go to repository"
-class="md-source"
-data-md-source="github">
-<div class="md-source__icon">
-<i class="fa fa-github"></i>
-</div>
-<div class="md-source__repository">
-yangbajing/akka-cookbook
-</div>
-</a>
-
-</div>
+<nav class="nav-toc">
 <ul>
+  <li><a href="../index.html#目录" class="header">目录</a></li>
   <li><a href="../introduction.html" class="page">介绍</a></li>
-  <li><a href="../actor/index.html" class="page">Actor</a>
-  <ul>
-    <li><a href="../actor/request-response.html" class="page">请求-响应模式</a></li>
-    <li><a href="../actor/adapted-response.html" class="page">适配响应类型到 actor</a></li>
-    <li><a href="../actor/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-    <li><a href="../actor/actor-outside-ask.html" class="page">Actor外使用ask（请求-响应模式）</a></li>
-    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../actor/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
-    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
-    <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
-    <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
-    <li><a href="../actor/supervise.html" class="page">处理 actor 异常</a></li>
-    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
-    <li><a href="../actor/escalate-exception.html" class="page">怎样向上冒泡异常</a></li>
-    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
-    <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
-  </ul></li>
-  <li><a href="../streams/index.html" class="active page">Akka 流（Streams）</a>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../streams/index.html#akka-流-streams-" class="active page">Akka 流（Streams）</a>
   <ul>
     <li><a href="../streams/introduction.html" class="page">介绍</a></li>
     <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
@@ -170,53 +125,74 @@ yangbajing/akka-cookbook
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a>
-  <ul>
-    <li><a href="../storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
-    <li><a href="../storage/cassandra.html" class="page">访问 Cassandra</a></li>
-    <li><a href="../storage/mongodb.html" class="page">访问 MongoDB</a></li>
-    <li><a href="../storage/elasticsearch.html" class="page">访问 Elasticsearch</a></li>
-  </ul></li>
-  <li><a href="../integration/index.html" class="page">集成</a>
-  <ul>
-    <li><a href="../integration/spring-web.html" class="page">在 Spring 里使用 Akka Streams</a></li>
-  </ul></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a>
-  <ul>
-    <li><a href="../grpc/grpc.html" class="page">gRPC服务</a></li>
-    <li><a href="../grpc/build-tool.html" class="page">构建工具（sbt）</a></li>
-    <li><a href="../grpc/deployment.html" class="page">部署</a></li>
-    <li><a href="../grpc/power-api.html" class="page">PowerApi</a></li>
-    <li><a href="../grpc/grpc.z.html" class="page">小结</a></li>
-  </ul></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a>
-  <ul>
-    <li><a href="../cluster/serialization-jackson.html" class="page">使用Jackson作为序列化</a></li>
-  </ul></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
-  <li><a href="../test/index.html" class="page">测试</a>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../index.html#目录" class="header">目录</a></li>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../streams/index.html#akka-流-streams-" class="active page">Akka 流（Streams）</a>
   <ul>
-    <li><a href="../test/test-actor.html" class="page">测试actor（scalatest）</a></li>
+    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
+    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
+    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
+    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
+    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
+    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
+    <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
 </ul>
-<nav class="md-nav md-nav--secondary">
+</div>
 </nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
 
-</nav>
-<ul style="display: none">
-<li class="md-nav__item md-version" id="project.version">
-<label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.0.0
-</label>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="md-content">
-<article class="md-content__inner md-typeset">
-<div class="md-content__searchable">
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
 <h1><a href="#akka-流-streams-" name="akka-流-streams-" class="anchor"><span class="anchor-link"></span></a>Akka 流（Streams）</h1>
 <div class="toc ">
 <ul>
@@ -278,78 +254,85 @@ yangbajing/akka-cookbook
 </ul>
 </div>
 </div>
-<div>
-<a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/index.md" title="Edit this page" class="md-source-file md-edit">
-Edit this page
-</a>
-</div>
-<div class="print-only">
-<span class="md-source-file md-version">
-1.0.0
-</span>
-</div>
 </article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../actor/shutdown.html"><i class="icon-prev"></i> <span class="link-prev">怎样优雅的关闭 ActorSystem</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../streams/introduction.html">介绍 <i class="icon-next"></i></a>
+</div>
+</section>
 </div>
 </div>
-</main>
-<footer class="md-footer">
-<div class="md-footer-nav">
-<nav class="md-footer-nav__inner md-grid">
-<a href="../actor/lifecycle.html" title="Actor 生命周期" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-<div class="md-flex__cell md-flex__cell--shrink">
-<i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-</div>
-<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-<span class="md-flex__ellipsis">
-<span class="md-footer-nav__direction">
-Previous
-</span>
-Actor 生命周期
-</span>
-</div>
-</a>
-<a href="../streams/introduction.html" title="介绍" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-<div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-<span class="md-flex__ellipsis">
-<span class="md-footer-nav__direction">
-Next
-</span>
-介绍
-</span>
-</div>
-<div class="md-flex__cell md-flex__cell--shrink">
-<i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-</div>
-</a>
-</nav>
-</div>
-<div class="md-footer-meta md-typeset">
-<div class="md-footer-meta__inner md-grid">
-<div class="md-footer-copyright">
-Powered by
-<a href="https://github.com/lightbend/paradox">Paradox</a>
-and
-<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
-
-</div>
-<div class="md-footer-social">
-<a href="https://yangbajing.github.io/akka-cookbook/" class="md-footer-social__link fa fa-globe"></a><a href="https://github.com/yangbajing/akka-cookbook" class="md-footer-social__link fa fa-github"></a><a href="https://weibo.com/yangbajing" class="md-footer-social__link fa fa-globe"></a>
+<div class="source-github row">
+Found an error in this documentation? The source code for this page can be found <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/index.md">here</a>.
+Please feel free to edit and contribute a pull request.
 </div>
 
-</div>
-</div>
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2019 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
 </footer>
-
+</section>
+</main>
 </div>
-<script src="../assets/javascripts/application.583bbe55.js"></script>
-<script src="../assets/javascripts/paradox-material-theme.js"></script>
-<script>app.initialize({version:"0.17",url:{base:"../."}})</script>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
 <script type="text/javascript" src="../lib/prettify/prettify.js"></script>
 <script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
 <script type="text/javascript">
-document.addEventListener("DOMContentLoaded", function(event) {
-window.prettyPrint && prettyPrint();
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
 });
 </script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
 </body>
 </html>
