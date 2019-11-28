@@ -59,10 +59,7 @@ object FaultTolerance extends StrictLogging {
   def main(args: Array[String]): Unit = {
     val system = ActorSystem(
       Behaviors
-        .supervise(
-          Behaviors
-            .supervise(FaultTolerance())
-            .onFailure[RestartException](SupervisorStrategy.restart))
+        .supervise(Behaviors.supervise(FaultTolerance()).onFailure[RestartException](SupervisorStrategy.restart))
         .onFailure[StopException](SupervisorStrategy.stop),
       "fault-tolerance")
     system ! Message

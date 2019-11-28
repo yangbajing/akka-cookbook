@@ -40,8 +40,7 @@ object Ping {
 
 object Pong {
   sealed trait Command
-  final case class PingCommand(message: String, replyTo: ActorRef[Ping.Command])
-      extends Command
+  final case class PingCommand(message: String, replyTo: ActorRef[Ping.Command]) extends Command
   def apply(): Behavior[Command] = Behaviors.receive[Command] {
     case (context, PingCommand(message, replyTo)) =>
       context.log.info(s"Receive ping message: $message")

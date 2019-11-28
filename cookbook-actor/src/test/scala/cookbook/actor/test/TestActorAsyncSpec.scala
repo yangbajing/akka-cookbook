@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package cookbook.actor.introduction
+package cookbook.actor.test
 
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ ActorRef, ActorSystem, Props, SpawnProtocol }
-import akka.util.Timeout
+import cookbook.actor.test.TestActor.{ Answer, Hello, Reply }
+import org.scalatest.AsyncWordSpecLike
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
-object SpawnProtocolMain {
-  def main(args: Array[String]): Unit = {
-    // #spawn-protocol
-    implicit val system = ActorSystem(SpawnProtocol(), "spawn-protocol")
-    implicit val timeout = Timeout(2.seconds)
-    val pingF = system.ask[ActorRef[Ping.Command]](replyTo => SpawnProtocol.Spawn(Ping(), "ping", Props.empty, replyTo))
-    val ping = Await.result(pingF, 2.seconds)
-    ping ! Ping.Start
-    system.terminate()
-    // #spawn-protocol
+// #TestActorAsyncSpec
+class TestActorAsyncSpec extends ScalaTestWithActorTestKit with AsyncWordSpecLike {
+  "TestActorAsync" must {
+    "async-assert" in {
+      val actor = spawn(TestActor())
+      val answerF =
+        actor.ask[Reply](replyTo => Hello("Akka", replyTo)).mapTo[Answer]
+      answerF.map { answer =>
+        answer should ===(Answer("Hi, you say is Akka."))
+      }
+    }
   }
 }
+// #TestActorAsyncSpec

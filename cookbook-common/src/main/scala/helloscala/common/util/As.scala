@@ -93,10 +93,7 @@ object AsInt {
   }
 
   def toInt(s: CharSequence): Option[Int] =
-    AsLong.REGEX_DIGIT
-      .findFirstIn(s)
-      .map(_.replaceAll(",", "").toInt)
-      .orElse(Try(s.toString.toInt).toOption)
+    AsLong.REGEX_DIGIT.findFirstIn(s).map(_.replaceAll(",", "").toInt).orElse(Try(s.toString.toInt).toOption)
 }
 
 object AsLong {
@@ -112,10 +109,7 @@ object AsLong {
   }
 
   def toLong(s: CharSequence): Option[Long] =
-    REGEX_DIGIT
-      .findFirstIn(s)
-      .map(_.replaceAll(",", "").toLong)
-      .orElse(Try(s.toString.toLong).toOption)
+    REGEX_DIGIT.findFirstIn(s).map(_.replaceAll(",", "").toLong).orElse(Try(s.toString.toLong).toOption)
 }
 
 object AsFloat {
@@ -223,9 +217,7 @@ object AsZonedDateTime {
     case null               => None
     case zdt: ZonedDateTime => Some(zdt)
     case s: String =>
-      Try(ZonedDateTime.parse(s))
-        .orElse(Try(TimeUtils.toZonedDateTime(s.toLong)))
-        .toOption
+      Try(ZonedDateTime.parse(s)).orElse(Try(TimeUtils.toZonedDateTime(s.toLong))).toOption
     case epochMillis: Long =>
       Try(TimeUtils.toZonedDateTime(epochMillis)).toOption
     case AsOffsetDateTime(odt) => Some(odt.toZonedDateTime)
@@ -238,9 +230,7 @@ object AsOffsetDateTime {
     case null                => None
     case odt: OffsetDateTime => Some(odt)
     case s: String =>
-      Try(TimeUtils.toOffsetDateTime(s))
-        .orElse(Try(TimeUtils.toOffsetDateTime(s.toLong)))
-        .toOption
+      Try(TimeUtils.toOffsetDateTime(s)).orElse(Try(TimeUtils.toOffsetDateTime(s.toLong))).toOption
     case epochMillis: Long =>
       Try(TimeUtils.toOffsetDateTime(epochMillis)).toOption
     case _ => None

@@ -37,8 +37,7 @@ class DigestUtilsTest
   val PROJECT_BASE = sys.props("user.dir")
 
   test("digest") {
-    fromPath(s"$PROJECT_BASE/README.md") mustBe fromPathFuture(
-      s"$PROJECT_BASE/README.md")
+    fromPath(s"$PROJECT_BASE/README.md") mustBe fromPathFuture(s"$PROJECT_BASE/README.md")
   }
 
   private def fromPath(path: String) =

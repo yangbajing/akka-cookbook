@@ -30,15 +30,13 @@ import scala.compat.java8.FunctionConverters.asJavaBiConsumer
 
 object StringUtils {
   val BLACK_CHAR: Char = ' '
-  val PRINTER_CHARS
-      : immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
+  val PRINTER_CHARS: immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
   val REGEX_STR_BLANK = """[\s　]+"""
   val CHINESE_COMMA = "，"
   val CHINESE_FULL_STOP = "。"
 
   val PRINTER_CHARS_EXT: immutable.IndexedSeq[Char] = PRINTER_CHARS ++
-    Vector('!', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '_', '.',
-      '?', '<', '>')
+    Vector('!', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '_', '.', '?', '<', '>')
 
   private val HEX_CHARS: Array[Char] = "0123456789abcdef".toCharArray
   private val HEX_CHAR_SETS = Set[Char]() ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
@@ -207,11 +205,9 @@ object StringUtils {
       case (key, value) => convertUnderscoreNameToPropertyName(key) -> value
     }
 
-  def convertUnderscoreNameToPropertyName(
-      obj: JMap[String, Object]): JMap[String, Object] = {
+  def convertUnderscoreNameToPropertyName(obj: JMap[String, Object]): JMap[String, Object] = {
     val result = new JHashMap[String, Object]()
-    val func: (String, Object) => Unit = (key, value) =>
-      result.put(convertUnderscoreNameToPropertyName(key), value)
+    val func: (String, Object) => Unit = (key, value) => result.put(convertUnderscoreNameToPropertyName(key), value)
     obj.forEach(asJavaBiConsumer(func))
     result
   }
@@ -379,12 +375,7 @@ object StringUtils {
     import scala.compat.java8.FunctionConverters._
     val filterNoneBlank: String => Boolean = s => StringUtils.isNoneBlank(s)
     val trim: String => String = s => s.trim
-    val trans: Path => java.util.stream.Stream[String] = path =>
-      Files.readAllLines(path).stream()
-    Files
-      .list(dir)
-      .flatMap(trans.asJava)
-      .map[String](trim.asJava)
-      .filter(filterNoneBlank.asJava)
+    val trans: Path => java.util.stream.Stream[String] = path => Files.readAllLines(path).stream()
+    Files.list(dir).flatMap(trans.asJava).map[String](trim.asJava).filter(filterNoneBlank.asJava)
   }
 }

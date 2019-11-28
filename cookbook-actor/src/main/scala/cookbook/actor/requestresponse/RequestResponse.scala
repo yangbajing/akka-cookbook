@@ -28,8 +28,7 @@ import scala.concurrent.duration._
 object Request {
   // #command
   sealed trait Command
-  private final case class WrappedBackendResponse(response: Backend.Response)
-      extends Command
+  private final case class WrappedBackendResponse(response: Backend.Response) extends Command
   // #command
 
   final case object Start extends Command
@@ -60,8 +59,7 @@ object Request {
 
 object Backend {
   sealed trait Command
-  final case class StartJob(job: String, replyTo: ActorRef[Response])
-      extends Command
+  final case class StartJob(job: String, replyTo: ActorRef[Response]) extends Command
 
   sealed trait Response
   case object JobStarted extends Response

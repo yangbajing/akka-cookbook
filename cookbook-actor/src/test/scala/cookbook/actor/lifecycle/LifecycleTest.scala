@@ -27,8 +27,7 @@ import org.scalatest.WordSpecLike
 class LifecycleTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "Lifecycle" should {
     "lifecycle" in {
-      val ref = spawn(
-        Behaviors.supervise(Lifecycle()).onFailure(SupervisorStrategy.restart))
+      val ref = spawn(Behaviors.supervise(Lifecycle()).onFailure(SupervisorStrategy.restart))
       ref ! "hello"
       TimeUnit.SECONDS.sleep(1)
       ref ! "restart"

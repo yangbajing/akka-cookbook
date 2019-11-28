@@ -35,16 +35,13 @@ class SerializationJacksonTest extends ScalaTestWithActorTestKit with WordSpecLi
       val rightText = objectMapper.writeValueAsString(right)
       println(rightText)
       rightText should be("""{"r":{"name":"羊八井","sex":1}}""")
-      objectMapper.readValue(rightText, classOf[Right[Error, User]]) should be(
-        right)
+      objectMapper.readValue(rightText, classOf[Right[Error, User]]) should be(right)
 
       val left: Either[Error, User] = Left(Error(400, "Bad Request."))
       val leftText = objectMapper.writeValueAsString(left)
       println(leftText)
       leftText should be("""{"l":{"status":400,"message":"Bad Request."}}""")
-      objectMapper.treeToValue(
-        objectMapper.readTree(leftText),
-        classOf[Either[Error, User]]) should be(left)
+      objectMapper.treeToValue(objectMapper.readTree(leftText), classOf[Either[Error, User]]) should be(left)
     }
   }
 }

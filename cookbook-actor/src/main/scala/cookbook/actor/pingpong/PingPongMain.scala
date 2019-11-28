@@ -33,10 +33,7 @@ object Ping {
     implicit val timeout: Timeout = 2.seconds
     val pong = context.spawn(Pong(), "pong")
     context.watch(pong)
-    context.ask(
-      pong,
-      (replyTo: ActorRef[Pong.Response]) =>
-        Pong.Message("Hello Scala!", 1, replyTo)) {
+    context.ask(pong, (replyTo: ActorRef[Pong.Response]) => Pong.Message("Hello Scala!", 1, replyTo)) {
       case Success(value)     => WrappedResponse(value)
       case Failure(exception) => throw exception
     }
@@ -45,9 +42,7 @@ object Ping {
       .receiveMessage[Request] {
         case WrappedResponse(Pong.Result(message, count)) =>
           context.log.info(s"Received pong response: $message, ${count}th.")
-          context.ask[Pong.Request, Pong.Response](
-            pong,
-            Pong.Message(message, count + 1, _)) {
+          context.ask[Pong.Request, Pong.Response](pong, Pong.Message(message, count + 1, _)) {
             case Success(value)     => WrappedResponse(value)
             case Failure(exception) => throw exception
           }
@@ -65,8 +60,7 @@ object Ping {
 
 object Pong {
   sealed trait Request
-  final case class Message(message: String, count: Int, replyTo: ActorRef[Response])
-      extends Request
+  final case class Message(message: String, count: Int, replyTo: ActorRef[Response]) extends Request
   sealed trait Response
   final case class Result(message: String, count: Int) extends Response
   def apply(): Behavior[Request] = Behaviors.receive {

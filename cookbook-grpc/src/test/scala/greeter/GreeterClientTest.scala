@@ -39,8 +39,7 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
     super.beforeAll()
     val handler = GreeterServiceHandler(new GreeterServiceImpl())
     Http().bindAndHandleAsync(handler, "localhost", 8000)
-    greeterClient = GreeterServiceClient(
-      GrpcClientSettings.fromConfig(GreeterService.name))
+    greeterClient = GreeterServiceClient(GrpcClientSettings.fromConfig(GreeterService.name))
   }
   // #GreeterService
 
@@ -50,9 +49,7 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
   def sendMetrics(in: MetricRequest): Source[MetricItem, NotUsed] = {
     val (queue, source) =
       Source.queue[MetricItem](16, OverflowStrategy.backpressure).preMaterialize()
-    Source
-      .tick(1.seconds, 1.seconds, MetricItem())
-      .runForeach(metric => queue.offer(metric))
+    Source.tick(1.seconds, 1.seconds, MetricItem()).runForeach(metric => queue.offer(metric))
     source
   }
   // #sendMetrics
@@ -60,16 +57,11 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "GreeterServiceClient" must {
     // #GreeterServiceClient
     "sayHello" in {
-      greeterClient.sayHello(HelloRequest("Scala")).futureValue should ===(
-        HelloReply("Hello, Scala."))
+      greeterClient.sayHello(HelloRequest("Scala")).futureValue should ===(HelloReply("Hello, Scala."))
     }
 
     "itKeepsReplying" in {
-      greeterClient
-        .itKeepsReplying(HelloRequest("Scala"))
-        .take(5)
-        .runWith(Sink.seq)
-        .futureValue should ===(
+      greeterClient.itKeepsReplying(HelloRequest("Scala")).take(5).runWith(Sink.seq).futureValue should ===(
         Seq(
           HelloReply("Hello, Scala; this is 1 times."),
           HelloReply("Hello, Scala; this is 2 times."),
@@ -80,12 +72,9 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
 
     "itKeepsTalking" in {
       val (queue, in) =
-        Source
-          .queue[HelloRequest](16, OverflowStrategy.backpressure)
-          .preMaterialize()
+        Source.queue[HelloRequest](16, OverflowStrategy.backpressure).preMaterialize()
       val f = greeterClient.itKeepsTalking(in)
-      Seq("Scala", "Java", "Groovy", "Kotlin").foreach(program =>
-        queue.offer(HelloRequest(program)))
+      Seq("Scala", "Java", "Groovy", "Kotlin").foreach(program => queue.offer(HelloRequest(program)))
       TimeUnit.SECONDS.sleep(1)
       queue.complete()
       f.futureValue should ===(HelloReply("Hello, Scala, Java, Groovy, Kotlin."))
@@ -93,12 +82,9 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
 
     "streamHellos" in {
       val (queue, in) =
-        Source
-          .queue[HelloRequest](16, OverflowStrategy.backpressure)
-          .preMaterialize()
+        Source.queue[HelloRequest](16, OverflowStrategy.backpressure).preMaterialize()
       val f = greeterClient.streamHellos(in).runWith(Sink.seq)
-      Seq("Scala", "Java", "Groovy", "Kotlin").foreach(item =>
-        queue.offer(HelloRequest(item)))
+      Seq("Scala", "Java", "Groovy", "Kotlin").foreach(item => queue.offer(HelloRequest(item)))
       TimeUnit.SECONDS.sleep(1)
       queue.complete()
       f.futureValue should ===(

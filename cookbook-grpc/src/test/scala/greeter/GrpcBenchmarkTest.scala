@@ -36,9 +36,7 @@ object GrpcBenchmarkTest {
     val greeterServiceClient = GreeterServiceClient(
       GrpcClientSettings.fromConfig(GreeterService.name)(system.toClassic))
     val greeterServiceClients =
-      Vector.fill(4)(
-        GreeterServiceClient(
-          GrpcClientSettings.fromConfig(GreeterService.name)(system.toClassic)))
+      Vector.fill(4)(GreeterServiceClient(GrpcClientSettings.fromConfig(GreeterService.name)(system.toClassic)))
 
     def bench(n: Int): Unit = {
       val begin = System.nanoTime()
@@ -54,21 +52,18 @@ object GrpcBenchmarkTest {
       f.onComplete { tryValue =>
         val millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - begin)
         val sec = n * 1000 / millis
-        println(
-          s"Sending $n messages takes ${millis}ms, TPS: $sec/s. return: $tryValue")
+        println(s"Sending $n messages takes ${millis}ms, TPS: $sec/s. return: $tryValue")
       }
       Await.ready(f, Duration.Inf)
     }
 
     def benchStreaming(n: Int): Unit = {
       val begin = System.nanoTime()
-      val f = greeterServiceClient.itKeepsTalking(
-        Source.repeat(0).map(n => HelloRequest(s"this is $n")).take(n))
+      val f = greeterServiceClient.itKeepsTalking(Source.repeat(0).map(n => HelloRequest(s"this is $n")).take(n))
       f.onComplete { tryValue =>
         val millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - begin)
         val sec = n * 1000 / millis
-        println(
-          s"Streaming sending $n messages takes ${millis}ms, TPS: $sec/s. return: $tryValue")
+        println(s"Streaming sending $n messages takes ${millis}ms, TPS: $sec/s. return: $tryValue")
       }
       Await.ready(f, Duration.Inf)
     }

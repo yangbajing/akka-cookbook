@@ -23,19 +23,16 @@ import akka.util.Timeout
 import scala.concurrent.Await
 
 object ActorUtils {
-  def spawnActor[T](
-      system: ActorSystem[SpawnProtocol.Command],
-      behavior: Behavior[T],
-      name: String,
-      props: Props)(implicit timeout: Timeout): ActorRef[T] =
+  def spawnActor[T](system: ActorSystem[SpawnProtocol.Command], behavior: Behavior[T], name: String, props: Props)(
+      implicit timeout: Timeout): ActorRef[T] =
     spawnActor(behavior, name, props)(system, timeout, system.scheduler)
 
   def spawnActor[T](behavior: Behavior[T], name: String, props: Props)(
       implicit recipient: RecipientRef[SpawnProtocol.Command],
       timeout: Timeout,
       scheduler: Scheduler): ActorRef[T] = {
-    val future = recipient.ask[ActorRef[T]](replyTo =>
-      SpawnProtocol.Spawn(behavior, name, props, replyTo))
+    val future =
+      recipient.ask[ActorRef[T]](replyTo => SpawnProtocol.Spawn(behavior, name, props, replyTo))
     Await.result(future, timeout.duration)
   }
 }

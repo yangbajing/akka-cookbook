@@ -19,8 +19,7 @@ package helloscala.common.exception
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import helloscala.common.IntStatus
 
-@JsonIgnoreProperties(
-  value = Array("suppressed", "localizedMessage", "stackTrace", "cause"))
+@JsonIgnoreProperties(value = Array("suppressed", "localizedMessage", "stackTrace", "cause"))
 class HSException(
     val status: Int,
     val msg: String,

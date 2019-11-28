@@ -8,4 +8,4 @@ Akka Typed默认不会 **watch** 创建的子actor，若需要监听子actor的�
 
 `Terminated`信号通过`ref`属性告知监听者是哪个actor已终止。`ChildFailed`信号作为`Termianted`的子类，它除了`ref`指出是哪个actor已终止外，还通过`cause`属性告知子actor终止时被抛出的异常。
 
-示例代码请见： @ref[怎样向上冒泡异常#示例代码](escalate-exception.md#示例代码)。
+示例代码请见： @ref[怎样向上冒泡异常#示例代码](supervise.md#示例代码)。

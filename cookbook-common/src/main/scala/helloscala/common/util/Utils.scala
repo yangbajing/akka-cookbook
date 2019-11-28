@@ -49,10 +49,7 @@ object Utils extends StrictLogging {
     Generators.randomBasedGenerator(new SecureRandom())
 
   @tailrec
-  final def getValueFromFunctions[T](
-      functions: Iterable[() => T],
-      value: T,
-      valueStopFunc: T => Boolean): T = {
+  final def getValueFromFunctions[T](functions: Iterable[() => T], value: T, valueStopFunc: T => Boolean): T = {
     if (valueStopFunc(value)) value
     else if (functions.isEmpty) value
     else getValueFromFunctions(functions.tail, functions.head(), valueStopFunc)
@@ -141,8 +138,7 @@ object Utils extends StrictLogging {
    */
   @inline def getPid: Long =
     try {
-      java.lang.Long
-        .parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
+      java.lang.Long.parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
     } catch {
       case NonFatal(e) =>
         logger.error("getPid failure", e)
@@ -254,11 +250,7 @@ object Utils extends StrictLogging {
 
   def propertiesToMap(props: Properties): Map[String, String] = {
     import scala.jdk.CollectionConverters._
-    props
-      .stringPropertyNames()
-      .asScala
-      .map(name => name -> props.getProperty(name))
-      .toMap
+    props.stringPropertyNames().asScala.map(name => name -> props.getProperty(name)).toMap
   }
 
   def propertiesToMapObject(props: Properties): Map[String, Object] = {

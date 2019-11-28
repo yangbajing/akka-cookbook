@@ -24,11 +24,7 @@ class FlowTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "Interleave Flow" must {
     "before interleave end add element" in {
       val expected = Seq("", "1", "-", "2", "-", "3", "-", "4", "-", "5", "-")
-      val value = Source(List(1, 2, 3, 4, 5))
-        .map(_.toString)
-        .intersperse("", "-", "-")
-        .runWith(Sink.seq)
-        .futureValue
+      val value = Source(List(1, 2, 3, 4, 5)).map(_.toString).intersperse("", "-", "-").runWith(Sink.seq).futureValue
       value should be(expected)
       Source(List(1, 2, 3, 4, 5))
         .map(_.toString)

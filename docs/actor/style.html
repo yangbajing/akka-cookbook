@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>Typed Actor 风格 &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/actor/style.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+
+<body id="underlay" data-toggler="nav-open">
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../index.html#目录" class="header">目录</a></li>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
+    <li><a href="../actor/pattern/index.html" class="page">交互模式</a></li>
+    <li><a href="../actor/supervise.html" class="page">异常处理与监管（Supervise）</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
+    <li><a href="../actor/style.html#typed-actor-风格" class="active page">Typed Actor 风格</a>
+    <ul>
+      <li><a href="../actor/style.html#直接构造-behavior" class="header">直接构造 <code>Behavior</code></a></li>
+      <li><a href="../actor/style.html#使用函数嵌套" class="header">使用函数嵌套</a></li>
+      <li><a href="../actor/style.html#使用类" class="header">使用类</a></li>
+      <li><a href="../actor/style.html#建议" class="header">建议</a></li>
+    </ul></li>
+    <li><a href="../actor/discovery.html" class="page">发现其它actor</a></li>
+    <li><a href="../actor/shutdown.html" class="page">怎样优雅的关闭 ActorSystem</a></li>
+  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../index.html#目录" class="header">目录</a></li>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a>
+  <ul>
+    <li><a href="../actor/create-child-actor.html" class="page">创建子 actor</a></li>
+    <li><a href="../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
+    <li><a href="../actor/pattern/index.html" class="page">交互模式</a></li>
+    <li><a href="../actor/supervise.html" class="page">异常处理与监管（Supervise）</a></li>
+    <li><a href="../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
+    <li><a href="../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
+    <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
+    <li><a href="../actor/style.html#typed-actor-风格" class="active page">Typed Actor 风格</a>
+    <ul>
+      <li><a href="../actor/style.html#直接构造-behavior" class="header">直接构造 <code>Behavior</code></a></li>
+      <li><a href="../actor/style.html#使用函数嵌套" class="header">使用函数嵌套</a></li>
+      <li><a href="../actor/style.html#使用类" class="header">使用类</a></li>
+      <li><a href="../actor/style.html#建议" class="header">建议</a></li>
+    </ul></li>
+    <li><a href="../actor/discovery.html" class="page">发现其它actor</a></li>
+    <li><a href="../actor/shutdown.html" class="page">怎样优雅的关闭 ActorSystem</a></li>
+  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#typed-actor-风格" name="typed-actor-风格" class="anchor"><span class="anchor-link"></span></a>Typed Actor 风格</h1>
+<p>本文将讨论各种使用Typed Actor的风格，并尝试着建议一种行之有效的风格作为大家在应用Akka时的参考。</p><div class="callout note "><div class="callout-title">Note</div>
+<p>任何时候，在准备应用Akka前都应该想一想是否有更简单的方式？如果有，则不要使用Akka！</p></div>
+<h2><a href="#直接构造-behavior" name="直接构造-behavior" class="anchor"><span class="anchor-link"></span></a>直接构造 <code>Behavior</code></h2>
+<p>通过<code>Behaviors</code>上的各个便捷函数定义行为，是使用Typed Actor最直观和简单的方式。</p>
+<pre class="prettyprint"><code class="language-scala">object Hello {
+  def apply(): Behavior[Nothing] = Behaviors.receiveMessage { msg =&gt;
+    // Do business logic.
+    Behaviors.same
+  }
+}
+
+context.spawn(Hello(), &quot;hello&quot;)
+</code></pre>
+<p>在一个object里通过<code>apply</code>定义行为只是一个惯例，你并不需要每次都这样。比如，你可以在<code>spawn</code>函数里直接构造一个行为。</p>
+<pre class="prettyprint"><code class="language-scala">context.spawn(
+  Behaviors.receiveMessage { msg =&gt; 
+    // Do business logic.
+    Behaviors.same
+  },
+  &quot;hello&quot;)
+</code></pre>
+<p>这在构建一个临时actor时有用，但通常这种情况下直接使用<code>Future</code>可能会更好。</p>
+<p>在object里定义actor行为，object名字相当于对这个行为的所有实例（<code>spawn</code>创建以后的<code>ActorRef[T]</code>）进行了类型命名（同一业务类型的actor）。同时，在object里定义这个actor能处理的消息是一个不错的对消息进行隔离的地方。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/style/Hello.scala#L30-L45" target="_blank" title="Go to snippet source"></a><code class="language-scala">object Hello {
+  trait Command
+  case object Start extends Command
+  final case class Question(message: String, replyTo: ActorRef[Reply]) extends Command
+  case object StopOrder extends Command
+
+  trait Reply
+  final case class Answer(message: String) extends Reply
+
+  def apply(dataSourceFactory: DataSourceFactory): Behavior[Command] =
+    Behaviors.setup { context =&gt;
+      Behaviors.withTimers { timers =&gt;
+        new Hello(dataSourceFactory, context, timers).init()
+      }
+    }
+}</code></pre>
+<h2><a href="#使用函数嵌套" name="使用函数嵌套" class="anchor"><span class="anchor-link"></span></a>使用函数嵌套</h2>
+<p>Scala中函数是第一类的，所以我们可以在代码块中直接定义函数，这样就可以将actor的不同行为定义在函数类部。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/style/Hello.scala#L132-L210" target="_blank" title="Go to snippet source"></a><code class="language-scala">private case object InternalInit extends Command
+def apply(dataSourceFactory: DataSourceFactory): Behavior[Command] = {
+  Behaviors.setup { context =&gt;
+    Behaviors.withTimers { timers =&gt;
+      import context.executionContext
+      context.self ! InternalInit
+
+      def init(): Future[AutoCloseable] = Future {
+        context.log.debug(&quot;开始异步初始化外部资源，idle……&quot;)
+        dataSourceFactory.createDataSource()
+      }
+
+      def idle(): Behavior[Command] = Behaviors.withStash(1024) { stash =&gt;
+        var ds: AutoCloseable = null
+        Behaviors.receiveMessage {
+          case InternalInit =&gt;
+            context.pipeToSelf(init()) {
+              case Success(value) =&gt;
+                ds = value
+                Start
+              case Failure(e) =&gt;
+                context.log.error(s&quot;Init error: $e&quot;)
+                StopOrder
+            }
+            Behaviors.same
+          case Start =&gt;
+            context.log.debug(&quot;外部资源初始化完成，active……&quot;)
+            // 切换行为active前，回放所有已stash消息
+            stash.unstashAll(active(ds))
+          case StopOrder =&gt;
+            if (stash.nonEmpty) {
+              var messages = List.empty[Command]
+              stash.foreach(messages ::= _)
+              loggingStashedMessages(messages)
+            }
+            Behaviors.stopped
+          case msg =&gt;
+            // 在 Start 前，stash进入的消息
+            stash.stash(msg)
+            Behaviors.same
+        }
+      }
+
+      def active(ds: AutoCloseable): Behavior[Command] =
+        Behaviors
+          .receiveMessage[Command] {
+            case Question(message, replyTo) =&gt;
+              replyTo ! Answer(s&quot;You say is $message.&quot;)
+              Behaviors.same
+
+            // 其它业务 case
+            // ...
+
+            case StopOrder =&gt;
+              Behaviors.stopped
+          }
+          .receiveSignal {
+            case (_, PreRestart) =&gt;
+              cleanup(ds)
+              Behaviors.same
+            case (_, PostStop) =&gt;
+              cleanup(ds)
+              Behaviors.same
+          }
+
+      def loggingStashedMessages(messages: List[Command]): Unit = {
+        // 对未处理的stash消息记录日志
+      }
+
+      def cleanup(ds: AutoCloseable): Unit = {
+        if (null != ds) {
+          ds.close()
+        }
+      }
+
+      idle()
+    }
+  }
+}</code></pre>
+<h2><a href="#使用类" name="使用类" class="anchor"><span class="anchor-link"></span></a>使用类</h2>
+<p>当actor的逻辑比较复杂时，比如：有多种行为、需要保存状态……函数嵌套的方式使一个函数实现非常的痈肿，代码缩进层次变多……这时，推荐使用类的方式来实现行为（<code>Behavior</code>）：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/style/Hello.scala#L49-L125" target="_blank" title="Go to snippet source"></a><code class="language-scala">class Hello private (
+    dataSourceFactory: DataSourceFactory,
+    context: ActorContext[Hello.Command],
+    timers: TimerScheduler[Hello.Command]) {
+  import Hello._
+  import context.executionContext
+
+  private var ds: AutoCloseable = _
+
+  def init(): Behavior[Command] = {
+    val future = Future {
+      context.log.debug(&quot;开始异步初始化外部资源，idle……&quot;)
+      ds = dataSourceFactory.createDataSource()
+    }
+
+    context.pipeToSelf(future) {
+      case Success(_) =&gt; Start
+      case Failure(exception) =&gt;
+        context.log.error(s&quot;Init error: $exception&quot;)
+        StopOrder
+    }
+
+    idle()
+  }
+
+  def idle(): Behavior[Command] = Behaviors.withStash(1024) { stash =&gt;
+    Behaviors.receiveMessage {
+      case Start =&gt;
+        context.log.debug(&quot;外部资源初始化完成，active……&quot;)
+        // 切换行为active前，回放所有已stash消息
+        stash.unstashAll(active())
+      case StopOrder =&gt;
+        if (stash.nonEmpty) {
+          var messages = List.empty[Command]
+          stash.foreach(messages ::= _)
+          loggingStashedMessages(messages)
+        }
+        Behaviors.stopped
+      case msg =&gt;
+        // 在 Start 前，stash进入的消息
+        stash.stash(msg)
+        Behaviors.same
+    }
+  }
+
+  def active(): Behavior[Command] =
+    Behaviors
+      .receiveMessage[Command] {
+        case Question(message, replyTo) =&gt;
+          replyTo ! Answer(s&quot;You say is $message.&quot;)
+          Behaviors.same
+
+        // 其它业务 case
+        // ...
+
+        case StopOrder =&gt;
+          Behaviors.stopped
+      }
+      .receiveSignal {
+        case (_, PreRestart) =&gt;
+          cleanup()
+          Behaviors.same
+        case (_, PostStop) =&gt;
+          cleanup()
+          Behaviors.same
+      }
+
+  private def loggingStashedMessages(messages: List[Command]): Unit = {
+    // 对未处理的stash消息记录日志
+  }
+
+  private def cleanup(): Unit = {
+    if (null != ds) {
+      ds.close()
+    }
+  }
+}</code></pre>
+<h2><a href="#建议" name="建议" class="anchor"><span class="anchor-link"></span></a>建议</h2>
+<ol>
+  <li>当逻辑比较复杂时，建议使用类的方式来实现actor行为。</li>
+  <li>函数嵌套的方式若嵌套超过2层或代码行数较大（40行），也建议使用类的方式，通过类成员函数实现行为的切换，而actor状态可以通过函数参数进行传递。</li>
+</ol>
+<p>actor状态是作为成员函数的参数进行传递，还是定义成类属性？其实都可以，无所谓好坏，更多的是代码风格问题。</p>
+<p>状态作为函数参数传递，优势是可以始终使用不可变数据，这样状态（数据）是线程安全的，可以避免状态的不小修改，且更函数式。但这样的缺点是每次消息处理后你都需要构造一个新的状态集（通常actor内会有多个状态变量或参数）传递给下一个行为，当状态比较多（而大）时这会很繁琐，也会污染正常的业务代码。</p>
+<p>状态作为类属性，不可避免的会使用到可变变量或可变数据，这样它们就不是线程安全的了。但是，若你坚持始终在actor消息处理中访问/修改这些状态，那就可以以线程安全的方式处理它们。类属性的方式，不需要每次消息处理完后都构造一个新的状态集，所以某种程度上它不会污染正常的业务代码。</p>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../actor/lifecycle.html"><i class="icon-prev"></i> <span class="link-prev">Actor 生命周期</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../actor/discovery.html">发现其它actor <i class="icon-next"></i></a>
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/style.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2019 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>

@@ -24,6 +24,7 @@ import akka.actor.typed.scaladsl.AskPattern._
 import org.scalatest.time.{ Milliseconds, Seconds, Span }
 
 import scala.concurrent.duration._
+import scala.util.Success
 
 object TestActor {
   // #TestActor_messages
@@ -71,12 +72,34 @@ class TestActorSpec extends ScalaTestWithActorTestKit with WordSpecLike {
     // #Req-Resp-ask
     "ask" in {
       val actor = spawn(TestActor())
-      val answer = actor
-        .ask[Reply](replyTo => Hello("Akka", replyTo))
-        .mapTo[Answer]
-        .futureValue
+      val answer = actor.ask[Reply](replyTo => Hello("Akka", replyTo)).mapTo[Answer].futureValue
       answer should ===(Answer("Hi, you say is Akka."))
     }
     // #Req-Resp-ask
+
+    // #Req-Resp-async-assert
+    "async-assert" in {
+      val actor = spawn(TestActor())
+      val answerF =
+        actor.ask[Reply](replyTo => Hello("Akka", replyTo)).mapTo[Answer]
+      eventually {
+        answerF.value.get should be(Success(Answer("Hi, you say is Akka.")))
+      }
+    }
+    // #Req-Resp-async-assert
+
+    // #Req-Resp-eventually
+    "eventually-success" in {
+      val xs = 1 to 9
+      val it = xs.iterator
+      eventually { it.next should be(3) }
+    }
+
+    "eventually-failure" in {
+      val xs = 1 to 9
+      val it = xs.iterator
+      eventually { it.next should be(10) }
+    }
+    // #Req-Resp-eventually
   }
 }

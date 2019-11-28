@@ -24,65 +24,9 @@
 <meta name="msapplication-TileColor" content="#15a9ce"/>
 <meta name="theme-color" content="#15a9ce"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) start -->
-<script src="https://optanon.blob.core.windows.net/consent/159bb13d-6748-4399-806e-ac28db879785.js" type="text/javascript" charset="UTF-8"></script>
-<script type="text/javascript">
-function OptanonWrapper() { }
-</script>
-<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) end -->
-<!--Google Analytics-->
-<script type="text/plain" class="optanon-category-2">
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', '']);
-_gaq.push(['_setDomainName', '']);
-_gaq.push(['_trackPageview']);
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})()
-</script>
-<!-- Google Tag Manager -->
-<script type="text/plain" class="optanon-category-2">
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KBJGH35');
-</script>
-<!--Marketo-->
-<script type="text/plain" class="optanon-category-3">
-(function() {
-var didInit = false;
-function initMunchkin() {
-if(didInit === false) {
-didInit = true;
-Munchkin.init('558-NCX-702', { 'asyncOnly': true, 'disableClickDelay': true });
-}
-}
-var s = document.createElement('script');
-s.type = 'text/javascript';
-s.async = true;
-s.src = '//munchkin.marketo.net/munchkin.js';
-s.onreadystatechange = function() {
-if (this.readyState == 'complete' || this.readyState == 'loaded') {
-initMunchkin();
-}
-};
-s.onload = initMunchkin;
-document.getElementsByTagName('head')[0].appendChild(s);
-})();
-</script>
-</head>
+
 
 <body id="underlay" data-toggler="nav-open">
-<div id="lightbend-banner" class="lightbend-banner akka full-width" data-category="OSS Lightbend Banner Impression" data-label="Akka Banner Impression">
-<div class="wrapper">
-<div class="brand">
-<a class="oss-track-link-label" href="https://www.yangbajing.me/" target="_blank">羊八井花园</a>
-</div>
-</div>
-</div>
 <header class="site-header hide-for-large">
 <div class="sticky-header clearfix">
 <a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
@@ -130,13 +74,13 @@ Version 1.0.0
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
 </ul>
 </nav>
 </div>
@@ -184,13 +128,13 @@ Version 1.0.0
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
 </ul>
 </div>
 </nav>
@@ -206,11 +150,7 @@ Version 1.0.0
 <h1><a href="#介绍" name="介绍" class="anchor"><span class="anchor-link"></span></a>介绍</h1>
 <p>Akka Streams是 <a href="http://reactive-streams.org/"><strong>Reactive Streams</strong></a> 的一种实现，提供了对反应式编程（见：<a href="https://www.reactivemanifesto.org/zh-CN">《反应式宣言》</a>）的支持。</p>
 <h2><a href="#第一个示例" name="第一个示例" class="anchor"><span class="anchor-link"></span></a>第一个示例</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/startup/Examples.scala#L28-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">Source
-  .fromIterator(() =&gt; Iterator.from(0))
-  .map(n =&gt; n.toString)
-  .take(10)
-  .runForeach(println)</code></pre>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/startup/Examples.scala#L28" target="_blank" title="Go to snippet source"></a><code class="language-scala">Source.fromIterator(() =&gt; Iterator.from(0)).map(n =&gt; n.toString).take(10).runForeach(println)</code></pre>
 <p>运行上面的示例，将在终端从0开始按递增数字每个数字并将其转换成字符串打印10行，每个字符串一行。</p>
 <p><strong>明细版</strong></p>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/startup/Startup.scala#L20-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
@@ -302,8 +242,7 @@ object Startup {
 </div>
 </div>
 <div class="source-github row">
-Found an error in this documentation? The source code for this page can be found <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/introduction.md">here</a>.
-Please feel free to edit and contribute a pull request.
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/introduction.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">

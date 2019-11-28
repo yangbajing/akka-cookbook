@@ -1,4 +1,4 @@
-# 处理 actor 异常
+# 异常处理与监管（Supervise）
 
 Akka实现了 [Let it crash](https://doc.akka.io/docs/akka/current/typed/fault-tolerance.html#fault-tolerance) 模式，它假定失败是不可避免的。我们不应该花费过多的精力去设计一个永不失败的系统，而是假定失败在所难免，当失败发生时应快速的响应失败并以正确的状态重新启动。
 
@@ -45,6 +45,42 @@ Actor[akka://fault-tolerance/user#0] started.
 Actor[akka://fault-tolerance/user#0] Received signal PostStop
 ```
 
-## 监管树
+## 监管树（Supervise）
 
-Akka Typed的监管策略里没有了经典（Untyped）actor的 **Escalate** 策略。就是说Akka Typed默认是不支持异常冒泡的，需要**watch**子actor，并监听`ChildFailed`信号并再手动重新抛出异常，或者不处理子actor的终止信息而自动抛出`DeathPactException`异常。关于这方面的内容请参阅： @ref[怎样向上冒泡异常](escalate-exception.md)。
+Akka Typed的监管策略里没有了经典（Untyped）actor的 **Escalate** 策略。就是说Akka Typed默认是不支持异常冒泡的，需要**watch**子actor，并监听`ChildFailed`信号并再手动重新抛出异常，或者不处理子actor的终止信息而自动抛出`DeathPactException`异常。
+
+### 怎样向上冒泡异常
+
+对于经典（Untyped）actor的 **Escalate** 监管策略，Akka Typed并未提供直接的支持，但有两种方式可以实现类似效果。
+
+1. 不处理子actor的终止异常（`Terminated`或`ChildFailed`信号），这样actor将自动抛出`akka.actor.typed.DeathPactException`异常。但这样会使导致失败的原始异常被吞掉，因为这个异常将告知直接父actor（这某种程度上说是一件好事，这样就不会泄露实现细节）。
+2. 监听子actor的终止异常，再重新抛出，这里父actor可以选择将导致子actor失败的原始直接抛出或做个封装。
+
+### 示例代码
+
+@@snip [WatchActor](../../../../../cookbook-actor/src/main/scala/cookbook/actor/fault/WatchActorMain.scala) { #WatchActorMain }
+
+运行代码可以看到如下输出（输出内容已作简化）：
+
+```
+[20:25:03,475] [INFO] [cookbook.actor.fault.Child$] 
+    [akka://watch/user/parent/child2] - started.
+[20:25:03,475] [INFO] [cookbook.actor.fault.Child$]
+    [akka://watch/user/parent/child1] - started.
+....
+[20:25:03,509] [INFO] [cookbook.actor.fault.Child$]
+    [akka://watch/user/parent/child2] - stopped.
+[20:25:03,513] [WARN] [akka.actor.SupervisorStrategy]
+    [akka://watch/user/parent] - Received child actor 
+    akka://watch/user/parent/child2 failed signal, original 
+    exception is java.lang.RuntimeException: This is normal exception.
+....
+[20:25:04,490] [INFO] [cookbook.actor.fault.Child$]
+    [akka://watch/user/parent/child1] - stopped.
+....
+[20:25:04,491] [INFO] [akka.actor.SupervisorStrategy]
+    [akka://watch/user] - Received child actor 
+    akka://watch/user/parent failed signal, original 
+    exception is cookbook.actor.fault.ActorException: 
+    cookbook.actor.fault.EscalateException: This is escalate exception.
+```

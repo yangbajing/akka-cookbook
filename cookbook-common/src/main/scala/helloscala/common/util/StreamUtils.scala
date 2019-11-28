@@ -26,27 +26,21 @@ import scala.collection.immutable
 import scala.concurrent.Future
 
 object StreamUtils {
-  def publishToHead[T](publisher: Publisher[T])(
-      implicit mat: Materializer): Future[T] =
+  def publishToHead[T](publisher: Publisher[T])(implicit mat: Materializer): Future[T] =
     Source.fromPublisher(publisher).runWith(Sink.head)
 
-  def publishToHeadOption[T](publisher: Publisher[T])(
-      implicit mat: Materializer): Future[Option[T]] =
+  def publishToHeadOption[T](publisher: Publisher[T])(implicit mat: Materializer): Future[Option[T]] =
     Source.fromPublisher(publisher).runWith(Sink.headOption)
 
-  def publishToSeq[T](publisher: Publisher[T])(
-      implicit mat: Materializer): Future[immutable.Seq[T]] =
+  def publishToSeq[T](publisher: Publisher[T])(implicit mat: Materializer): Future[immutable.Seq[T]] =
     Source.fromPublisher(publisher).runWith(Sink.seq)
 
-  def publishToIgnore[T](publisher: Publisher[T])(
-      implicit mat: Materializer): Future[Done] =
+  def publishToIgnore[T](publisher: Publisher[T])(implicit mat: Materializer): Future[Done] =
     Source.fromPublisher(publisher).runWith(Sink.ignore)
 
-  def sourceToPublish[T](source: Source[T, _])(
-      implicit mat: Materializer): Publisher[T] =
+  def sourceToPublish[T](source: Source[T, _])(implicit mat: Materializer): Publisher[T] =
     source.runWith(Sink.asPublisher(false))
 
-  def sourceToPublishMultiple[T](source: Source[T, _])(
-      implicit mat: Materializer): Publisher[T] =
+  def sourceToPublishMultiple[T](source: Source[T, _])(implicit mat: Materializer): Publisher[T] =
     source.runWith(Sink.asPublisher(true))
 }

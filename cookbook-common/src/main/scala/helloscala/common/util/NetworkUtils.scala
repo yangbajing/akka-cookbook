@@ -34,8 +34,7 @@ object NetworkUtils {
 
   def onlineNetworkInterfaces() = {
     interfaces().filterNot(ni =>
-      ni.isLoopback || !ni.isUp || ni.isVirtual || ni.isPointToPoint || !validNetworkName(
-        ni.getName))
+      ni.isLoopback || !ni.isUp || ni.isVirtual || ni.isPointToPoint || !validNetworkName(ni.getName))
   }
 
   def onlineInterfaceAddress(): Vector[InterfaceAddress] = {
@@ -43,10 +42,7 @@ object NetworkUtils {
   }
 
   def firstOnlineInet4Address(): Option[InetAddress] = {
-    onlineInterfaceAddress().view
-      .filter(ia => ia.getAddress.isInstanceOf[Inet4Address])
-      .map(_.getAddress)
-      .headOption
+    onlineInterfaceAddress().view.filter(ia => ia.getAddress.isInstanceOf[Inet4Address]).map(_.getAddress).headOption
   }
 
   def toInetSocketAddress(address: String, defaultPort: Int): InetSocketAddress =

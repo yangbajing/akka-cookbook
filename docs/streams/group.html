@@ -24,65 +24,9 @@
 <meta name="msapplication-TileColor" content="#15a9ce"/>
 <meta name="theme-color" content="#15a9ce"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) start -->
-<script src="https://optanon.blob.core.windows.net/consent/159bb13d-6748-4399-806e-ac28db879785.js" type="text/javascript" charset="UTF-8"></script>
-<script type="text/javascript">
-function OptanonWrapper() { }
-</script>
-<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) end -->
-<!--Google Analytics-->
-<script type="text/plain" class="optanon-category-2">
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', '']);
-_gaq.push(['_setDomainName', '']);
-_gaq.push(['_trackPageview']);
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})()
-</script>
-<!-- Google Tag Manager -->
-<script type="text/plain" class="optanon-category-2">
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KBJGH35');
-</script>
-<!--Marketo-->
-<script type="text/plain" class="optanon-category-3">
-(function() {
-var didInit = false;
-function initMunchkin() {
-if(didInit === false) {
-didInit = true;
-Munchkin.init('558-NCX-702', { 'asyncOnly': true, 'disableClickDelay': true });
-}
-}
-var s = document.createElement('script');
-s.type = 'text/javascript';
-s.async = true;
-s.src = '//munchkin.marketo.net/munchkin.js';
-s.onreadystatechange = function() {
-if (this.readyState == 'complete' || this.readyState == 'loaded') {
-initMunchkin();
-}
-};
-s.onload = initMunchkin;
-document.getElementsByTagName('head')[0].appendChild(s);
-})();
-</script>
-</head>
+
 
 <body id="underlay" data-toggler="nav-open">
-<div id="lightbend-banner" class="lightbend-banner akka full-width" data-category="OSS Lightbend Banner Impression" data-label="Akka Banner Impression">
-<div class="wrapper">
-<div class="brand">
-<a class="oss-track-link-label" href="https://www.yangbajing.me/" target="_blank">羊八井花园</a>
-</div>
-</div>
-</div>
 <header class="site-header hide-for-large">
 <div class="sticky-header clearfix">
 <a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
@@ -129,13 +73,13 @@ Version 1.0.0
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
 </ul>
 </nav>
 </div>
@@ -182,13 +126,13 @@ Version 1.0.0
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
   </ul></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
 </ul>
 </div>
 </nav>
@@ -204,18 +148,13 @@ Version 1.0.0
 <h1><a href="#streams-分组" name="streams-分组" class="anchor"><span class="anchor-link"></span></a>Streams 分组</h1>
 <h2><a href="#grouped" name="grouped" class="anchor"><span class="anchor-link"></span></a>grouped</h2>
 <p>通过<code>grouped</code>函数可将上游发送的元素按指定个数分组，这在很场景下可作为一个优化策略。比如：批量写入数据库。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L29-L37" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;grouped&quot; in {
-  val list = Source
-    .fromIterator(() =&gt; Iterator.from(0))
-    .grouped(100)
-    .take(2)
-    .runWith(Sink.seq)
-    .futureValue
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L29-L32" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;grouped&quot; in {
+  val list = Source.fromIterator(() =&gt; Iterator.from(0)).grouped(100).take(2).runWith(Sink.seq).futureValue
   list should be(Vector(0 until 100, 100 until 200))
 }</code></pre>
 <h2><a href="#groupedwithin" name="groupedwithin" class="anchor"><span class="anchor-link"></span></a>groupedWithin</h2>
 <p>若上游长时间没有元素被发送，很有可能下游将被永久的挂在那里，形成一种假死的状态。这时可通过<code>groupedWithin</code>函数传递一个超时时间，它将在指定的分组数量或超时时间两者之一达到时形成一个分组并将批量数据传给下游。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L40-L49" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;groupedWithin&quot; in {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/test/scala/cookbook/streams/group/GroupTest.scala#L35-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;groupedWithin&quot; in {
   val f = Source
     .fromIterator(() =&gt; Iterator.from(0))
     .throttle(5, 500.millis)
@@ -240,8 +179,7 @@ Version 1.0.0
 </div>
 </div>
 <div class="source-github row">
-Found an error in this documentation? The source code for this page can be found <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/group.md">here</a>.
-Please feel free to edit and contribute a pull request.
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/group.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">

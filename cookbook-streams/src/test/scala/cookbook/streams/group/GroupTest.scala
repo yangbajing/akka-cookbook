@@ -27,12 +27,7 @@ class GroupTest extends ScalaTestWithActorTestKit with WordSpecLike {
   "Group" should {
     // #grouped
     "grouped" in {
-      val list = Source
-        .fromIterator(() => Iterator.from(0))
-        .grouped(100)
-        .take(2)
-        .runWith(Sink.seq)
-        .futureValue
+      val list = Source.fromIterator(() => Iterator.from(0)).grouped(100).take(2).runWith(Sink.seq).futureValue
       list should be(Vector(0 until 100, 100 until 200))
     }
     // #grouped

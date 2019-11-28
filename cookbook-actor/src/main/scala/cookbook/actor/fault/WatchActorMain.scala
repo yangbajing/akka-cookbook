@@ -24,10 +24,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import scala.concurrent.duration._
 
 // #WatchActorMain
-final case class EscalateException(message: String)
-    extends RuntimeException(message)
-final case class ActorException(ref: ActorRef[Nothing], cause: Throwable)
-    extends RuntimeException(cause)
+final case class EscalateException(message: String) extends RuntimeException(message)
+final case class ActorException(ref: ActorRef[Nothing], cause: Throwable) extends RuntimeException(cause)
 
 // #child
 object Child {
@@ -65,14 +63,12 @@ object Parent {
     val child2 = context.spawn(Child(), "child2")
     context.watch(child2)
     child2 ! Child.ThrowNormalException
-    context.system.scheduler
-      .scheduleOnce(1.second, () => child1 ! Child.ThrowEscalateException)
+    context.system.scheduler.scheduleOnce(1.second, () => child1 ! Child.ThrowEscalateException)
     Behaviors.receiveSignal {
       case (_, ChildFailed(ref, e: EscalateException)) =>
         throw ActorException(ref, e)
       case (_, ChildFailed(ref, e)) =>
-        context.log.warn(
-          s"Received child actor ${ref.path} terminated signal, original exception is $e")
+        context.log.warn(s"Received child actor ${ref.path} terminated signal, original exception is $e")
         Behaviors.same
     }
   }
@@ -87,8 +83,7 @@ object Root {
     context.watch(parent)
     Behaviors.receiveSignal {
       case (_, ChildFailed(ref, e)) =>
-        context.log.info(
-          s"Received child actor ${ref.path} failed signal, original exception is $e")
+        context.log.info(s"Received child actor ${ref.path} failed signal, original exception is $e")
         Behaviors.same
       case (_, Terminated(ref)) =>
         context.log.info(s"Received actor ${ref.path} terminated signal.")

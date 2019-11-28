@@ -43,9 +43,7 @@ object NumberUtils {
    */
   @SuppressWarnings(Array("unchecked"))
   @throws[IllegalArgumentException]
-  def convertNumberToTargetClass[T <: Number](
-      number: Number,
-      targetClass: Class[T]): T = {
+  def convertNumberToTargetClass[T <: Number](number: Number, targetClass: Class[T]): T = {
     require(number ne null, "Number must not be null")
     require(targetClass ne null, "Target class must not be null")
     if (targetClass.isInstance(number)) {
@@ -78,10 +76,7 @@ object NumberUtils {
             } else {
               if (classOf[BigInteger] eq targetClass) {
                 if (number.isInstanceOf[JBigDecimal]) { // do not lose precision - use BigDecimal's own conversion
-                  return (number
-                    .asInstanceOf[JBigDecimal])
-                    .toBigInteger
-                    .asInstanceOf[T]
+                  return (number.asInstanceOf[JBigDecimal]).toBigInteger.asInstanceOf[T]
                 } else { // original value is not a Big* number - use standard long conversion
                   return BigInteger.valueOf(number.longValue).asInstanceOf[T]
                 }
@@ -90,9 +85,7 @@ object NumberUtils {
                   return java.lang.Float.valueOf(number.floatValue).asInstanceOf[T]
                 } else {
                   if (classOf[Double] eq targetClass) {
-                    return java.lang.Double
-                      .valueOf(number.doubleValue)
-                      .asInstanceOf[T]
+                    return java.lang.Double.valueOf(number.doubleValue).asInstanceOf[T]
                   } else {
                     if (classOf[JBigDecimal] eq targetClass) { // always use BigDecimal(String) here to avoid unpredictability of BigDecimal(double)
                       // (see BigDecimal javadoc for details)
@@ -121,9 +114,7 @@ object NumberUtils {
    * @throws IllegalArgumentException if there is an overflow
    * @see #raiseOverflowException
    */
-  private def checkedLongValue(
-      number: Number,
-      targetClass: Class[_ <: Number]): Long = {
+  private def checkedLongValue(number: Number, targetClass: Class[_ <: Number]): Long = {
     val bigInt: BigInteger = number match {
       case integer: BigInteger  => integer
       case decimal: JBigDecimal => decimal.toBigInteger
@@ -131,8 +122,7 @@ object NumberUtils {
     }
 
     // Effectively analogous to JDK 8's BigInteger.longValueExact()
-    if (bigInt != null && (bigInt.compareTo(LONG_MIN) < 0 || bigInt.compareTo(
-          LONG_MAX) > 0)) {
+    if (bigInt != null && (bigInt.compareTo(LONG_MIN) < 0 || bigInt.compareTo(LONG_MAX) > 0)) {
       raiseOverflowException(number, targetClass)
     }
 
@@ -146,9 +136,7 @@ object NumberUtils {
    * @param targetClass the target class we tried to convert to
    * @throws IllegalArgumentException if there is an overflow
    */
-  private def raiseOverflowException(
-      number: Number,
-      targetClass: Class[_]): Unit = {
+  private def raiseOverflowException(number: Number, targetClass: Class[_]): Unit = {
     throw new IllegalArgumentException(
       "Could not convert number [" + number + "] of type [" + number.getClass.getName + "] to target class [" + targetClass.getName + "]: overflow")
   }

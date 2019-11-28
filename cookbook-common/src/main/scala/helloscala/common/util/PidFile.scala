@@ -42,8 +42,7 @@ class PidFile(val pid: Long) {
     val parent = path.getParent
     if (parent != null) {
       if (Files.exists(parent) && !Files.isDirectory(parent))
-        throw new IllegalArgumentException(
-          parent + " exists but is not a directory")
+        throw new IllegalArgumentException(parent + " exists but is not a directory")
 
       if (!Files.exists(parent)) {
         // only do this if it doesn't exists we get a better exception further down
@@ -57,10 +56,8 @@ class PidFile(val pid: Long) {
     if (Files.exists(path) && !Files.isRegularFile(path))
       throw new IllegalArgumentException(path + " exists but is not a regular file")
 
-    val stream = Files.newOutputStream(
-      path,
-      StandardOpenOption.CREATE,
-      StandardOpenOption.TRUNCATE_EXISTING)
+    val stream =
+      Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
     try {
       stream.write(pid.toString.getBytes(StandardCharsets.UTF_8))
     } finally {
@@ -80,9 +77,7 @@ class PidFile(val pid: Long) {
           Files.deleteIfExists(path)
         } catch {
           case e: IOException =>
-            throw new IllegalArgumentException(
-              "Failed to delete pid file " + path,
-              e)
+            throw new IllegalArgumentException("Failed to delete pid file " + path, e)
         }
     })
 }

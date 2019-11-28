@@ -30,20 +30,15 @@ class GreeterServiceImpl()(implicit system: ActorSystem[_]) extends GreeterServi
     Future.successful(HelloReply(s"Hello, ${in.name}."))
   }
 
-  override def itKeepsTalking(
-      in: Source[HelloRequest, NotUsed]): Future[HelloReply] = {
-    in.runWith(Sink.seq)
-      .map(ins => HelloReply("Hello, " + ins.map(_.name).mkString("", ", ", ".")))
+  override def itKeepsTalking(in: Source[HelloRequest, NotUsed]): Future[HelloReply] = {
+    in.runWith(Sink.seq).map(ins => HelloReply("Hello, " + ins.map(_.name).mkString("", ", ", ".")))
   }
 
   override def itKeepsReplying(in: HelloRequest): Source[HelloReply, NotUsed] = {
-    Source
-      .fromIterator(() => Iterator.from(1))
-      .map(n => HelloReply(s"Hello, ${in.name}; this is $n times."))
+    Source.fromIterator(() => Iterator.from(1)).map(n => HelloReply(s"Hello, ${in.name}; this is $n times."))
   }
 
-  override def streamHellos(
-      ins: Source[HelloRequest, NotUsed]): Source[HelloReply, NotUsed] = {
+  override def streamHellos(ins: Source[HelloRequest, NotUsed]): Source[HelloReply, NotUsed] = {
     ins.map(in => HelloReply(s"Hello, ${in.name}."))
   }
 }

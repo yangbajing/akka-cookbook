@@ -135,20 +135,12 @@ object DigestUtils {
 
   def sha512Hex(path: Path): String = StringUtils.hex2Str(sha512(path))
 
-  def reactiveSha256Hex(path: Path)(
-      implicit mat: Materializer,
-      ec: ExecutionContext): Future[String] = {
+  def reactiveSha256Hex(path: Path)(implicit mat: Materializer, ec: ExecutionContext): Future[String] = {
     reactiveSha256(path).map(bytes => StringUtils.hex2Str(bytes))
   }
 
-  def reactiveSha256(path: Path)(
-      implicit mat: Materializer,
-      ec: ExecutionContext): Future[Array[Byte]] = {
+  def reactiveSha256(path: Path)(implicit mat: Materializer, ec: ExecutionContext): Future[Array[Byte]] = {
     val md = digestSha256()
-    FileIO
-      .fromPath(path)
-      .map(bytes => md.update(bytes.asByteBuffer))
-      .runWith(Sink.ignore)
-      .map(_ => md.digest())
+    FileIO.fromPath(path).map(bytes => md.update(bytes.asByteBuffer)).runWith(Sink.ignore).map(_ => md.digest())
   }
 }

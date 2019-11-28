@@ -56,3 +56,17 @@ akka.actor.testkit.typed.single-expect-default = 10.seconds
 override implicit val patience = 
   PatienceConfig(Span(5, Seconds), Span(10, Milliseconds))
 ```
+
+`PatienceConfig`的第一个参数`timeout`配置调用的超时总时间，第二个参数`interval`配置两次检测`Future`是否完成的间隔时间。
+
+## 异步断言
+
+### 使用 AsyncWordSpec 特质
+
+使用`AsyncWordSpec`进行异步断言测试，它需要每个测试用例都以`Future`返回，我们在`Future`的转换函数里进行断言测试：
+
+@@snip [TestActorAsyncSpec](../../../../../cookbook-actor/src/test/scala/cookbook/actor/test/TestActorAsyncSpec.scala) { #TestActorAsyncSpec }
+
+@@@note
+读者会发现，这里使用了`AsyncWordSpecLike`特质而非`AsyncWordSpec`，包括`TestActorSpec`也使用了以`Like`后缀结尾的特质。加`Like`后缀和未加的区别在哪？其实看下两者的签名即可知道，有`Like`后缀的是以`trait`定义的，而没有的却是用`class`或`abstract class`定义的。因为Java不允许多继承（Scala兼容Java），而`ScalaTestWithActorTestKit`本身是一个抽像类，所以我们需要使用各测试风格规范（如：`WordSpec`、`FunSpec`、`FlatSpec`、`AsyncWordSpec`等）`Like`后缀版本。
+@@@

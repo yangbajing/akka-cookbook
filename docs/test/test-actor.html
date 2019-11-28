@@ -24,65 +24,9 @@
 <meta name="msapplication-TileColor" content="#15a9ce"/>
 <meta name="theme-color" content="#15a9ce"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) start -->
-<script src="https://optanon.blob.core.windows.net/consent/159bb13d-6748-4399-806e-ac28db879785.js" type="text/javascript" charset="UTF-8"></script>
-<script type="text/javascript">
-function OptanonWrapper() { }
-</script>
-<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) end -->
-<!--Google Analytics-->
-<script type="text/plain" class="optanon-category-2">
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', '']);
-_gaq.push(['_setDomainName', '']);
-_gaq.push(['_trackPageview']);
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})()
-</script>
-<!-- Google Tag Manager -->
-<script type="text/plain" class="optanon-category-2">
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KBJGH35');
-</script>
-<!--Marketo-->
-<script type="text/plain" class="optanon-category-3">
-(function() {
-var didInit = false;
-function initMunchkin() {
-if(didInit === false) {
-didInit = true;
-Munchkin.init('558-NCX-702', { 'asyncOnly': true, 'disableClickDelay': true });
-}
-}
-var s = document.createElement('script');
-s.type = 'text/javascript';
-s.async = true;
-s.src = '//munchkin.marketo.net/munchkin.js';
-s.onreadystatechange = function() {
-if (this.readyState == 'complete' || this.readyState == 'loaded') {
-initMunchkin();
-}
-};
-s.onload = initMunchkin;
-document.getElementsByTagName('head')[0].appendChild(s);
-})();
-</script>
-</head>
+
 
 <body id="underlay" data-toggler="nav-open">
-<div id="lightbend-banner" class="lightbend-banner akka full-width" data-category="OSS Lightbend Banner Impression" data-label="Akka Banner Impression">
-<div class="wrapper">
-<div class="brand">
-<a class="oss-track-link-label" href="https://www.yangbajing.me/" target="_blank">羊八井花园</a>
-</div>
-</div>
-</div>
 <header class="site-header hide-for-large">
 <div class="sticky-header clearfix">
 <a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
@@ -110,10 +54,6 @@ Version 1.0.0
   <li><a href="../introduction.html" class="page">介绍</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a>
@@ -123,8 +63,13 @@ Version 1.0.0
       <li><a href="../test/test-actor.html#测试代码" class="header">测试代码</a></li>
       <li><a href="../test/test-actor.html#使用-testprobe-预期答复" class="header">使用 TestProbe 预期答复</a></li>
       <li><a href="../test/test-actor.html#使用-ask" class="header">使用 ask</a></li>
+      <li><a href="../test/test-actor.html#异步断言" class="header">异步断言</a></li>
     </ul></li>
   </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
 </ul>
 </nav>
 </div>
@@ -152,10 +97,6 @@ Version 1.0.0
   <li><a href="../introduction.html" class="page">介绍</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
   <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
   <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a>
@@ -165,8 +106,13 @@ Version 1.0.0
       <li><a href="../test/test-actor.html#测试代码" class="header">测试代码</a></li>
       <li><a href="../test/test-actor.html#使用-testprobe-预期答复" class="header">使用 TestProbe 预期答复</a></li>
       <li><a href="../test/test-actor.html#使用-ask" class="header">使用 ask</a></li>
+      <li><a href="../test/test-actor.html#异步断言" class="header">异步断言</a></li>
     </ul></li>
   </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../storage/index.html" class="page">访问存储</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
 </ul>
 </div>
 </nav>
@@ -190,13 +136,13 @@ Version 1.0.0
 }</code></pre></dd></dl>
 <h2><a href="#测试代码" name="测试代码" class="anchor"><span class="anchor-link"></span></a>测试代码</h2>
 <p>首先列出待测试actor的消息协议：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L30-L34" target="_blank" title="Go to snippet source"></a><code class="language-scala">sealed trait Command
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L31-L35" target="_blank" title="Go to snippet source"></a><code class="language-scala">sealed trait Command
 final case class Hello(message: String, replyTo: ActorRef[Reply]) extends Command
 
 sealed trait Reply
 final case class Answer(message: String) extends Reply</code></pre>
 <p>下面是待测试actor的实现：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L38-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">def apply(): Behavior[Command] = Behaviors.setup { context =&gt;
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L39-L45" target="_blank" title="Go to snippet source"></a><code class="language-scala">def apply(): Behavior[Command] = Behaviors.setup { context =&gt;
   Behaviors.receiveMessage[Command] {
     case Hello(message, replyTo) =&gt;
       replyTo ! Answer(s&quot;Hi, you say is $message.&quot;)
@@ -204,7 +150,7 @@ final case class Answer(message: String) extends Reply</code></pre>
   }
 }</code></pre>
 <h2><a href="#使用-testprobe-预期答复" name="使用-testprobe-预期答复" class="anchor"><span class="anchor-link"></span></a>使用 TestProbe 预期答复</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L55-L68" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;probe&quot; in {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L56-L69" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;probe&quot; in {
   val actor = spawn(TestActor(), &quot;req-resp-probe&quot;)
   val probe: TestProbe[Reply] = createTestProbe[Reply]()
 
@@ -231,12 +177,9 @@ final case class Answer(message: String) extends Reply</code></pre>
 <pre class="prettyprint"><code class="language-hocon">akka.actor.testkit.typed.single-expect-default = 10.seconds
 </code></pre>
 <h2><a href="#使用-ask" name="使用-ask" class="anchor"><span class="anchor-link"></span></a>使用 ask</h2>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L72-L79" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;ask&quot; in {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorSpec.scala#L73-L77" target="_blank" title="Go to snippet source"></a><code class="language-scala">&quot;ask&quot; in {
   val actor = spawn(TestActor())
-  val answer = actor
-    .ask[Reply](replyTo =&gt; Hello(&quot;Akka&quot;, replyTo))
-    .mapTo[Answer]
-    .futureValue
+  val answer = actor.ask[Reply](replyTo =&gt; Hello(&quot;Akka&quot;, replyTo)).mapTo[Answer].futureValue
   answer should ===(Answer(&quot;Hi, you say is Akka.&quot;))
 }</code></pre>
 <p><code>ask</code>接受一个函数，函数参数为构造的一个临时actor <code>ActorRef[Reply]</code>（通过<code>ask[T]</code>指定临时actor的参数类型），返回值是发送给被调用actor的消息。<code>ask</code>模式发送的消息将返回一个<code>Future[T]</code>，通过调用<code>futureValue</code>将阻塞等待这个<code>Future</code>执行完成并获得结果。</p>
@@ -245,6 +188,23 @@ final case class Answer(message: String) extends Reply</code></pre>
 <pre class="prettyprint"><code class="language-scala">override implicit val patience = 
   PatienceConfig(Span(5, Seconds), Span(10, Milliseconds))
 </code></pre>
+<p><code>PatienceConfig</code>的第一个参数<code>timeout</code>配置调用的超时总时间，第二个参数<code>interval</code>配置两次检测<code>Future</code>是否完成的间隔时间。</p>
+<h2><a href="#异步断言" name="异步断言" class="anchor"><span class="anchor-link"></span></a>异步断言</h2>
+<h3><a href="#使用-asyncwordspec-特质" name="使用-asyncwordspec-特质" class="anchor"><span class="anchor-link"></span></a>使用 AsyncWordSpec 特质</h3>
+<p>使用<code>AsyncWordSpec</code>进行异步断言测试，它需要每个测试用例都以<code>Future</code>返回，我们在<code>Future</code>的转换函数里进行断言测试：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorAsyncSpec.scala#L25-L36" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TestActorAsyncSpec extends ScalaTestWithActorTestKit with AsyncWordSpecLike {
+  &quot;TestActorAsync&quot; must {
+    &quot;async-assert&quot; in {
+      val actor = spawn(TestActor())
+      val answerF =
+        actor.ask[Reply](replyTo =&gt; Hello(&quot;Akka&quot;, replyTo)).mapTo[Answer]
+      answerF.map { answer =&gt;
+        answer should ===(Answer(&quot;Hi, you say is Akka.&quot;))
+      }
+    }
+  }
+}</code></pre><div class="callout note "><div class="callout-title">Note</div>
+<p>读者会发现，这里使用了<code>AsyncWordSpecLike</code>特质而非<code>AsyncWordSpec</code>，包括<code>TestActorSpec</code>也使用了以<code>Like</code>后缀结尾的特质。加<code>Like</code>后缀和未加的区别在哪？其实看下两者的签名即可知道，有<code>Like</code>后缀的是以<code>trait</code>定义的，而没有的却是用<code>class</code>或<code>abstract class</code>定义的。因为Java不允许多继承（Scala兼容Java），而<code>ScalaTestWithActorTestKit</code>本身是一个抽像类，所以我们需要使用各测试风格规范（如：<code>WordSpec</code>、<code>FunSpec</code>、<code>FlatSpec</code>、<code>AsyncWordSpec</code>等）<code>Like</code>后缀版本。</p></div>
 </div>
 </article>
 <div class="row">
@@ -254,13 +214,13 @@ final case class Answer(message: String) extends Reply</code></pre>
 <a href="../test/index.html"><i class="icon-prev"></i> <span class="link-prev">测试</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../http/index.html">Akka HTTP <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 <div class="source-github row">
-Found an error in this documentation? The source code for this page can be found <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/test/test-actor.md">here</a>.
-Please feel free to edit and contribute a pull request.
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/test/test-actor.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">
