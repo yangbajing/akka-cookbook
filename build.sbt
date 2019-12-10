@@ -81,8 +81,7 @@ lazy val cookbookGrpc = _project("cookbook-grpc")
     libraryDependencies ++= Seq(
         "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"))
 
-lazy val cookbookActor = _project("cookbook-actor").dependsOn(
-  cookbookCommon % "compile->compile;test->test")
+lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "compile->compile;test->test")
 
 lazy val cookbookStreams = _project("cookbook-streams")
   .dependsOn(cookbookCommon % "compile->compile;test->test")

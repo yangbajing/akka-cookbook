@@ -38,7 +38,7 @@ class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     val handler = GreeterServiceHandler(new GreeterServiceImpl())
-    Http().bindAndHandleAsync(handler, "localhost", 8000)
+    Http().bindAndHandleAsync(handler, "localhost", 8001)
     greeterClient = GreeterServiceClient(GrpcClientSettings.fromConfig(GreeterService.name))
   }
   // #GreeterService
