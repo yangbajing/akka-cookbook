@@ -6,6 +6,3 @@ logs/
 ~*
 node_modules/
 
-!/.scalafmt.conf
-!/.scalafix.conf
-!/.gitignore

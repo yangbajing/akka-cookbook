@@ -1,10 +1,8 @@
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.HeaderLicense
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
+import bintray.BintrayKeys._
+import com.typesafe.sbt.SbtNativePackager.autoImport.maintainer
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{ HeaderLicense, headerLicense }
 import sbt.Keys._
 import sbt._
-import sbtassembly.AssemblyKeys.assemblyMergeStrategy
-import sbtassembly.MergeStrategy
-import sbtassembly.PathList
 
 object Commons {
   def basicSettings =
@@ -22,35 +20,35 @@ object Commons {
           "-feature",
           "-deprecation",
           "-unchecked",
-          //"-Yno-adapted-args", //akka-http heavily depends on adapted args and => Unit implicits break otherwise
-          //"-Ypartial-unification",
           "-Ywarn-dead-code",
-          //"-Yrangepos", // required by SemanticDB compiler plugin
-          //"-Ywarn-unused-import", // required by `RemoveUnused` rule
           "-Xlint"),
       javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
       javaOptions in run ++= Seq("-Xms128m", "-Xmx1024m", "-Djava.library.path=./target/native"),
       shellPrompt := { s =>
         Project.extract(s).currentProject.id + " > "
       },
-      resolvers += Resolver.bintrayRepo("akka", "snapshots"),
+      //resolvers += Resolver.bintrayRepo("akka", "snapshots"),
       fork in run := true,
       fork in Test := true,
       parallelExecution in Test := false,
-      libraryDependencies ++= Seq(Dependencies._scalatest % Test))
+      libraryDependencies ++= Seq(Dependencies._fusionTestkit % Test))
 }
 
 object Publishing {
   lazy val publishing = Seq(
-    publishTo := (if (version.value.endsWith("-SNAPSHOT")) {
-                    Some("Helloscala_sbt-public_snapshot".at(
-                      "https://artifactory.hongkazhijia.com/artifactory/sbt-release;build.timestamp=" + new java.util.Date().getTime))
-                  } else {
-                    Some(
-                      "Helloscala_sbt-public_release".at(
-                        "https://artifactory.hongkazhijia.com/artifactory/libs-release"))
-                  }),
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials_akka-fusion"))
+    bintrayOrganization := Some("akka-fusion"),
+    bintrayRepository := "maven",
+    maintainer := "yangbajing <yang.xunjing@qq.com>",
+    developers := List(
+        Developer(
+          id = "yangbajing",
+          name = "Yang Jing",
+          email = "yang.xunjing@qq.com",
+          url = url("https://github.com/yangbajing"))),
+    scmInfo := Some(
+        ScmInfo(
+          url("https://github.com/akka-fusion/akka-fusion"),
+          "scm:git:git@github.com:akka-fusion/akka-fusion.git")))
 
   lazy val noPublish =
     Seq(publish := ((): Unit), publishLocal := ((): Unit), publishTo := None)
@@ -74,14 +72,11 @@ object Environment {
 
 object Packaging {
   // Good example https://github.com/typesafehub/activator/blob/master/project/Packaging.scala
-  import Environment.BuildEnv
-  import Environment.buildEnv
+  import Environment.{ BuildEnv, buildEnv }
   import com.typesafe.sbt.SbtNativePackager._
   import com.typesafe.sbt.packager.Keys._
-  import sbtassembly.AssemblyKeys.assembly
-  import sbtassembly.AssemblyKeys.assemblyMergeStrategy
-  import sbtassembly.MergeStrategy
-  import sbtassembly.PathList
+  import sbtassembly.AssemblyKeys.{ assembly, assemblyMergeStrategy }
+  import sbtassembly.{ MergeStrategy, PathList }
 
   // This is dirty, but play has stolen our keys, and we must mimc them here.
   val stage = TaskKey[File]("stage")

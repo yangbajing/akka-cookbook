@@ -6,21 +6,19 @@
 
 从Akka 2.6开始，[Typed]() 已经作为默认实现，本书也将基于 typed actor 讲解有关Akka的各种知识。同时，本书示例都将使用 Scala 2.13 完成。可以在 [https://github.com/yangbajing/akka-cookbook](https://github.com/yangbajing/akka-cookbook) 找到本书的所有示例及源文件。
 
-## 目录
-
 @@toc { depth=2 }
 
 @@@ index
 
 * [introduction](introduction.md)
 * [actor](actor/index.md)
+* [test](test/index.md)
 * [streams](streams/index.md)
+* [http](http/index.md)
 * [cluster](cluster/index.md)
 * [persistence](persistence/index.md)
-* [test](test/index.md)
-* [http](http/index.md)
 * [grpc](grpc/index.md)
-* [storage](storage/index.md)
 * [integration](integration/index.md)
+* [action](action/index.md)
 
 @@@

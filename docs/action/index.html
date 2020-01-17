@@ -2,11 +2,11 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>访问 Elasticsearch &bull; Akka Cookbook</title>
+<title>实战 &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
-<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/storage/elasticsearch.html"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/action/index.html"/>
 <script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
@@ -50,23 +50,19 @@ Version 1.0.0
 </header>
 <nav class="nav-toc">
 <ul>
-  <li><a href="../index.html#目录" class="header">目录</a></li>
   <li><a href="../introduction.html" class="page">介绍</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
-  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
-  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a>
-  <ul>
-    <li><a href="../storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
-    <li><a href="../storage/cassandra.html" class="page">访问 Cassandra</a></li>
-    <li><a href="../storage/mongodb.html" class="page">访问 MongoDB</a></li>
-    <li><a href="../storage/elasticsearch.html#访问-elasticsearch" class="active page">访问 Elasticsearch</a></li>
-  </ul></li>
   <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../action/index.html#实战" class="active page">实战</a>
+  <ul>
+    <li><a href="../action/oauth2-server.html" class="page">OAuth 2 Service</a></li>
+  </ul></li>
 </ul>
 </nav>
 </div>
@@ -90,23 +86,19 @@ Version 1.0.0
 <nav class="site-nav sticky-sidebar-contents">
 <div class="nav-toc">
 <ul>
-  <li><a href="../index.html#目录" class="header">目录</a></li>
   <li><a href="../introduction.html" class="page">介绍</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
-  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
-  <li><a href="../persistence/index.html" class="page">Akka 持久化</a></li>
   <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../storage/index.html" class="page">访问存储</a>
-  <ul>
-    <li><a href="../storage/jdbc.html" class="page">使用JDBC访问关系数据库</a></li>
-    <li><a href="../storage/cassandra.html" class="page">访问 Cassandra</a></li>
-    <li><a href="../storage/mongodb.html" class="page">访问 MongoDB</a></li>
-    <li><a href="../storage/elasticsearch.html#访问-elasticsearch" class="active page">访问 Elasticsearch</a></li>
-  </ul></li>
   <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../action/index.html#实战" class="active page">实战</a>
+  <ul>
+    <li><a href="../action/oauth2-server.html" class="page">OAuth 2 Service</a></li>
+  </ul></li>
 </ul>
 </div>
 </nav>
@@ -119,24 +111,35 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#访问-elasticsearch" name="访问-elasticsearch" class="anchor"><span class="anchor-link"></span></a>访问 Elasticsearch</h1>
-<p>TODO</p>
+<h1><a href="#实战" name="实战" class="anchor"><span class="anchor-link"></span></a>实战</h1>
+<div class="toc ">
+<ul>
+  <li><a href="../action/oauth2-server.html" class="page">OAuth 2 Service</a>
+  <ul>
+    <li><a href="../action/oauth2-server.html#access-token-management" class="header"><code>access_token</code> management</a>
+    <ul>
+      <li><a href="../action/oauth2-server.html#per-access-token-one-actor" class="header">Per access_token one Actor</a></li>
+      <li><a href="../action/oauth2-server.html#per-user-one-actor" class="header">Per user one Actor</a></li>
+    </ul></li>
+  </ul></li>
+</ul>
+</div>
 </div>
 </article>
 <div class="row">
 <div class="small-12 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
-<a href="../storage/mongodb.html"><i class="icon-prev"></i> <span class="link-prev">访问 MongoDB</span></a>
+<a href="../integration/spring-web.html"><i class="icon-prev"></i> <span class="link-prev">在 Spring 里使用 Akka Streams</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../integration/index.html">集成 <i class="icon-next"></i></a>
+<a class="float-right" href="../action/oauth2-server.html">OAuth 2 Service <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 <div class="source-github row">
-在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/storage/elasticsearch.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/action/index.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">
@@ -144,7 +147,7 @@ Version 1.0.0
 <section class="copyright">
 <div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
 <p class="legal">
-&copy; 2019-2019 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+&copy; 2019-2020 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
 <a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
 <a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
 <a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>

@@ -1,12 +1,19 @@
 import Commons._
 import Dependencies._
 
+ThisBuild / offline := true
+
+ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true).withLatestSnapshots(false)
+
 ThisBuild / scalaVersion := versionScala213
 
 ThisBuild / scalafmtOnCompile := true
 
+ThisBuild / resolvers ++= Seq(Resolver.bintrayRepo("akka-fusion", "maven"), Resolver.sonatypeRepo("snapshots"))
+
 lazy val root = Project(id = "akka-cookbook", base = file(".")).aggregate(
   book,
+  actionOauth2,
   storageCassandra,
   integrationSpring,
   cookbookGrpc,
@@ -21,6 +28,7 @@ lazy val book =
     .enablePlugins(AkkaParadoxPlugin)
     .dependsOn(
       storageCassandra,
+      actionOauth2,
       integrationSpring,
       cookbookGrpc,
       cookbookPersistence,
@@ -47,11 +55,11 @@ lazy val book =
           "scala.version" -> scalaVersion.value,
           "scala.binary_version" -> scalaBinaryVersion.value,
           "extref.wikipedia.base_url" -> "https://en.wikipedia.org/wiki/%s",
-          "alpakka.version" -> versionAlpakka,
-          "scaladoc.akka.base_url" -> s"http://doc.akka.io/api/$versionAkka",
+          "alpakka.version" -> fusion.sbt.gen.BuildInfo.versionAlpakka,
+          "scaladoc.akka.base_url" -> s"http://doc.akka.io/api/${fusion.sbt.gen.BuildInfo.versionAkka}",
           "algolia.docsearch.api_key" -> "bc8e6a27d54d01e7d322395f061bf539",
           "algolia.docsearch.index_name" -> "akka-cookbook",
-          "akka.version" -> versionAkka))
+          "akka.version" -> fusion.sbt.gen.BuildInfo.versionAkka))
 
 lazy val cookbookGrpc = _project("cookbook-grpc")
   .enablePlugins(AkkaGrpcPlugin, JavaAgent, JavaAppPackaging)
@@ -79,7 +87,12 @@ lazy val cookbookGrpc = _project("cookbook-grpc")
     },
     akkaGrpcCodeGeneratorSettings += "server_power_apis",
     libraryDependencies ++= Seq(
-        "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"))
+        "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
+        _akkaDiscovery))
+
+lazy val actionOauth2 = _project("action-oauth2")
+  .dependsOn(cookbookCommon % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Seq(_fusionJson, _akkaPersistenceTyped) ++ _akkaClusters)
 
 lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "compile->compile;test->test")
 
@@ -89,14 +102,14 @@ lazy val cookbookStreams = _project("cookbook-streams")
 
 lazy val cookbookCluster = _project("cookbook-cluster")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
-  .settings(libraryDependencies ++= _akkaClusters)
+  .settings(libraryDependencies ++= Seq(_fusionJson) ++ _akkaClusters)
 
 lazy val cookbookPersistence = _project("cookbook-persistence")
-  .dependsOn(cookbookCommon % "compile->compile;test->test")
+  .dependsOn(cookbookCluster, cookbookCommon % "compile->compile;test->test")
   .settings(libraryDependencies ++= Seq(_akkaPersistenceTyped))
 
 lazy val storageCassandra = _storageProject("cookbook-cassandra")
-  .dependsOn(cookbookCommon % "compile->compile;test->test")
+  .dependsOn(cookbookCluster, cookbookCommon % "compile->compile;test->test")
   .settings(libraryDependencies ++= _cassandras)
 
 lazy val integrationSpring = _integrationProject("cookbook-spring")
@@ -104,15 +117,7 @@ lazy val integrationSpring = _integrationProject("cookbook-spring")
   .settings(libraryDependencies ++= Seq(_alpakkaSpringWeb) ++ _springs)
 
 lazy val cookbookCommon = _project("cookbook-common").settings(
-  libraryDependencies ++= Seq(
-      _uuidGenerator,
-      "org.scala-lang" % "scala-library" % scalaVersion.value,
-      _akkaSerializationJackson % Provided,
-      _scalaCollectionCompat,
-      _scalaJava8Compat,
-      _akkaTypedTestkit % Test,
-      _akkaStreamTestkit % Test,
-      _scalatest % Test) ++ _akkas ++ _logs)
+  libraryDependencies ++= Seq(_akkaSerializationJackson % Provided, _fusionCore) ++ _logs)
 
 def _integrationProject(name: String) = _project(name, s"integration/$name")
 

@@ -1,5 +1,5 @@
 #!/bin/sh
 
-rm -rf docs/*
-mv book/target/paradox/site/main/* docs/
+rm -rf ../docs/*
+cp -r ../book/target/paradox/site/main/* ../docs/
 

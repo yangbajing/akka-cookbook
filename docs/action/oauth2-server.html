@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>OAuth 2 Service &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/action/oauth2-server.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+
+<body id="underlay" data-toggler="nav-open">
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../action/index.html" class="page">实战</a>
+  <ul>
+    <li><a href="../action/oauth2-server.html#oauth-2-service" class="active page">OAuth 2 Service</a>
+    <ul>
+      <li><a href="../action/oauth2-server.html#access-token-management" class="header"><code>access_token</code> management</a></li>
+    </ul></li>
+  </ul></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../action/index.html" class="page">实战</a>
+  <ul>
+    <li><a href="../action/oauth2-server.html#oauth-2-service" class="active page">OAuth 2 Service</a>
+    <ul>
+      <li><a href="../action/oauth2-server.html#access-token-management" class="header"><code>access_token</code> management</a></li>
+    </ul></li>
+  </ul></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#oauth-2-service" name="oauth-2-service" class="anchor"><span class="anchor-link"></span></a>OAuth 2 Service</h1>
+<p>实现一个 OAuth 2 服务有几个核心点：</p>
+<ol>
+  <li>OAuth 2 协议解析</li>
+  <li>连接的用户可能很多，系统需支持横向扩展</li>
+  <li>每个连接用户的 <code>access_token</code> 的状态控制：有效期控制</li>
+  <li>服务要支持容错、可恢复、可扩展、高并发等特性</li>
+</ol>
+<p>使用 Akka 来实现 OAuth 2 服务会发现逻辑非常的清晰，且能很好的实现以上几个核心点。</p>
+<p>每个连接用户可抽像为一个 <strong>Actor</strong>，这样多个连接用户即可并发访问。</p>
+<p>使用 <strong>akka-cluster-sharding</strong> 我们可以实现连接用户的集群部署、横向扩展。</p>
+<p>而 <strong>akka-persistence</strong> 提供 <code>EventSourcedBehavior</code> 为 <strong>Actor</strong> 添加了持久化能力，这实现了可恢复特性。</p>
+<p>Akka Actor提供了监管机制，这样我们可对错误快速响应，实现了容错性。</p>
+<h2><a href="#access-token-management" name="access-token-management" class="anchor"><span class="anchor-link"></span></a><code>access_token</code> management</h2>
+<p>在 Akka 中通过 Actor 模型来设计 access_token 有两种主要方案：</p>
+<ol>
+  <li>每个 access_token 一个 Actor，通过 ClusterSharding 来水平扩展，将 Akka Actor 做为一种有状态的缓存来使用。</li>
+  <li>每个用户（User）一个 Actor，在用户 Actor 内部通过状态来保存多个 access_token 。</li>
+</ol>
+<h3><a href="#per-access-token-one-actor" name="per-access-token-one-actor" class="anchor"><span class="anchor-link"></span></a>Per access_token one Actor</h3>
+<p>每个 access_token 一个 Actor 在设计上比较简单，只需要注意在过期时间到时停止此 Actor。示例代码如下：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/scala/book/oauth2/peraccesstoken/AccessTokenEntity.scala#L32-L93" target="_blank" title="Go to snippet source"></a><code class="language-scala">final case class State(accessToken: String, expiresEpochMillis: Long = 0L, refreshToken: String = &quot;&quot;)
+    extends CborSerializable
+
+sealed trait Command extends CborSerializable
+case object StopSelf extends Command
+final case class Check(replyTo: ActorRef[Int]) extends Command
+final case class Create(refreshToken: String, replTo: ActorRef[AccessToken]) extends Command
+
+sealed trait Event extends CborSerializable
+final case class Created(expiresIn: FiniteDuration, refreshToken: String) extends Event
+
+val TypeKey: EntityTypeKey[Command] = EntityTypeKey(&quot;AccessTokenEntity&quot;)
+
+def init(system: ActorSystem[_]): ActorRef[ShardingEnvelope[Command]] =
+  ClusterSharding(system).init(
+    Entity(TypeKey)(ec =&gt; apply(ec.entityId))
+      .withSettings(ClusterShardingSettings(system).withPassivateIdleEntityAfter(Duration.Zero)))
+
+private def apply(accessToken: String): Behavior[Command] =
+  Behaviors.setup(context =&gt;
+    Behaviors.withTimers { timers =&gt;
+      val behavior = EventSourcedBehavior[Command, Event, State](
+        PersistenceId.of(TypeKey.name, accessToken),
+        State(accessToken),
+        (state, command) =&gt; commandHandler(timers, state, command),
+        (state, event) =&gt; eventHandler(state, event))
+      behavior.receiveSignal {
+        case (state, RecoveryCompleted) =&gt;
+          val now = System.currentTimeMillis()
+          if (state.expiresEpochMillis &lt; now) context.self ! StopSelf
+          else timers.startSingleTimer(StopSelf, (state.expiresEpochMillis - now).millis)
+      }
+    })
+
+private def commandHandler(timers: TimerScheduler[Command], state: State, command: Command): Effect[Event, State] =
+  command match {
+    case Check(replyTo) =&gt;
+      if (state.expiresEpochMillis == 0L) {
+        Effect.stop().thenReply(replyTo)(_ =&gt; 401)
+      } else {
+        val status = if (System.currentTimeMillis() &lt; state.expiresEpochMillis) 200 else 401
+        Effect.reply(replyTo)(status)
+      }
+
+    case Create(refreshToken, replTo) =&gt;
+      if (state.expiresEpochMillis &gt; 0L) // 返回已存在 AccessToken
+        Effect.reply(replTo)(createAccessToken(state))
+      else
+        Effect.persist(Created(2.hours, refreshToken)).thenReply(replTo) { st =&gt;
+          timers.startSingleTimer(StopSelf, (st.expiresEpochMillis - System.currentTimeMillis()).millis)
+          createAccessToken(st)
+        }
+
+    case StopSelf =&gt; Effect.stop()
+  }
+
+private def eventHandler(state: State, event: Event): State = event match {
+  case Created(expiresIn, refreshToken) =&gt;
+    state.copy(
+      expiresEpochMillis = System.currentTimeMillis() + expiresIn.toMillis + OAuthUtils.DEVIATION,
+      refreshToken = refreshToken)
+}</code></pre>
+<p>这种方案的好处在于：</p>
+<ol>
+  <li>通过 ClusterSharding 可以实现理论上无限水平扩展的集群，无论多少个 access_token 都可以保存下来</li>
+  <li>容错、可恢复，节点挂掉后可从其它机器上恢复令牌状态</li>
+  <li>生成的 access_token 令牌不需要含有业务信息，只需要保证唯一性即可</li>
+  <li>代码逻辑直观</li>
+</ol>
+<p>这种方案的缺点有：</p>
+<ol>
+  <li>每个 access_token 一个 Actor，Actor 所做的功能不多，相对具有过期时间（TTL）的缓存数据存储系统来说优势不明显</li>
+  <li>每个无效 access_token 都会在生成一个 Actor 后才可以判断是否有效，这会造成创建很多无效的 Actor</li>
+</ol>
+<h3><a href="#per-user-one-actor" name="per-user-one-actor" class="anchor"><span class="anchor-link"></span></a>Per user one Actor</h3>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/scala/book/oauth2/peruser/UserEntity.scala#L32-L150" target="_blank" title="Go to snippet source"></a><code class="language-scala">object UserEntity {
+  final case class State(
+      tokens: Map[String, DueEpochMillis] = Map(),
+      refreshTokens: Map[String, DueEpochMillis] = Map())
+      extends CborSerializable {
+    def clear(clearTokens: IterableOnce[String], clearRefreshTokens: IterableOnce[String]): State =
+      copy(tokens = tokens -- clearTokens, refreshTokens = refreshTokens -- clearRefreshTokens)
+
+    def addToken(created: TokenCreated): State = {
+      val tokenDue = OAuthUtils.expiresInToEpochMillis(created.accessTokenExpiresIn)
+      val refreshTokenDue = OAuthUtils.expiresInToEpochMillis(created.refreshTokenExpiresIn)
+      State(tokens + (created.accessToken -&gt; tokenDue), refreshTokens + (created.refreshToken -&gt; refreshTokenDue))
+    }
+
+    def addToken(accessToken: String, expiresIn: FiniteDuration): State =
+      copy(tokens = tokens + (accessToken -&gt; OAuthUtils.expiresInToEpochMillis(expiresIn)))
+  }
+
+  sealed trait Command extends CborSerializable
+
+  final case class CreateToken(replyTo: ActorRef[AccessToken]) extends Command
+  final case class CheckToken(accessToken: String, replyTo: ActorRef[Int]) extends Command
+  final case class RefreshToken(refreshToken: String, replyTo: ActorRef[Option[AccessToken]]) extends Command
+  final case object ClearTick extends Command
+
+  sealed trait Event extends CborSerializable
+  final case class TokenCreated(
+      accessToken: String,
+      accessTokenExpiresIn: FiniteDuration,
+      refreshToken: String,
+      refreshTokenExpiresIn: FiniteDuration)
+      extends Event
+  final case class TokenRefreshed(accessToken: String, expiresIn: FiniteDuration) extends Event
+  final case class ClearEvent(clearTokens: Set[String], clearRefreshTokens: Set[String]) extends Event
+
+  val TypeKey: EntityTypeKey[Command] = EntityTypeKey(&quot;UserEntity&quot;)
+
+  def init(system: ActorSystem[_]): ActorRef[ShardingEnvelope[Command]] =
+    ClusterSharding(system).init(
+      Entity(TypeKey)(ec =&gt; apply(ec))
+        .withSettings(ClusterShardingSettings(system).withPassivateIdleEntityAfter(Duration.Zero)))
+
+  private def apply(ec: EntityContext[Command]): Behavior[Command] = {
+    val userId = ec.entityId
+    Behaviors.setup(
+      context =&gt;
+        Behaviors.withTimers(timers =&gt;
+          new UserEntity(PersistenceId.of(ec.entityTypeKey.name, ec.entityId), userId, timers, context)
+            .eventSourcedBehavior()))
+  }
+}
+
+import book.oauth2.peruser.UserEntity._
+class UserEntity private (
+    persistenceId: PersistenceId,
+    userId: String,
+    timers: TimerScheduler[Command],
+    context: ActorContext[Command]) {
+  timers.startTimerWithFixedDelay(ClearTick, 2.hours)
+
+  def eventSourcedBehavior(): EventSourcedBehavior[Command, Event, State] =
+    EventSourcedBehavior(
+      persistenceId,
+      State(),
+      (state, command) =&gt;
+        command match {
+          case CheckToken(accessToken, replyTo)    =&gt; processCheckToken(state, accessToken, replyTo)
+          case RefreshToken(refreshToken, replyTo) =&gt; processRefreshToken(state, refreshToken, replyTo)
+          case CreateToken(replyTo)                =&gt; processCreateToken(replyTo)
+          case ClearTick                           =&gt; processClear(state)
+        },
+      (state, event) =&gt;
+        event match {
+          case TokenRefreshed(accessToken, expiresIn)      =&gt; state.addToken(accessToken, expiresIn)
+          case created: TokenCreated                       =&gt; state.addToken(created)
+          case ClearEvent(clearTokens, clearRefreshTokens) =&gt; state.clear(clearTokens, clearRefreshTokens)
+        })
+
+  private def processRefreshToken(
+      state: State,
+      refreshToken: String,
+      replyTo: ActorRef[Option[AccessToken]]): Effect[Event, State] = {
+    if (state.refreshTokens.get(refreshToken).exists(due =&gt; System.currentTimeMillis() &lt; due)) {
+      val refreshed = TokenRefreshed(OAuthUtils.generateToken(userId), 2.hours)
+      Effect
+        .persist(refreshed)
+        .thenReply(replyTo)(_ =&gt; Some(AccessToken(refreshed.accessToken, refreshed.expiresIn.toSeconds, refreshToken)))
+    } else {
+      Effect.reply(replyTo)(None)
+    }
+  }
+
+  private def processCheckToken(state: State, accessToken: String, replyTo: ActorRef[Int]): Effect[Event, State] = {
+    val status = state.tokens.get(accessToken) match {
+      case Some(dueTimestamp) =&gt; if (System.currentTimeMillis() &lt; dueTimestamp) 200 else 401
+      case None               =&gt; 401
+    }
+    Effect.reply(replyTo)(status)
+  }
+
+  private def processCreateToken(replyTo: ActorRef[AccessToken]): Effect[Event, State] = {
+    val createdEvent =
+      TokenCreated(OAuthUtils.generateToken(userId), 2.hours, OAuthUtils.generateToken(userId), 30.days)
+    Effect.persist(createdEvent).thenReply(replyTo) { _ =&gt;
+      AccessToken(createdEvent.accessToken, createdEvent.accessTokenExpiresIn.toSeconds, createdEvent.refreshToken)
+    }
+  }
+
+  private def processClear(state: State): Effect[Event, State] = {
+    if (state.tokens.isEmpty &amp;&amp; state.refreshTokens.isEmpty) {
+      Effect.stop()
+    } else {
+      val now = System.currentTimeMillis()
+      val clearTokens = state.tokens.view.filterNot { case (_, due)               =&gt; now &lt; due }.keys.toSet
+      val clearRefreshTokens = state.refreshTokens.view.filterNot { case (_, due) =&gt; now &lt; due }.keys.toSet
+      Effect.persist(ClearEvent(clearTokens, clearRefreshTokens))
+    }
+  }
+}</code></pre>
+<p>每个用户一个 Actor 的优势有：</p>
+<ol>
+  <li>通过 ClusterSharding 可以实现理论上无限水平扩展的集群，无论多少个 access_token 都可以保存下来</li>
+  <li>容错、可恢复，节点挂掉后可从其它机器上恢复令牌状态</li>
+  <li>相比每 access_token 一个 Actor，此方案可以显著减少系统 Actor 的数量</li>
+  <li>相比拥有过期时间（TTL）的缓存数据存储系统，使用 Actor 更灵活，且可于业务（用户）系统在同一集群</li>
+  <li>无效 access_token 不会生成多于的 Actor</li>
+</ol>
+<p>每个用户一个 Actor 的缺点有：</p>
+<ol>
+  <li>生成的 access_token 令牌不需要含有业务信息，如：用户ID</li>
+  <li>从代码行数上可看出，相对每 access_token 一个 Actor ，此方案代码逻辑相对复杂，但功能更加强大！</li>
+</ol>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../action/index.html"><i class="icon-prev"></i> <span class="link-prev">实战</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/action/oauth2-server.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2020 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>

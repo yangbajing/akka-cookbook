@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>Akka Persistence Cookbook &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/persistence/cookbook.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+
+<body id="underlay" data-toggler="nav-open">
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a>
+  <ul>
+    <li><a href="../persistence/cookbook.html#akka-persistence-cookbook" class="active page">Akka Persistence Cookbook</a>
+    <ul>
+      <li><a href="../persistence/cookbook.html#how-to-implement-pagination-query-in-the-akka-persistence" class="header">How to implement pagination query in the Akka Persistence</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../action/index.html" class="page">实战</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">测试</a></li>
+  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a>
+  <ul>
+    <li><a href="../persistence/cookbook.html#akka-persistence-cookbook" class="active page">Akka Persistence Cookbook</a>
+    <ul>
+      <li><a href="../persistence/cookbook.html#how-to-implement-pagination-query-in-the-akka-persistence" class="header">How to implement pagination query in the Akka Persistence</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">集成</a></li>
+  <li><a href="../action/index.html" class="page">实战</a></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#akka-persistence-cookbook" name="akka-persistence-cookbook" class="anchor"><span class="anchor-link"></span></a>Akka Persistence Cookbook</h1>
+<h2><a href="#how-to-implement-pagination-query-in-the-akka-persistence" name="how-to-implement-pagination-query-in-the-akka-persistence" class="anchor"><span class="anchor-link"></span></a>How to implement pagination query in the Akka Persistence</h2>
+<p>在 Akka Persistence 中，数据都缓存在服务内存（状态），后端存储的都是一些持久化的事件日志，没法使用类似 SQL 一样的 DSL 来进行分页查询。利用 Akka Streams 和 Actor 我们可以通过编码的方式来实现分页查询的效果，而且这个分页查询还是分步式并行的……</p>
+<h3><a href="#eventsourcedbehavior" name="eventsourcedbehavior" class="anchor"><span class="anchor-link"></span></a><code>EventSourcedBehavior</code></h3>
+<p>Akka Persistence的<code>EventSourcedBehavior</code>里实现了**CQRS**模型，通过<code>commandHandler</code>与<code>eventHandler</code>解耦了命令处理与事件处理。<code>commandHandler</code>处理传入的命令并返回一个事件，并可选择将这个事件持久化；若事件需要持久化，则事件将被传给<code>eventHandler</code>处理，<code>eventHandler</code>处理完事件后将返回一个“新的”状态（也可以不更新，直接返回原状态）。</p>
+<pre class="prettyprint"><code class="language-scala">def apply[Command, Event, State](
+      persistenceId: PersistenceId,
+      emptyState: State,
+      commandHandler: (State, Command) =&gt; Effect[Event, State],
+      eventHandler: (State, Event) =&gt; State): EventSourcedBehavior[Command, Event, State]
+</code></pre>
+<h3><a href="#build-models" name="build-models" class="anchor"><span class="anchor-link"></span></a>Build models</h3>
+<p>以我们习惯的数据库表建模来说，我们会有以下一张表：</p>
+<pre class="prettyprint"><code class="language-sql">create table t_config
+(
+    data_id     varchar(64),
+    namespace   varchar(64) not null,
+    config_type varchar(32) not null,
+    content     text        not null,
+    constraint t_config_pk primary key (namespace, data_id)
+);
+create index t_config_idx_data_id on t_config (data_id);
+</code></pre>
+<p><code>ConfigManager</code> actor 可以看作 <code>t_config</code> 表，它的 <code>entityId</code> 就是 <code>namespace</code>， <strong>State</strong> 里保存了所有记录的主键值（<code>ConfigManagerState</code>），这就相当于 <code>t_config</code> 表的 <code>t_config_idx_data_id</code> 索引。</p>
+<p>而 <code>ConfigEntity</code> actor 可看作 <code>t_config</code> 表里存储的记录，每个 actor 实例就是一行记录。它的 <code>entityId</code> 由 <code>namespace</code> + <code>data_id</code> 组成，这就相当于 <code>t_config</code> 表的 <code>t_config_pk</code> 复合主键。 这里我们定义两个 <code>EventSourcedBehavior</code>：</p>
+<ul>
+  <li><code>ConfigManager</code>：拥有所有配置ID列表，并作为 State 保存在 EventSourcedBehavior</li>
+  <li><code>ConfigEntity</code>: 拥有每个配置数据，并作为 State 保存在 EventSourcedBehavior</li>
+</ul>
+<h3><a href="#implementation" name="implementation" class="anchor"><span class="anchor-link"></span></a>Implementation</h3>
+<p>这里先贴出 <code>ConfigManager</code> 和 <code>ConfigEntity</code> 的部分代码，接下来再详解怎样实现分页查询。</p>
+<p><strong>ConfigManager</strong></p>
+<pre class="prettyprint"><code class="language-scala">object ConfigManager {
+  sealed trait Command extends CborSerializable
+  sealed trait Event extends CborSerializable
+  sealed trait Response extends CborSerializable
+
+  final case class Query(dataId: Option[String], configType: Option[String], page: Int, size: Int) extends Command
+  final case class ReplyCommand(in: AnyRef, replyTo: ActorRef[Response]) extends Command
+  private final case class InternalResponse(replyTo: ActorRef[Response], response: Response) extends Command
+
+  case class ConfigResponse(status: Int, message: String = &quot;&quot;, data: Option[AnyRef] = None) extends Response
+
+  final case class ConfigManagerState(dataIds: Vector[String] = Vector()) extends CborSerializable
+
+  val TypeKey: EntityTypeKey[Command] = EntityTypeKey(&quot;ConfigManager&quot;)
+}
+
+import ConfigManager._
+class ConfigManager private (namespace: String, context: ActorContext[Command]) {
+  private implicit val system = context.system
+  private implicit val timeout: Timeout = 5.seconds
+  import context.executionContext
+  private val configEntity = ConfigEntity.init(context.system)
+
+  def eventSourcedBehavior(): EventSourcedBehavior[Command, Event, ConfigManagerState] =
+    EventSourcedBehavior(
+      PersistenceId.of(TypeKey.name, namespace),
+      ConfigManagerState(), {
+        case (state, ReplyCommand(in, replyTo)) =&gt;
+          replyCommandHandler(state, replyTo, in)
+        case (_, InternalResponse(replyTo, response)) =&gt;
+          Effect.reply(replyTo)(response)
+      },
+      eventHandler)
+  
+  private def processPageQuery(
+      state: ConfigManagerState,
+      replyTo: ActorRef[Response],
+      in: Query): Effect[Event, ConfigManagerState] = {
+    val offset = if (in.page &gt; 0) (in.page - 1) * in.size else 0
+    val responseF = if (offset &lt; state.dataIds.size) {
+      Source(state.dataIds)
+        .filter(dataId =&gt; in.dataId.forall(v =&gt; v.contains(dataId)))
+        .mapAsync(20) { dataId =&gt;
+          configEntity.ask[Option[ConfigState]](replyTo =&gt;
+            ShardingEnvelope(dataId, ConfigEntity.Query(in.configType, replyTo)))
+        }
+        .collect { case Some(value) =&gt; value }
+        .drop(offset)
+        .take(in.size)
+        .runWith(Sink.seq)
+        .map(items =&gt; ConfigResponse(IntStatus.OK, data = Some(items)))
+    } else {
+      Future.successful(ConfigResponse(IntStatus.NOT_FOUND, data = Some(Nil)))
+    }
+    context.pipeToSelf(responseF) {
+      case Success(value) =&gt; InternalResponse(replyTo, value)
+      case Failure(e)     =&gt; InternalResponse(replyTo, ConfigResponse(IntStatus.INTERNAL_ERROR, e.getLocalizedMessage))
+    }
+    Effect.none
+  }
+}
+</code></pre>
+<p><strong>ConfigEntity</strong></p>
+<pre class="prettyprint"><code class="language-scala">object ConfigEntity {
+  case class ConfigState(namespace: String, dataId: String, configType: String, content: String)
+
+  sealed trait Command extends CborSerializable
+  sealed trait Event extends CborSerializable
+
+  final case class Query(configType: Option[String], replyTo: ActorRef[Option[ConfigState]]) extends Command
+
+  final case class ConfigEntityState(config: Option[ConfigState] = None) extends CborSerializable
+
+  val TypeKey: EntityTypeKey[Command] = EntityTypeKey(&quot;ConfigEntity&quot;)
+}
+
+import ConfigEntity._
+class ConfigEntity private (namespace: String, dataId: String, context: ActorContext[Command]) {
+  def eventSourcedBehavior(): EventSourcedBehavior[Command, Event, ConfigEntityState] =
+    EventSourcedBehavior(PersistenceId.of(TypeKey.name, dataId), ConfigEntityState(), commandHandler, eventHandler)
+
+  def commandHandler(state: ConfigEntityState, command: Command): Effect[Event, ConfigEntityState] = command match {
+    case Query(configType, replyTo) =&gt;
+      state.config match {
+        case None =&gt;
+          Effect.reply(replyTo)(None)
+        case Some(config) =&gt;
+          val resp = if (configType.forall(v =&gt; config.configType.contains(v))) Some(config) else None
+          Effect.reply(replyTo)(resp)
+      }
+  }
+}
+</code></pre>
+<p><code>ConfigManager#processPageQuery</code> 函数实现了大部分的分页查询逻辑（有部分逻辑需要由 <code>ConfigEntity</code> 处理）。</p>
+<pre class="prettyprint"><code class="language-scala">val offset = if (in.page &gt; 0) (in.page - 1) * in.size else 0
+val responseF = if (offset &lt; state.dataIds.size) {
+  // process paging
+} else {
+  Future.successful(ConfigResponse(IntStatus.OK, data = Some(Nil)))
+}
+</code></pre>
+<p>这里首先获取实际的分页数据偏移量 <code>offset</code> ，再于 <code>ConfigManager</code> 状态里保存的 <code>dataIds</code> 的大小进行判断，若 <code>offset</code> &lt; <code>state.dataIds.size</code> 则我们进行分页逻辑，否则直接返回一个空列表给前端。</p>
+<pre class="prettyprint"><code class="language-scala">  Source(state.dataIds)
+    .filter(dataId =&gt; in.dataId.forall(v =&gt; v.contains(dataId)))
+    .mapAsync(20) { dataId =&gt;
+      configEntity.ask[Option[ConfigState]](replyTo =&gt;
+        ShardingEnvelope(s&quot;$namespace@$dataId&quot;, ConfigEntity.Query(in.configType, replyTo)))
+    }
+    .collect { case Some(value) =&gt; value }
+    .drop(offset)
+    .take(in.size)
+    .runWith(Sink.seq)
+    .map(items =&gt; ConfigResponse(IntStatus.OK, data = Some(items)))
+</code></pre>
+<p>这个 Akka Streams 流即是分页处理的主要实现，若是SQL的话，它类似：</p>
+<pre class="prettyprint"><code class="language-sql">select * from t_config where data_id like &#39;%&quot;in.dataId&quot;%&#39; offset &quot;offset&quot; limit &quot;in.size&quot;
+</code></pre>
+<p><code>.mapAsync</code> 在流执行流程中起了20个并发的异步操作，将委托每个匹配的 <code>ConfigEntity</code> （由<code>s&quot;$namespace@$dataId&quot;</code>生成<code>entityId</code>）执行 <code>config_type</code> 字段的查询。这样，完整的SQL语句类似：</p>
+<pre class="prettyprint"><code class="language-sql">select * from t_config where data_id like &#39;%&quot;in.dataId&quot;%&#39; and config_type = &quot;in.configType&quot; offset &quot;offset&quot; limit &quot;in.size&quot;
+</code></pre>
+<p><code>ConfigEntity</code> 对 <code>config_type</code> 部分的查询逻辑实现如下：</p>
+<pre class="prettyprint"><code class="language-scala">case Query(configType, replyTo) =&gt;
+  state.config match {
+    case None =&gt;
+      Effect.reply(replyTo)(None)
+    case Some(config) =&gt;
+      val resp = if (configType.forall(v =&gt; config.configType.contains(v))) Some(config) else None
+      Effect.reply(replyTo)(resp)
+  }
+</code></pre>
+<p>若<code>in.configType</code>为空，既不需要判断 <code>config_type</code> 这个字段，直接返回 <code>Some(config)</code> 即可，而这时的SQL语句类似：</p>
+<pre class="prettyprint"><code class="language-sql">select * from t_config where data_id like &#39;%&quot;in.dataId&quot;%&#39; and true offset &quot;offset&quot; limit &quot;in.size&quot;
+</code></pre>
+<p><em><strong>Tip</strong>这里有个小技巧，对于 <code>Option[T]</code> 字段的判断，直接使用了 <code>.forall</code> 方法，它等价于：</em></p>
+<pre class="prettyprint"><code class="language-scala">option match {
+  case Some(x) =&gt; p(x)
+  case None    =&gt; true
+}
+</code></pre>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../persistence/index.html"><i class="icon-prev"></i> <span class="link-prev">Akka Persistence</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../grpc/index.html">Akka gRPC <i class="icon-next"></i></a>
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/persistence/cookbook.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2020 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>
