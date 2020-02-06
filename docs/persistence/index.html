@@ -50,19 +50,20 @@ Version 1.0.0
 </header>
 <nav class="nav-toc">
 <ul>
-  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
-  <li><a href="../test/index.html" class="page">测试</a></li>
-  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html#akka-persistence" class="active page">Akka Persistence</a>
   <ul>
+    <li><a href="../persistence/event-sourcing.html" class="page">Event Sourcing</a></li>
     <li><a href="../persistence/cookbook.html" class="page">Akka Persistence Cookbook</a></li>
   </ul></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../action/index.html" class="page">实战</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </nav>
 </div>
@@ -86,19 +87,20 @@ Version 1.0.0
 <nav class="site-nav sticky-sidebar-contents">
 <div class="nav-toc">
 <ul>
-  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
-  <li><a href="../test/index.html" class="page">测试</a></li>
-  <li><a href="../streams/index.html" class="page">Akka 流（Streams）</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html#akka-persistence" class="active page">Akka Persistence</a>
   <ul>
+    <li><a href="../persistence/event-sourcing.html" class="page">Event Sourcing</a></li>
     <li><a href="../persistence/cookbook.html" class="page">Akka Persistence Cookbook</a></li>
   </ul></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../action/index.html" class="page">实战</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </div>
 </nav>
@@ -113,8 +115,19 @@ Version 1.0.0
 <div class="small-12 column" id="docs">
 <h1><a href="#akka-persistence" name="akka-persistence" class="anchor"><span class="anchor-link"></span></a>Akka Persistence</h1>
 <p>Akka Persistence 支持对 Actor 内部状态进行持久化管理，这样在系统挂掉或重启时就不会丢失数据。而对于 At-Least-Once-Delivery，也需要有 Akka Persistence 的支持。</p>
+<p>要使用 Akka Persistence，需要在项目里添加 <code>akka-persistence-typed</code> 依赖</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-persistence-typed" % "2.6.1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;com.typesafe.akka&lt;/groupId&gt;
+  &lt;artifactId&gt;akka-persistence-typed_2.13&lt;/artifactId&gt;
+  &lt;version&gt;2.6.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'com.typesafe.akka', name: 'akka-persistence-typed_2.13', version: '2.6.1'
+}</code></pre></dd></dl>
 <div class="toc ">
 <ul>
+  <li><a href="../persistence/event-sourcing.html" class="page">Event Sourcing</a>
+  <ul>
+    <li><a href="../persistence/event-sourcing.html#eventsourcedbehavior" class="header"><code>EventSourcedBehavior</code></a></li>
+  </ul></li>
   <li><a href="../persistence/cookbook.html" class="page">Akka Persistence Cookbook</a>
   <ul>
     <li><a href="../persistence/cookbook.html#how-to-implement-pagination-query-in-the-akka-persistence" class="header">How to implement pagination query in the Akka Persistence</a>
@@ -135,7 +148,7 @@ Version 1.0.0
 <a href="../cluster/serialization-jackson.html"><i class="icon-prev"></i> <span class="link-prev">使用Jackson作为序列化</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../persistence/cookbook.html">Akka Persistence Cookbook <i class="icon-next"></i></a>
+<a class="float-right" href="../persistence/event-sourcing.html">Event Sourcing <i class="icon-next"></i></a>
 </div>
 </section>
 </div>

@@ -98,7 +98,7 @@ lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "
 
 lazy val cookbookStreams = _project("cookbook-streams")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_alpakkaCsv, _alpakkaFtp, _alpakkaFile))
+  .settings(libraryDependencies ++= Seq(_akkaHttp, _alpakkaCsv, _alpakkaFtp, _alpakkaFile))
 
 lazy val cookbookCluster = _project("cookbook-cluster")
   .dependsOn(cookbookCommon % "compile->compile;test->test")

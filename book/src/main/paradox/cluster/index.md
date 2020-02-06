@@ -1,6 +1,6 @@
-# Akka 集群
+# Akka Cluster
 
-@@toc { depth=2 }
+@@toc { depth=3 }
 
 @@@ index
 

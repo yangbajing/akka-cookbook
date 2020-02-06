@@ -2,11 +2,11 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>访问FTP/sFTP &bull; Akka Cookbook</title>
+<title>Event Sourcing &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
-<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/streams/ftp.html"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/persistence/event-sourcing.html"/>
 <script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
@@ -53,26 +53,17 @@ Version 1.0.0
   <li><a href="../introduction.html" class="page">Introduction</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
   <li><a href="../test/index.html" class="page">Test</a></li>
-  <li><a href="../streams/index.html" class="page">Akka Streams</a>
-  <ul>
-    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
-    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
-    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
-    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
-    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
-    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
-    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
-    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
-    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
-    <li><a href="../streams/file.html" class="page">访问文件</a></li>
-    <li><a href="../streams/ftp.html#访问ftp-sftp" class="active page">访问FTP/sFTP</a></li>
-    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
-    <li><a href="../streams/example-top-k.html" class="page">实例：使用 Akka Streams 解 Top K 问题</a></li>
-  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
-  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a>
+  <ul>
+    <li><a href="../persistence/event-sourcing.html#event-sourcing" class="active page">Event Sourcing</a>
+    <ul>
+      <li><a href="../persistence/event-sourcing.html#eventsourcedbehavior" class="header"><code>EventSourcedBehavior</code></a></li>
+    </ul></li>
+    <li><a href="../persistence/cookbook.html" class="page">Akka Persistence Cookbook</a></li>
+  </ul></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
@@ -102,26 +93,17 @@ Version 1.0.0
   <li><a href="../introduction.html" class="page">Introduction</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
   <li><a href="../test/index.html" class="page">Test</a></li>
-  <li><a href="../streams/index.html" class="page">Akka Streams</a>
-  <ul>
-    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
-    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
-    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
-    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
-    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
-    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
-    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
-    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
-    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
-    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
-    <li><a href="../streams/file.html" class="page">访问文件</a></li>
-    <li><a href="../streams/ftp.html#访问ftp-sftp" class="active page">访问FTP/sFTP</a></li>
-    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
-    <li><a href="../streams/example-top-k.html" class="page">实例：使用 Akka Streams 解 Top K 问题</a></li>
-  </ul></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
-  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a>
+  <ul>
+    <li><a href="../persistence/event-sourcing.html#event-sourcing" class="active page">Event Sourcing</a>
+    <ul>
+      <li><a href="../persistence/event-sourcing.html#eventsourcedbehavior" class="header"><code>EventSourcedBehavior</code></a></li>
+    </ul></li>
+    <li><a href="../persistence/cookbook.html" class="page">Akka Persistence Cookbook</a></li>
+  </ul></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
@@ -137,24 +119,25 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#访问ftp-sftp" name="访问ftp-sftp" class="anchor"><span class="anchor-link"></span></a>访问FTP/sFTP</h1>
-<p>TODO</p>
+<h1><a href="#event-sourcing" name="event-sourcing" class="anchor"><span class="anchor-link"></span></a>Event Sourcing</h1>
+<p>Akka Persistence 使有状态的 actor 在重启后能保持其内部状态，如：JVM崩溃、被监控策略或手动停止及集群迁移。Akka Persistence 默认只存储事件日志（Event），状态通过事件日志生成。当系统运行很长时间后，事件日志会非常多，重启将回放所有日志，这可能会造成系统启动时间过长。Akka Persistence 还提供了快照将状态（State）存储下来，这样系统重启时将以最新的快照为基础，并只重放从快照生成时间点开始的事件日志，这样可以显著加快系统恢复的时间。而且，我们还可以选择删除快照时间点之前的所有事件日志来节省存储空间。</p>
+<h2><a href="#eventsourcedbehavior" name="eventsourcedbehavior" class="anchor"><span class="anchor-link"></span></a><code>EventSourcedBehavior</code></h2>
 </div>
 </article>
 <div class="row">
 <div class="small-12 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
-<a href="../streams/file.html"><i class="icon-prev"></i> <span class="link-prev">访问文件</span></a>
+<a href="../persistence/index.html"><i class="icon-prev"></i> <span class="link-prev">Akka Persistence</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../streams/custom-graph.html">自定义图（Graph） <i class="icon-next"></i></a>
+<a class="float-right" href="../persistence/cookbook.html">Akka Persistence Cookbook <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 <div class="source-github row">
-在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/ftp.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/persistence/event-sourcing.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">

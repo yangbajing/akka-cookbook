@@ -1,6 +1,6 @@
-# gRPC服务
+# gRPC Service
 
-## 定义消息和服务
+## Define messages and services
 
 @@snip [greeter.proto](../../../../../cookbook-grpc/src/main/protobuf/greeter/greeter.proto)
 
@@ -11,7 +11,7 @@
 - `ItKeepsReplying`：发送一个请求，获得持续不断的多个响应；
 - `streamHellos`：持续不断的发送响应的同时也可获得持续不断的响应，可以通过`Source.queue`来获得可发送数据的`Queue`和获得响应数据的`Source`。
 
-## 实现 gRPC 服务
+## Implement the gRPC services
 
 @@snip [GreeterServiceImpl](../../../../../cookbook-grpc/src/main/scala/greeter/GreeterServiceImpl.scala) { #GreeterServiceImpl }
 
@@ -39,7 +39,7 @@ Akka gRPC提供了基于 Akka Streams 的API，更多 Akka Streams 的内容请�
 
 `heartbeat`收到心跳请求后马上就像客户端返回一个`HeartbeatAck`的心跳确认请求，因为这里心跳只用于保持连接，返回一个空响应即可。而`ref ! req`将心跳请求发送给`ref`指代的一个客户端Manager业务处理actor，由actor实现心跳超时监控，可以通过配置actor的 **ReceiveTimeout** 来实现心跳超时判断。
 
-## 测试 gRPC 服务
+## Test the gRPC services
 
 使用 Scalatest 对实现的4个gRPC服务进行测试，下面是单元测试代码：
 
