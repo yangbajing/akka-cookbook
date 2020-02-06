@@ -22,7 +22,7 @@ import akka.stream.{ AbruptStageTerminationException, Attributes, Inlet, SinkSha
 import scala.concurrent.{ Future, Promise }
 
 // #TopKSink
-class TopKSink(TOP_N: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
+class TopKSink(TOP_K: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
   val in: Inlet[Movie] = Inlet("TopKSink.in")
 
   override def shape: SinkShape[Movie] = SinkShape(in)
@@ -58,11 +58,11 @@ class TopKSink(TOP_N: Int) extends GraphStageWithMaterializedValue[SinkShape[Mov
 
       override def onPush(): Unit = {
         val movie = grab(in)
-        buf = if (bufSize < TOP_N) {
+        buf = if (bufSize < TOP_K) {
           bufSize += 1
           insertMovie(buf, movie)
         } else {
-          if (buf.head.rating < movie.rating) insertMovie(buf.slice(1, TOP_N), movie) else buf
+          if (buf.head.rating < movie.rating) insertMovie(buf.slice(1, TOP_K), movie) else buf
         }
         pull(in)
       }

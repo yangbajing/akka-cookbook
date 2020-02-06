@@ -33,7 +33,7 @@ object TopKForAkkaHTTP {
     implicit val ec = system.executionContext
     val TOP_K = 10
     val URL =
-      "https://github.com/yangbajing/akka-cookbook/raw/master/cookbook-streams/src/main/resources/movies.csv"
+      "https://gitee.com/yangbajing/akka-cookbook/raw/master/cookbook-streams/src/main/resources/movies.csv"
 
     val topKF = Http(system).singleRequest(HttpRequest(uri = URL)).flatMap { response =>
       response.entity.dataBytes

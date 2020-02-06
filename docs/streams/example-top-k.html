@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>实例：求解 Top K 问题 &bull; Akka Cookbook</title>
+<title>实例：使用 Akka Streams 解 Top K 问题 &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
@@ -68,13 +68,14 @@ Version 1.0.0
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
-    <li><a href="../streams/example-top-k.html#实例-求解-top-k-问题" class="active page">实例：求解 Top K 问题</a>
+    <li><a href="../streams/example-top-k.html#实例-使用-akka-streams-解-top-k-问题" class="active page">实例：使用 Akka Streams 解 Top K 问题</a>
     <ul>
       <li><a href="../streams/example-top-k.html#问题描述" class="header">问题描述</a></li>
       <li><a href="../streams/example-top-k.html#解法1-全量排序求top-10" class="header">解法1：全量排序求Top 10</a></li>
       <li><a href="../streams/example-top-k.html#解法2-遍历一次文件求出top-10" class="header">解法2：遍历一次文件求出Top 10</a></li>
       <li><a href="../streams/example-top-k.html#解法3-使用akka-streams异步求出top-k个得分最高的电影" class="header">解法3：使用Akka Streams异步求出Top K个得分最高的电影</a></li>
       <li><a href="../streams/example-top-k.html#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="header">解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</a></li>
+      <li><a href="../streams/example-top-k.html#小结" class="header">小结</a></li>
     </ul></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
@@ -124,13 +125,14 @@ Version 1.0.0
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
-    <li><a href="../streams/example-top-k.html#实例-求解-top-k-问题" class="active page">实例：求解 Top K 问题</a>
+    <li><a href="../streams/example-top-k.html#实例-使用-akka-streams-解-top-k-问题" class="active page">实例：使用 Akka Streams 解 Top K 问题</a>
     <ul>
       <li><a href="../streams/example-top-k.html#问题描述" class="header">问题描述</a></li>
       <li><a href="../streams/example-top-k.html#解法1-全量排序求top-10" class="header">解法1：全量排序求Top 10</a></li>
       <li><a href="../streams/example-top-k.html#解法2-遍历一次文件求出top-10" class="header">解法2：遍历一次文件求出Top 10</a></li>
       <li><a href="../streams/example-top-k.html#解法3-使用akka-streams异步求出top-k个得分最高的电影" class="header">解法3：使用Akka Streams异步求出Top K个得分最高的电影</a></li>
       <li><a href="../streams/example-top-k.html#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="header">解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</a></li>
+      <li><a href="../streams/example-top-k.html#小结" class="header">小结</a></li>
     </ul></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
@@ -151,7 +153,7 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#实例-求解-top-k-问题" name="实例-求解-top-k-问题" class="anchor"><span class="anchor-link"></span></a>实例：求解 Top K 问题</h1>
+<h1><a href="#实例-使用-akka-streams-解-top-k-问题" name="实例-使用-akka-streams-解-top-k-问题" class="anchor"><span class="anchor-link"></span></a>实例：使用 Akka Streams 解 Top K 问题</h1>
 <h2><a href="#问题描述" name="问题描述" class="anchor"><span class="anchor-link"></span></a>问题描述</h2>
 <p>服务器上有一个 movies.csv 文件，里面保存了每部电影的评分（为了简化和专注问题，CSV文件每一行只有两个字段：movieId和rating）。文件通过HTTP服务器发布。要求从文件内找出排名最高的10部电影。</p>
 <h2><a href="#解法1-全量排序求top-10" name="解法1-全量排序求top-10" class="anchor"><span class="anchor-link"></span></a>解法1：全量排序求Top 10</h2>
@@ -221,7 +223,7 @@ system.terminate()</code></pre>
   }</code></pre>
 <h3><a href="#自定义sink-topksink" name="自定义sink-topksink" class="anchor"><span class="anchor-link"></span></a>自定义Sink：<code>TopKSink</code></h3>
 <p><code>.runWith(new TopKSink(10))</code> 调用自定义的 Akka Streams <code>Sink</code> 来获得得分最高的10部电影。让我们先来看看 <code>TopKSink</code> 的实现：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L25-L88" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TopKSink(TOP_N: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L25-L88" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TopKSink(TOP_K: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
   val in: Inlet[Movie] = Inlet(&quot;TopKSink.in&quot;)
 
   override def shape: SinkShape[Movie] = SinkShape(in)
@@ -257,11 +259,11 @@ system.terminate()</code></pre>
 
       override def onPush(): Unit = {
         val movie = grab(in)
-        buf = if (bufSize &lt; TOP_N) {
+        buf = if (bufSize &lt; TOP_K) {
           bufSize += 1
           insertMovie(buf, movie)
         } else {
-          if (buf.head.rating &lt; movie.rating) insertMovie(buf.slice(1, TOP_N), movie) else buf
+          if (buf.head.rating &lt; movie.rating) insertMovie(buf.slice(1, TOP_K), movie) else buf
         }
         pull(in)
       }
@@ -291,7 +293,7 @@ system.terminate()</code></pre>
 implicit val ec = system.executionContext
 val TOP_K = 10
 val URL =
-  &quot;https://gitee.com/yangbajing/yangbajing-blog/raw/master/src/main/resources/movies.csv&quot;
+  &quot;https://gitee.com/yangbajing/akka-cookbook/raw/master/cookbook-streams/src/main/resources/movies.csv&quot;
 
 val topKF = Http(system).singleRequest(HttpRequest(uri = URL)).flatMap { response =&gt;
   response.entity.dataBytes
@@ -307,6 +309,17 @@ topN.foreach(println)
 println(topN.size)
 
 system.terminate()</code></pre>
+<p>通过继承 <code>GraphStageWithMaterializedValue</code> 抽像类，可以定义一个返回特定结果的自定义 <code>Sink</code>，否则流处理结果默认为 <code>NotUsed</code>。</p>
+<pre class="prettyprint"><code class="language-scala">  override def createLogicAndMaterializedValue(
+      inheritedAttributes: Attributes): (GraphStageLogic, Future[List[Movie]])
+</code></pre>
+<p>函数 <code>createLogicAndMaterializedValue</code> 实现 <code>Sink</code> 处理逻辑并返回 <code>Sink</code> 阶段的处理逻辑 <code>GraphStageLogic</code> 和获得的 Top K 结果 <code>Future[List[Movie]]</code>，流执行后的结果（通过调用 <code>.runWith</code>）是一个异步结果（<code>Future</code>）。这样将不会阻塞调用线程。</p>
+<p><code>buf</code> 用于缓存 Top K 个得分最高的电影，使用 <code>List</code> 模拟了一个堆结构，Top K 里评分最低的电影在链表头且按评分升序排序。</p>
+<p><code>onPush</code> 函数上游有数据传入时调用 <code>grab</code> 函数获取一个元素（<code>movie</code>）。<code>bufSize</code> 保存了当前 <code>buf</code> 的数量，当 <code>bufSize &lt; TOP_K</code> 时，调用 <code>insertMovie</code> 函数将 <code>movie</code> 直接插入到匹配顺序的 <code>buf</code> 里并将 <code>bufSize</code> 加1。否则通过 <code>buf.head.rating &lt; movie.rating</code> 比较，若为 true 则将 <code>movie</code> 加入缓存，否则 <code>buf</code> 保持不变。</p>
+<p><code>insertMovie</code> 函数实现了将新电影插入 <code>buf</code> 的逻辑，并保持 <code>buf</code> 按评分升序排序。</p>
+<h2><a href="#小结" name="小结" class="anchor"><span class="anchor-link"></span></a>小结</h2>
+<p>本文使用4种方式来求解 Top K 问题，从简单粗暴的全量读入内存并排序；到不使用排序通过一次遍历获得 Top K；再使用 Akka Streams 以流式方式异步获得；最后，通过结合 Akka HTTP 和 Akka Streams，可以HTTP请求的同时计算 Top K。</p>
+<p>有关 Akka HTTP 更多内容可阅读 <a href="https://www.yangbajing.me/scala-web-development/">《Scala Web 开发——基于Akka HTTP》</a> 。</p>
 </div>
 </article>
 <div class="row">
