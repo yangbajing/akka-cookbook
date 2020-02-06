@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>实例：求解 Top K 问题 &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/streams/example-top-k.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+
+<body id="underlay" data-toggler="nav-open">
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a>
+  <ul>
+    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
+    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
+    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
+    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
+    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
+    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
+    <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
+    <li><a href="../streams/example-top-k.html#实例-求解-top-k-问题" class="active page">实例：求解 Top K 问题</a>
+    <ul>
+      <li><a href="../streams/example-top-k.html#问题描述" class="header">问题描述</a></li>
+      <li><a href="../streams/example-top-k.html#解法1-全量排序求top-10" class="header">解法1：全量排序求Top 10</a></li>
+      <li><a href="../streams/example-top-k.html#解法2-遍历一次文件求出top-10" class="header">解法2：遍历一次文件求出Top 10</a></li>
+      <li><a href="../streams/example-top-k.html#解法3-使用akka-streams异步求出top-k个得分最高的电影" class="header">解法3：使用Akka Streams异步求出Top K个得分最高的电影</a></li>
+      <li><a href="../streams/example-top-k.html#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="header">解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a>
+  <ul>
+    <li><a href="../streams/introduction.html" class="page">介绍</a></li>
+    <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
+    <li><a href="../streams/materialize.html" class="page">物化与物化值</a></li>
+    <li><a href="../streams/depth-flow.html" class="page">深入 Flow</a></li>
+    <li><a href="../streams/depth-sink.html" class="page">深入 Sink</a></li>
+    <li><a href="../streams/source.html" class="page">创建 Source 的常用函数</a></li>
+    <li><a href="../streams/flow.html" class="page">执行转换的 Flow 常用函数</a></li>
+    <li><a href="../streams/sink.html" class="page">汇聚数据的 Sink 常用函数</a></li>
+    <li><a href="../streams/group.html" class="page">Streams 分组</a></li>
+    <li><a href="../streams/throttle.html" class="page">基于时间的处理</a></li>
+    <li><a href="../streams/file.html" class="page">访问文件</a></li>
+    <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
+    <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
+    <li><a href="../streams/example-top-k.html#实例-求解-top-k-问题" class="active page">实例：求解 Top K 问题</a>
+    <ul>
+      <li><a href="../streams/example-top-k.html#问题描述" class="header">问题描述</a></li>
+      <li><a href="../streams/example-top-k.html#解法1-全量排序求top-10" class="header">解法1：全量排序求Top 10</a></li>
+      <li><a href="../streams/example-top-k.html#解法2-遍历一次文件求出top-10" class="header">解法2：遍历一次文件求出Top 10</a></li>
+      <li><a href="../streams/example-top-k.html#解法3-使用akka-streams异步求出top-k个得分最高的电影" class="header">解法3：使用Akka Streams异步求出Top K个得分最高的电影</a></li>
+      <li><a href="../streams/example-top-k.html#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="header">解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#实例-求解-top-k-问题" name="实例-求解-top-k-问题" class="anchor"><span class="anchor-link"></span></a>实例：求解 Top K 问题</h1>
+<h2><a href="#问题描述" name="问题描述" class="anchor"><span class="anchor-link"></span></a>问题描述</h2>
+<p>服务器上有一个 movies.csv 文件，里面保存了每部电影的评分（为了简化和专注问题，CSV文件每一行只有两个字段：movieId和rating）。文件通过HTTP服务器发布。要求从文件内找出排名最高的10部电影。</p>
+<h2><a href="#解法1-全量排序求top-10" name="解法1-全量排序求top-10" class="anchor"><span class="anchor-link"></span></a>解法1：全量排序求Top 10</h2>
+<p>通过 <code>wget</code>、<code>curl</code> 等工具先将文件下载到本地，再读出文件内所有行并解析出 <code>movieId</code>和<code>rating</code> 字段，按 <code>rating</code> 字段排序并求得分最高的 10 部电影。这种方法逻辑很简单，实现代码如下：</p>
+<pre class="prettyprint"><code class="language-scala">final case class Movie(id: String, rating: Double)
+
+val top10 = scala.io.Source.fromFile(&quot;/tmp/movies.csv&quot;).getLines()
+  //.drop(1) // if csv header exists.
+  .flatMap { line =&gt; 
+    line.split(&#39;,&#39;) match {
+      case Array(movieId, rating) =&gt; Try(Movie(movieId, rating.toDouble)).toOption  
+      case _ =&gt; None
+    }
+  }
+  .toVector
+  .sortWith(_.rating &gt; _.rating)
+  .take(10)
+</code></pre>
+<h2><a href="#解法2-遍历一次文件求出top-10" name="解法2-遍历一次文件求出top-10" class="anchor"><span class="anchor-link"></span></a>解法2：遍历一次文件求出Top 10</h2>
+<p>因为我们只是找出得分最高的10部电影，可以预先定义一个有序 <code>top10</code> 集合，在遍历 <code>movies.csv</code> 的每一部电影时将其与 <code>top10</code> 集合里得分最低的一部电影比较。若得分大于集合里最低的那部电影，则将集合里得分最低的电影去掉，将将当前电影加入集合。这样，我们只需要遍历一次文件即可获得得分最高的10部电影。</p>
+<pre class="prettyprint"><code class="language-scala">final case class Movie(id: String, rating: Double)
+
+var top10 = Vector[Movie]()
+scala.io.Source.fromFile(&quot;/tmp/movies.csv&quot;).getLines()
+  //.drop(1) // if csv header exists.
+  .flatMap { line =&gt; 
+    line.split(&#39;,&#39;) match {
+      case Array(movieId, rating) =&gt; Some(Movie(movieId, rating.toDouble))  
+      case _ =&gt; None
+    }
+  }
+  .foreach { movie =&gt;
+    top10 = if (top10.size &lt; 10) (movie +: top10).sortWith(_.rating &lt; _.rating)
+      else if (top10.head.rating &gt; movie.rating) top10
+      else (movie +: top10.tail).sortWith(_.rating &lt; _.rating)
+  }
+</code></pre>
+<h2><a href="#解法3-使用akka-streams异步求出top-k个得分最高的电影" name="解法3-使用akka-streams异步求出top-k个得分最高的电影" class="anchor"><span class="anchor-link"></span></a>解法3：使用Akka Streams异步求出Top K个得分最高的电影</h2>
+<p><code>FileIO</code> 是Akka Streams自带的一个文件读、写工具类，可以从一个文件生成 <code>Source[ByteString, Future[IOResult]]</code> 或将 <code>Source[ByteString, Future[IOResult]]</code> 写入文件。<code>Framing.delimiter</code> 可以从Akka Streams 的 <code>ByteString</code> 流以指定分隔符（<code>\n</code>）按行提取内容，并将每一行数据发送到流程的下一步骤。</p><div class="callout note "><div class="callout-title">Note</div>
+<p>这里 <code>Framing.delimiter</code> 的第3个参数 <code>allowTruncation</code> 需要设置为 <strong>true</strong> ，否则文件在不以 <code>\n</code> 结尾的情况下将抛出以下异常：</p>
+<pre class="prettyprint"><code class="language-scala">akka.stream.scaladsl.Framing$FramingException: Stream finished but there was a truncated final frame in the buffer
+</code></pre>
+<p>如果设置为 <strong>false</strong>，则当正在解码的最后一个帧不包含有效的分隔符时，此流将失败，而不是返回截断的帧数据。</p></div>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForFile.scala#L32-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val system = ActorSystem(Behaviors.ignore, &quot;topK&quot;)
+implicit val ec = system.executionContext
+
+val topKF = FileIO
+  .fromPath(Paths.get(&quot;/tmp/movies.csv&quot;))
+  .via(Framing.delimiter(ByteString(&quot;\n&quot;), 8192))
+  .drop(1) // Drop CSV Header
+  .mapConcat(bs =&gt; TopKUtils.toMovie(bs).toSeq)
+  .runWith(new TopKSink(10))
+
+val topN = Await.result(topKF, 5.minutes)
+
+topN.foreach(println)
+println(topN.size)
+
+system.terminate()</code></pre>
+<p><code>TopKUtils.toMovie</code> 函数将 <code>ByteString</code> 解析为 <code>Movie</code> 数据结构，实现如下：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKUtils.scala#L25-L31" target="_blank" title="Go to snippet source"></a><code class="language-scala">def toMovie(bs: ByteString): Either[Throwable, Movie] =
+  try {
+    val arr = bs.utf8String.split(&#39;,&#39;)
+    Right(Movie(arr(0), arr(1).toDouble))
+  } catch {
+    case e: Throwable =&gt; Left(e)
+  }</code></pre>
+<h3><a href="#自定义sink-topksink" name="自定义sink-topksink" class="anchor"><span class="anchor-link"></span></a>自定义Sink：<code>TopKSink</code></h3>
+<p><code>.runWith(new TopKSink(10))</code> 调用自定义的 Akka Streams <code>Sink</code> 来获得得分最高的10部电影。让我们先来看看 <code>TopKSink</code> 的实现：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L25-L88" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TopKSink(TOP_N: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
+  val in: Inlet[Movie] = Inlet(&quot;TopKSink.in&quot;)
+
+  override def shape: SinkShape[Movie] = SinkShape(in)
+
+  override def createLogicAndMaterializedValue(
+      inheritedAttributes: Attributes): (GraphStageLogic, Future[List[Movie]]) = {
+    val p: Promise[List[Movie]] = Promise()
+
+    val logic = new GraphStageLogic(shape) with InHandler {
+      var buf = List[Movie]()
+      var bufSize = 0
+
+      def insertMovie(list: List[Movie], movie: Movie): List[Movie] = {
+        list match {
+          case Nil =&gt; movie :: Nil
+          case list =&gt;
+            var buf = List[Movie]()
+            var use = false
+            for (item &lt;- list.reverse) {
+              if (!use &amp;&amp; item.rating &lt; movie.rating) {
+                buf ::= movie
+                use = true
+              }
+              buf ::= item
+            }
+            if (!use) {
+              buf ::= movie
+            }
+            buf
+        }
+      }
+      override def preStart(): Unit = pull(in)
+
+      override def onPush(): Unit = {
+        val movie = grab(in)
+        buf = if (bufSize &lt; TOP_N) {
+          bufSize += 1
+          insertMovie(buf, movie)
+        } else {
+          if (buf.head.rating &lt; movie.rating) insertMovie(buf.slice(1, TOP_N), movie) else buf
+        }
+        pull(in)
+      }
+
+      override def onUpstreamFinish(): Unit = {
+        p.trySuccess(buf)
+      }
+
+      override def onUpstreamFailure(ex: Throwable): Unit = {
+        p.tryFailure(ex)
+        failStage(ex)
+      }
+
+      override def postStop(): Unit = {
+        if (!p.isCompleted) p.failure(new AbruptStageTerminationException(this))
+      }
+
+      setHandler(in, this)
+    }
+
+    (logic, p.future)
+  }
+}</code></pre>
+<h2><a href="#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" name="解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="anchor"><span class="anchor-link"></span></a>解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</h2>
+<p>Akka HTTP提供了 HTTP Client/Server 实现，同时它也是基于 Akka Streams 实现的。上一步我们已经定义了 <code>TopKSink</code> 来消费流数据，而通过 Akka HTTP Client 获得的响应数据也是一个流（<code>Source[ByteString, Any]</code>）。我们可以将获取 <code>movies.csv</code> 文件的 HTTP 请求与取得分最高的K部电影两个任务结合到一起，**实现内存固定、处理数据无限的 Top K 程序（假设网络稳定不会断开）**。 </p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForAkkaHTTP.scala#L32-L51" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val system = ActorSystem(Behaviors.ignore, &quot;topK&quot;)
+implicit val ec = system.executionContext
+val TOP_K = 10
+val URL =
+  &quot;https://gitee.com/yangbajing/yangbajing-blog/raw/master/src/main/resources/movies.csv&quot;
+
+val topKF = Http(system).singleRequest(HttpRequest(uri = URL)).flatMap { response =&gt;
+  response.entity.dataBytes
+    .via(Framing.delimiter(ByteString(&quot;\n&quot;), 8192, true))
+    .drop(1) // Drop CSV Header
+    .mapConcat(bs =&gt; TopKUtils.toMovie(bs).toOption.toList)
+    .runWith(new TopKSink(TOP_K))
+}
+
+val topN = Await.result(topKF, 5.minutes)
+
+topN.foreach(println)
+println(topN.size)
+
+system.terminate()</code></pre>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../streams/custom-graph.html"><i class="icon-prev"></i> <span class="link-prev">自定义图（Graph）</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../http/index.html">Akka HTTP <i class="icon-next"></i></a>
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/streams/example-top-k.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2020 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>

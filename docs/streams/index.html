@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Akka 流（Streams） &bull; Akka Cookbook</title>
+<title>Akka Streams &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
@@ -50,10 +50,10 @@ Version 1.0.0
 </header>
 <nav class="nav-toc">
 <ul>
-  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
-  <li><a href="../test/index.html" class="page">测试</a></li>
-  <li><a href="../streams/index.html#akka-流-streams-" class="active page">Akka 流（Streams）</a>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html#akka-streams" class="active page">Akka Streams</a>
   <ul>
     <li><a href="../streams/introduction.html" class="page">介绍</a></li>
     <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
@@ -68,13 +68,14 @@ Version 1.0.0
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
+    <li><a href="../streams/example-top-k.html" class="page">实例：求解 Top K 问题</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../action/index.html" class="page">实战</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </nav>
 </div>
@@ -98,10 +99,10 @@ Version 1.0.0
 <nav class="site-nav sticky-sidebar-contents">
 <div class="nav-toc">
 <ul>
-  <li><a href="../introduction.html" class="page">介绍</a></li>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
   <li><a href="../actor/index.html" class="page">Actor</a></li>
-  <li><a href="../test/index.html" class="page">测试</a></li>
-  <li><a href="../streams/index.html#akka-流-streams-" class="active page">Akka 流（Streams）</a>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html#akka-streams" class="active page">Akka Streams</a>
   <ul>
     <li><a href="../streams/introduction.html" class="page">介绍</a></li>
     <li><a href="../streams/depth-source.html" class="page">深入 Source</a></li>
@@ -116,13 +117,14 @@ Version 1.0.0
     <li><a href="../streams/file.html" class="page">访问文件</a></li>
     <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
     <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
+    <li><a href="../streams/example-top-k.html" class="page">实例：求解 Top K 问题</a></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka 集群</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../integration/index.html" class="page">集成</a></li>
-  <li><a href="../action/index.html" class="page">实战</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </div>
 </nav>
@@ -135,7 +137,7 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#akka-流-streams-" name="akka-流-streams-" class="anchor"><span class="anchor-link"></span></a>Akka 流（Streams）</h1>
+<h1><a href="#akka-streams" name="akka-streams" class="anchor"><span class="anchor-link"></span></a>Akka Streams</h1>
 <div class="toc ">
 <ul>
   <li><a href="../streams/introduction.html" class="page">介绍</a>
@@ -193,6 +195,17 @@ Version 1.0.0
   </ul></li>
   <li><a href="../streams/ftp.html" class="page">访问FTP/sFTP</a></li>
   <li><a href="../streams/custom-graph.html" class="page">自定义图（Graph）</a></li>
+  <li><a href="../streams/example-top-k.html" class="page">实例：求解 Top K 问题</a>
+  <ul>
+    <li><a href="../streams/example-top-k.html#问题描述" class="header">问题描述</a></li>
+    <li><a href="../streams/example-top-k.html#解法1-全量排序求top-10" class="header">解法1：全量排序求Top 10</a></li>
+    <li><a href="../streams/example-top-k.html#解法2-遍历一次文件求出top-10" class="header">解法2：遍历一次文件求出Top 10</a></li>
+    <li><a href="../streams/example-top-k.html#解法3-使用akka-streams异步求出top-k个得分最高的电影" class="header">解法3：使用Akka Streams异步求出Top K个得分最高的电影</a>
+    <ul>
+      <li><a href="../streams/example-top-k.html#自定义sink-topksink" class="header">自定义Sink：<code>TopKSink</code></a></li>
+    </ul></li>
+    <li><a href="../streams/example-top-k.html#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="header">解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</a></li>
+  </ul></li>
 </ul>
 </div>
 </div>
