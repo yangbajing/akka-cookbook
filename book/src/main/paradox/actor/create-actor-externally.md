@@ -24,4 +24,4 @@ val system = ActorSystem(behavior, "typed")
 
 @@snip [CustomSpawnMain](../../../../../cookbook-actor/src/main/scala/cookbook/actor/introduction/CustomSpawnMain.scala) { #root-actor }
 
-**通过此方式创建的所以actor都为是守卫actor的子actor。**
+**通过此方式创建的所有actor都是守卫actor的子actor。**
