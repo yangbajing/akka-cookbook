@@ -20,8 +20,7 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpRequest
-import akka.stream.scaladsl.Framing
-import akka.util.ByteString
+import akka.stream.alpakka.csv.scaladsl.CsvParsing
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -37,9 +36,12 @@ object TopKForAkkaHTTP {
 
     val topKF = Http(system).singleRequest(HttpRequest(uri = URL)).flatMap { response =>
       response.entity.dataBytes
-        .via(Framing.delimiter(ByteString("\n"), 8192, true))
+        .via(CsvParsing.lineScanner())
         .drop(1) // Drop CSV Header
-        .mapConcat(bs => TopKUtils.toMovie(bs).toOption.toList)
+        .mapConcat {
+          case name :: AsDouble(rating) :: _ => Movie(name.utf8String, rating) :: Nil
+          case _                             => Nil
+        }
         .runWith(new TopKSink(TOP_K))
     }
 

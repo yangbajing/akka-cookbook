@@ -62,7 +62,7 @@ akka.stream.scaladsl.Framing$FramingException: Stream finished but there was a t
 
 @@snip [TopKForFile.scala](../../../../../cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForFile.scala) { #TopKForFile }
 
-`TopKUtils.toMovie` 函数将 `ByteString` 解析为 `Movie` 数据结构，实现如下：
+这里使用 alpakka-csv 来将 `ByteString` 数据流转换成 CSV 数据格式，可以在 [https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html](https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html) 找到这个库的详细使用说明。
 
 @@snip [TopKUtils.scala](../../../../../cookbook-streams/src/main/scala/cookbook/streams/topk/TopKUtils.scala) { #toMovie }
 

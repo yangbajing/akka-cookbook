@@ -18,14 +18,6 @@ package cookbook.streams.topk
 
 import akka.util.ByteString
 
-object TopKUtils {
-  // #toMovie
-  def toMovie(bs: ByteString): Either[Throwable, Movie] =
-    try {
-      val arr = bs.utf8String.split(',')
-      Right(Movie(arr(0), arr(1).toDouble))
-    } catch {
-      case e: Throwable => Left(e)
-    }
-  // #toMovie
+object AsDouble {
+  def unapply(bs: ByteString): Option[Double] = bs.utf8String.toDoubleOption
 }

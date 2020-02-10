@@ -197,14 +197,17 @@ scala.io.Source.fromFile(&quot;/tmp/movies.csv&quot;).getLines()
 <pre class="prettyprint"><code class="language-scala">akka.stream.scaladsl.Framing$FramingException: Stream finished but there was a truncated final frame in the buffer
 </code></pre>
 <p>如果设置为 <strong>false</strong>，则当正在解码的最后一个帧不包含有效的分隔符时，此流将失败，而不是返回截断的帧数据。</p></div>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForFile.scala#L32-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val system = ActorSystem(Behaviors.ignore, &quot;topK&quot;)
-implicit val ec = system.executionContext
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForFile.scala#L32-L50" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val system = ActorSystem(Behaviors.ignore, &quot;topK&quot;)
+val res = Paths.get(Thread.currentThread().getContextClassLoader.getResource(&quot;movies.csv&quot;).toURI)
 
 val topKF = FileIO
-  .fromPath(Paths.get(&quot;/tmp/movies.csv&quot;))
-  .via(Framing.delimiter(ByteString(&quot;\n&quot;), 8192))
+  .fromPath(Paths.get(res.toUri))
+  .via(CsvParsing.lineScanner())
   .drop(1) // Drop CSV Header
-  .mapConcat(bs =&gt; TopKUtils.toMovie(bs).toSeq)
+  .mapConcat {
+    case name :: AsDouble(rating) :: _ =&gt; Movie(name.utf8String, rating) :: Nil
+    case _                             =&gt; Nil
+  }
   .runWith(new TopKSink(10))
 
 val topN = Await.result(topKF, 5.minutes)
@@ -213,8 +216,8 @@ topN.foreach(println)
 println(topN.size)
 
 system.terminate()</code></pre>
-<p><code>TopKUtils.toMovie</code> 函数将 <code>ByteString</code> 解析为 <code>Movie</code> 数据结构，实现如下：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKUtils.scala#L25-L31" target="_blank" title="Go to snippet source"></a><code class="language-scala">def toMovie(bs: ByteString): Either[Throwable, Movie] =
+<p>这里使用 alpakka-csv 来将 <code>ByteString</code> 数据流转换成 CSV 数据格式，可以在 <a href="https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html">https://doc.akka.io/docs/alpakka/current/data-transformations/csv.html</a> 找到这个库的详细使用说明。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKUtils.scala#L23-L29" target="_blank" title="Go to snippet source"></a><code class="language-scala">def toMovie(bs: ByteString): Either[Throwable, Movie] =
   try {
     val arr = bs.utf8String.split(&#39;,&#39;)
     Right(Movie(arr(0), arr(1).toDouble))
@@ -289,7 +292,7 @@ system.terminate()</code></pre>
 }</code></pre>
 <h2><a href="#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" name="解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="anchor"><span class="anchor-link"></span></a>解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</h2>
 <p>Akka HTTP提供了 HTTP Client/Server 实现，同时它也是基于 Akka Streams 实现的。上一步我们已经定义了 <code>TopKSink</code> 来消费流数据，而通过 Akka HTTP Client 获得的响应数据也是一个流（<code>Source[ByteString, Any]</code>）。我们可以将获取 <code>movies.csv</code> 文件的 HTTP 请求与取得分最高的K部电影两个任务结合到一起，**实现内存固定、处理数据无限的 Top K 程序（假设网络稳定不会断开）**。 </p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForAkkaHTTP.scala#L32-L51" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val system = ActorSystem(Behaviors.ignore, &quot;topK&quot;)
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForAkkaHTTP.scala#L31-L53" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val system = ActorSystem(Behaviors.ignore, &quot;topK&quot;)
 implicit val ec = system.executionContext
 val TOP_K = 10
 val URL =
@@ -297,9 +300,12 @@ val URL =
 
 val topKF = Http(system).singleRequest(HttpRequest(uri = URL)).flatMap { response =&gt;
   response.entity.dataBytes
-    .via(Framing.delimiter(ByteString(&quot;\n&quot;), 8192, true))
+    .via(CsvParsing.lineScanner())
     .drop(1) // Drop CSV Header
-    .mapConcat(bs =&gt; TopKUtils.toMovie(bs).toOption.toList)
+    .mapConcat {
+      case name :: AsDouble(rating) :: _ =&gt; Movie(name.utf8String, rating) :: Nil
+      case _                             =&gt; Nil
+    }
     .runWith(new TopKSink(TOP_K))
 }
 

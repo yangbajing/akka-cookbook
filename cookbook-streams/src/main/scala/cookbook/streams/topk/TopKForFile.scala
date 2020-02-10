@@ -20,8 +20,8 @@ import java.nio.file.Paths
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.scaladsl.{ FileIO, Framing }
-import akka.util.ByteString
+import akka.stream.alpakka.csv.scaladsl.CsvParsing
+import akka.stream.scaladsl.FileIO
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -30,13 +30,16 @@ object TopKForFile {
   def main(args: Array[String]): Unit = {
     // #TopKForFile
     implicit val system = ActorSystem(Behaviors.ignore, "topK")
-    implicit val ec = system.executionContext
+    val res = Paths.get(Thread.currentThread().getContextClassLoader.getResource("movies.csv").toURI)
 
     val topKF = FileIO
-      .fromPath(Paths.get("/tmp/movies.csv"))
-      .via(Framing.delimiter(ByteString("\n"), 8192))
+      .fromPath(Paths.get(res.toUri))
+      .via(CsvParsing.lineScanner())
       .drop(1) // Drop CSV Header
-      .mapConcat(bs => TopKUtils.toMovie(bs).toSeq)
+      .mapConcat {
+        case name :: AsDouble(rating) :: _ => Movie(name.utf8String, rating) :: Nil
+        case _                             => Nil
+      }
       .runWith(new TopKSink(10))
 
     val topN = Await.result(topKF, 5.minutes)

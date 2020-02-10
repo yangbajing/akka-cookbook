@@ -1,4 +1,4 @@
-# 将 Future 结果发送给自己
+# 将 Future 结果发送给（actor）自己
 
 当在actor内部执行异步操作（返回一个`Future`时）需要小心处理，因为actor与那个异步操作不在同一个线程。`ActorContext[T]`提供了`pipeToSelf`方法来将`Future`的结果安全的传给自己（actor）。
 

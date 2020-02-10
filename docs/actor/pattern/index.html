@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>交互模式 &bull; Akka Cookbook</title>
+<title>常用交互模式 &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
@@ -54,18 +54,18 @@ Version 1.0.0
   <li><a href="../../actor/index.html" class="page">Actor</a>
   <ul>
     <li><a href="../../actor/create-child-actor.html" class="page">创建子 actor</a></li>
-    <li><a href="../../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
-    <li><a href="../../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
-    <li><a href="../../actor/pattern/index.html#交互模式" class="active page">交互模式</a>
+    <li><a href="../../actor/pattern/index.html#常用交互模式" class="active page">常用交互模式</a>
     <ul>
       <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a></li>
       <li><a href="../../actor/pattern/adapted-response.html" class="page">适配响应类型到 actor</a></li>
       <li><a href="../../actor/pattern/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">actor 外使用 ask（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">使用ask从外部访问actor（请求-响应模式）</a></li>
+      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给（actor）自己</a></li>
     </ul></li>
+    <li><a href="../../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../../actor/supervise.html" class="page">异常处理与监管（Supervise）</a></li>
     <li><a href="../../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
     <li><a href="../../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
@@ -109,18 +109,18 @@ Version 1.0.0
   <li><a href="../../actor/index.html" class="page">Actor</a>
   <ul>
     <li><a href="../../actor/create-child-actor.html" class="page">创建子 actor</a></li>
-    <li><a href="../../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
-    <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
-    <li><a href="../../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
-    <li><a href="../../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
-    <li><a href="../../actor/pattern/index.html#交互模式" class="active page">交互模式</a>
+    <li><a href="../../actor/pattern/index.html#常用交互模式" class="active page">常用交互模式</a>
     <ul>
       <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a></li>
       <li><a href="../../actor/pattern/adapted-response.html" class="page">适配响应类型到 actor</a></li>
       <li><a href="../../actor/pattern/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">actor 外使用 ask（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给自己</a></li>
+      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">使用ask从外部访问actor（请求-响应模式）</a></li>
+      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给（actor）自己</a></li>
     </ul></li>
+    <li><a href="../../actor/create-actor-externally.html" class="page">通过 ActorSystem 创建 actor</a></li>
+    <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
+    <li><a href="../../actor/change-behavior-and-state-machine.html" class="page">行为切换与状态机</a></li>
+    <li><a href="../../actor/stash.html" class="page">StashBuffer 暂存待处理消息</a></li>
     <li><a href="../../actor/supervise.html" class="page">异常处理与监管（Supervise）</a></li>
     <li><a href="../../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
     <li><a href="../../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
@@ -149,7 +149,7 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#交互模式" name="交互模式" class="anchor"><span class="anchor-link"></span></a>交互模式</h1>
+<h1><a href="#常用交互模式" name="常用交互模式" class="anchor"><span class="anchor-link"></span></a>常用交互模式</h1>
 <div class="toc ">
 <ul>
   <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a>
@@ -168,12 +168,12 @@ Version 1.0.0
     <li><a href="../../actor/pattern/actor-inside-ask.html#问题" class="header">问题</a></li>
     <li><a href="../../actor/pattern/actor-inside-ask.html#完整代码" class="header">完整代码</a></li>
   </ul></li>
-  <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">actor 外使用 ask（请求-响应模式）</a>
+  <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">使用ask从外部访问actor（请求-响应模式）</a>
   <ul>
     <li><a href="../../actor/pattern/actor-outside-ask.html#适用范围" class="header">适用范围</a></li>
     <li><a href="../../actor/pattern/actor-outside-ask.html#问题" class="header">问题</a></li>
   </ul></li>
-  <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给自己</a>
+  <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给（actor）自己</a>
   <ul>
     <li><a href="../../actor/pattern/pipe-to-self.html#适用范围" class="header">适用范围</a></li>
     <li><a href="../../actor/pattern/pipe-to-self.html#问题" class="header">问题</a></li>
@@ -186,7 +186,7 @@ Version 1.0.0
 <div class="small-12 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
-<a href="../../actor/stash.html"><i class="icon-prev"></i> <span class="link-prev">StashBuffer 暂存待处理消息</span></a>
+<a href="../../actor/create-child-actor.html"><i class="icon-prev"></i> <span class="link-prev">创建子 actor</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
 <a class="float-right" href="../../actor/pattern/request-response.html">请求-响应模式 <i class="icon-next"></i></a>
