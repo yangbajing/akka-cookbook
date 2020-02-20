@@ -65,7 +65,11 @@ Version 1.0.0
     <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
     <li><a href="../actor/style.html" class="page">Typed Actor 风格</a></li>
     <li><a href="../actor/discovery.html" class="page">发现其它actor</a></li>
-    <li><a href="../actor/shutdown.html#怎样优雅的关闭-actorsystem" class="active page">怎样优雅的关闭 ActorSystem</a></li>
+    <li><a href="../actor/shutdown.html#怎样优雅的关闭-actorsystem" class="active page">怎样优雅的关闭 ActorSystem</a>
+    <ul>
+      <li><a href="../actor/shutdown.html#启用-coordinatedshutdown" class="header">启用 CoordinatedShutdown</a></li>
+      <li><a href="../actor/shutdown.html#使用-coordinatedshutdown" class="header">使用 CoordinatedShutdown</a></li>
+    </ul></li>
   </ul></li>
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
@@ -113,7 +117,11 @@ Version 1.0.0
     <li><a href="../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
     <li><a href="../actor/style.html" class="page">Typed Actor 风格</a></li>
     <li><a href="../actor/discovery.html" class="page">发现其它actor</a></li>
-    <li><a href="../actor/shutdown.html#怎样优雅的关闭-actorsystem" class="active page">怎样优雅的关闭 ActorSystem</a></li>
+    <li><a href="../actor/shutdown.html#怎样优雅的关闭-actorsystem" class="active page">怎样优雅的关闭 ActorSystem</a>
+    <ul>
+      <li><a href="../actor/shutdown.html#启用-coordinatedshutdown" class="header">启用 CoordinatedShutdown</a></li>
+      <li><a href="../actor/shutdown.html#使用-coordinatedshutdown" class="header">使用 CoordinatedShutdown</a></li>
+    </ul></li>
   </ul></li>
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
@@ -136,7 +144,53 @@ Version 1.0.0
 <article class="page-content row">
 <div class="small-12 column" id="docs">
 <h1><a href="#怎样优雅的关闭-actorsystem" name="怎样优雅的关闭-actorsystem" class="anchor"><span class="anchor-link"></span></a>怎样优雅的关闭 ActorSystem</h1>
-<p>TODO</p>
+<p>使用 <code>CoordinatedShutdown</code> 可以优雅的方式关闭 <code>ActorSystem</code>。默认情况下，需要调用 <code>ActorSystem</code> 上的 <code>terminate</code> 方法才会触发 <code>CoordinatedShutdown</code>，但也可以设置为在 JVM 退出时自动运行（比如接收到操作系统的 <strong>SIGTERM</strong> 信号或Java虚拟机退出）。要使在程序退出时 <code>CoordinatedShutdown</code> 自动调用，需要如下配置：</p>
+<h2><a href="#启用-coordinatedshutdown" name="启用-coordinatedshutdown" class="anchor"><span class="anchor-link"></span></a>启用 CoordinatedShutdown</h2>
+<p>确保启用如下配置，同时加载 <code>CoordinatedShutdown</code> 扩展。</p>
+<pre class="prettyprint"><code class="language-hocon">akka.jvm-shutdown-hooks = on
+akka.coordinated-shutdown.run-by-jvm-shutdown-hook = on
+akka.coordinated-shutdown.run-by-actor-system-terminate = on
+akka.coordinated-shutdown.terminate-actor-system = on
+</code></pre>
+<p>有两种方式加载 <code>CoordinatedShutdown</code> 扩展：</p>
+<ol>
+  <li>通过配置文件随 <code>ActorSystem</code> 自动加载：<code>akka.extensions += &quot;akka.actor.CoordinatedShutdown&quot;</code></li>
+  <li>在代码中手动调用 <code>CoordinatedShutdown(system)</code></li>
+</ol><div class="callout note "><div class="callout-title">Note</div>
+<p>当系统中应用了 <code>akka-cluster-typed</code>、<code>akka-cluster-sharding-typed</code> 等模块时，它们将在内部调用 <code>CoordinatedShutdown</code> 扩展。</p></div>
+<h2><a href="#使用-coordinatedshutdown" name="使用-coordinatedshutdown" class="anchor"><span class="anchor-link"></span></a>使用 CoordinatedShutdown</h2>
+<h3><a href="#phase-阶段-" name="phase-阶段-" class="anchor"><span class="anchor-link"></span></a>Phase（阶段）</h3>
+<p><code>CoordinatedShutdown</code> 可通过 <strong>Phase</strong>(阶段) 来管理关闭时要执行任务的顺序。相同阶段内的多个任务将同时进行，不同阶段的任务以配置的顺序依次进行，默认阶段里 <code>before-service-unbind</code> 在关闭时最先执行。</p>
+<p>默认，<code>CoordinatedShutdown</code> 定义了如下阶段：</p>
+<ul>
+  <li><code>before-service-unbind</code> 取消绑定自定义服务之前</li>
+  <li><code>service-unbind</code> 服务已取消绑定，这时不再接收新的请求，但已进入的请求将继续。如：HTTP 请求</li>
+  <li><code>service-requests-done</code> 已进入的请求全部执行完成</li>
+  <li><code>service-stop</code> 服务已停止</li>
+  <li><code>before-cluster-shutdown</code> 集群节点开始停止前</li>
+  <li><code>cluster-sharding-shutdown-region</code> 集群节点的分片区域开始关闭</li>
+  <li><code>cluster-leave</code> 集群节点发出 Leave 命令后</li>
+  <li><code>cluster-exiting</code> 集群节点开始退出</li>
+  <li><code>cluster-exiting-done</code> 集群节点退出结束</li>
+  <li><code>cluster-shutdown</code> 集群节点已关闭</li>
+  <li><code>before-actor-system-terminate</code> ActorSystem 终止前</li>
+  <li><code>actor-system-terminate</code> ActorSystem 已终止</li>
+</ul><div class="callout warning "><div class="callout-title">Warning</div>
+<p>注册到 <code>actor-system-terminate</code> 阶段的任务需要注意，这时候 <code>ActorSystem</code> 的线程调度和定时调度已经关闭。也就是说 <code>ActorSystem</code> 上的 <code>ExecutionContext</code> 和 <code>Scheduler</code> 已不可用。 </p></div>
+<h3><a href="#添加关闭任务" name="添加关闭任务" class="anchor"><span class="anchor-link"></span></a>添加关闭任务</h3>
+<p>可以调用 <code>CoordinatedShutdown</code> 上的 <code>addTask</code> 方法来添加关闭任务，<code>addJvmShutdownHook</code> 方法来添加 JVM 退出时执行的关闭任务。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/shutdown/ShutdownMain.scala#L29-L39" target="_blank" title="Go to snippet source"></a><code class="language-scala">CoordinatedShutdown(system)
+  .addCancellableTask(CoordinatedShutdown.PhaseServiceRequestsDone, &quot;CloseJdbcDataSource&quot;) { () =&gt;
+    Future {
+      println(&quot;Close JDBC DataSource.&quot;)
+      Done
+    }(system.dispatcher)
+  }
+
+CoordinatedShutdown(system).addJvmShutdownHook {
+  println(&quot;JVM shutdown hook.&quot;)
+}</code></pre>
+<p><code>addCancellableTask</code> 和 <code>addCancellableJvmShutdownHook</code> 方法可以添加可取消的关闭任务，它们将返回 <code>akka.actor.Cancellable</code> 。</p>
 </div>
 </article>
 <div class="row">
