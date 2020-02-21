@@ -226,7 +226,7 @@ system.terminate()</code></pre>
   }</code></pre>
 <h3><a href="#自定义sink-topksink" name="自定义sink-topksink" class="anchor"><span class="anchor-link"></span></a>自定义Sink：<code>TopKSink</code></h3>
 <p><code>.runWith(new TopKSink(10))</code> 调用自定义的 Akka Streams <code>Sink</code> 来获得得分最高的10部电影。让我们先来看看 <code>TopKSink</code> 的实现：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L25-L88" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TopKSink(TOP_K: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L25-L71" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TopKSink(TOP_K: Int) extends GraphStageWithMaterializedValue[SinkShape[Movie], Future[List[Movie]]] {
   val in: Inlet[Movie] = Inlet(&quot;TopKSink.in&quot;)
 
   override def shape: SinkShape[Movie] = SinkShape(in)
@@ -236,43 +236,24 @@ system.terminate()</code></pre>
     val p: Promise[List[Movie]] = Promise()
 
     val logic = new GraphStageLogic(shape) with InHandler {
-      var buf = List[Movie]()
-      var bufSize = 0
+      private implicit val movieOrdering: Ordering[Movie] =
+        (x: Movie, y: Movie) =&gt; if (x.rating &lt; y.rating) 1 else if (x.rating == y.rating) 0 else -1
+      private val queue = scala.collection.mutable.PriorityQueue[Movie]()
 
-      def insertMovie(list: List[Movie], movie: Movie): List[Movie] = {
-        list match {
-          case Nil =&gt; movie :: Nil
-          case list =&gt;
-            var buf = List[Movie]()
-            var use = false
-            for (item &lt;- list.reverse) {
-              if (!use &amp;&amp; item.rating &lt; movie.rating) {
-                buf ::= movie
-                use = true
-              }
-              buf ::= item
-            }
-            if (!use) {
-              buf ::= movie
-            }
-            buf
-        }
-      }
       override def preStart(): Unit = pull(in)
 
       override def onPush(): Unit = {
         val movie = grab(in)
-        buf = if (bufSize &lt; TOP_K) {
-          bufSize += 1
-          insertMovie(buf, movie)
-        } else {
-          if (buf.head.rating &lt; movie.rating) insertMovie(buf.slice(1, TOP_K), movie) else buf
+        if (queue.size &lt; TOP_K) {
+          queue.addOne(movie)
+        } else if (queue.head.rating &lt; movie.rating) {
+          queue.addOne(movie).dequeue()
         }
         pull(in)
       }
 
       override def onUpstreamFinish(): Unit = {
-        p.trySuccess(buf)
+        p.trySuccess(queue.toList)
       }
 
       override def onUpstreamFailure(ex: Throwable): Unit = {
@@ -289,6 +270,12 @@ system.terminate()</code></pre>
 
     (logic, p.future)
   }
+}</code></pre>
+<p>在 <code>TopKSink</code> 里，使用了一个优先级队列来保存 TOP K 部电影，通过提供一个自定义的隐式变量 <code>movieOrdering</code> 告知 <code>PriorityQueue</code> 怎样排序。得分低的电影排在队列头，这样在有一部新电影时我们只需要和队列头比较评分即可，若新电影评分更高我们就将它插入队列并将队列头删去，下面为电影入队操作具体代码：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L44-L48" target="_blank" title="Go to snippet source"></a><code class="language-scala">if (queue.size &lt; TOP_K) {
+  queue.addOne(movie)
+} else if (queue.head.rating &lt; movie.rating) {
+  queue.addOne(movie).dequeue()
 }</code></pre>
 <h2><a href="#解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" name="解法4-通过-akka-http-在下载文件的同时求出top-k个得分最高的电影" class="anchor"><span class="anchor-link"></span></a>解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影</h2>
 <p>Akka HTTP提供了 HTTP Client/Server 实现，同时它也是基于 Akka Streams 实现的。上一步我们已经定义了 <code>TopKSink</code> 来消费流数据，而通过 Akka HTTP Client 获得的响应数据也是一个流（<code>Source[ByteString, Any]</code>）。我们可以将获取 <code>movies.csv</code> 文件的 HTTP 请求与取得分最高的K部电影两个任务结合到一起，**实现内存固定、处理数据无限的 Top K 程序（假设网络稳定不会断开）**。 </p>
