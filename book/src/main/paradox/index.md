@@ -15,10 +15,12 @@
 * [test](test/index.md)
 * [streams](streams/index.md)
 * [http](http/index.md)
+* [serialization](serialization/index.md)
 * [cluster](cluster/index.md)
 * [persistence](persistence/index.md)
 * [grpc](grpc/index.md)
 * [integration](integration/index.md)
+* [util](util/index.md)
 * [action](action/index.md)
 
 @@@
