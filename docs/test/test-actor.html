@@ -61,13 +61,17 @@ Version 1.0.0
       <li><a href="../test/test-actor.html#使用-ask" class="header">使用 ask</a></li>
       <li><a href="../test/test-actor.html#异步断言" class="header">异步断言</a></li>
     </ul></li>
+    <li><a href="../test/custom-test-actor-system.html" class="page">怎样在 Testkit 中使用自定义 ActorSystem</a></li>
+    <li><a href="../test/synchronous.html" class="page">实用同步方式测试 Behavior</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </nav>
@@ -103,13 +107,17 @@ Version 1.0.0
       <li><a href="../test/test-actor.html#使用-ask" class="header">使用 ask</a></li>
       <li><a href="../test/test-actor.html#异步断言" class="header">异步断言</a></li>
     </ul></li>
+    <li><a href="../test/custom-test-actor-system.html" class="page">怎样在 Testkit 中使用自定义 ActorSystem</a></li>
+    <li><a href="../test/synchronous.html" class="page">实用同步方式测试 Behavior</a></li>
   </ul></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </div>
@@ -125,12 +133,12 @@ Version 1.0.0
 <div class="small-12 column" id="docs">
 <h1><a href="#测试-actor" name="测试-actor" class="anchor"><span class="anchor-link"></span></a>测试 actor</h1>
 <p><code>akka-actor-testkit-typed</code>测试库为Akka（Typed）提供了开箱即用的测试工具，通常可以实现<code>ScalaTestWithActorTestKit</code>来实现自己的单元测试。有关更多 <strong>scalatest</strong> 的内容请访问官方网站： <a href="http://www.scalatest.org/">http://scalatest.org</a>。</p>
-<p>要使用<code>akka-actor-testkit-typed</code>对Akka代码进行测试，需要添加以下依赖到sbt项目：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.6.1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+<p>要使用<code>akka-actor-testkit-typed</code>对Akka代码进行测试，需要添加以下依赖到sbt项目：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.6.3"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;com.typesafe.akka&lt;/groupId&gt;
   &lt;artifactId&gt;akka-actor-testkit-typed_2.13&lt;/artifactId&gt;
-  &lt;version&gt;2.6.1&lt;/version&gt;
+  &lt;version&gt;2.6.3&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'com.typesafe.akka', name: 'akka-actor-testkit-typed_2.13', version: '2.6.1'
+  compile group: 'com.typesafe.akka', name: 'akka-actor-testkit-typed_2.13', version: '2.6.3'
 }</code></pre></dd></dl>
 <h2><a href="#测试代码" name="测试代码" class="anchor"><span class="anchor-link"></span></a>测试代码</h2>
 <p>首先列出待测试actor的消息协议：</p>
@@ -212,7 +220,7 @@ final case class Answer(message: String) extends Reply</code></pre>
 <a href="../test/index.html"><i class="icon-prev"></i> <span class="link-prev">Test</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../streams/index.html">Akka Streams <i class="icon-next"></i></a>
+<a class="float-right" href="../test/custom-test-actor-system.html">怎样在 Testkit 中使用自定义 ActorSystem <i class="icon-next"></i></a>
 </div>
 </section>
 </div>

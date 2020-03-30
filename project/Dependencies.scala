@@ -2,13 +2,12 @@ import sbt._
 import fusion.sbt.gen.BuildInfo
 
 object Dependencies {
-  val versionScala212 = "2.12.10"
   val versionScala213 = "2.13.1"
   val versionSpringBoot = "2.1.10.RELEASE"
 
-  val _fusionCore = "com.akka-fusion" %% "fusion-core" % BuildInfo.version
-  val _fusionJson = "com.akka-fusion" %% "fusion-json" % BuildInfo.version
-  val _fusionTestkit = "com.akka-fusion" %% "fusion-testkit" % BuildInfo.version
+  val _fusionCore = "com.helloscala.fusion" %% "fusion-core" % BuildInfo.version
+  val _fusionJsonJackson = "com.helloscala.fusion" %% "fusion-json-jackson" % BuildInfo.version
+  val _fusionTestkit = "com.helloscala.fusion" %% "fusion-testkit" % BuildInfo.version
 
   val _akkaDiscovery = "com.typesafe.akka" %% "akka-discovery" % BuildInfo.versionAkka
   val _akkaSerializationJackson = "com.typesafe.akka" %% "akka-serialization-jackson" % BuildInfo.versionAkka

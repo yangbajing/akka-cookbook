@@ -23,7 +23,7 @@ import akka.cluster.sharding.typed.{ ClusterShardingSettings, ShardingEnvelope }
 import akka.persistence.typed.scaladsl.{ Effect, EventSourcedBehavior }
 import akka.persistence.typed.{ PersistenceId, RecoveryCompleted }
 import book.oauth2.{ AccessToken, OAuthUtils }
-import fusion.json.jackson.CborSerializable
+import fusion.json.CborSerializable
 
 import scala.concurrent.duration._
 

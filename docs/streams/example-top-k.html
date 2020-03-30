@@ -79,10 +79,12 @@ Version 1.0.0
     </ul></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </nav>
@@ -136,10 +138,12 @@ Version 1.0.0
     </ul></li>
   </ul></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </div>
@@ -271,7 +275,12 @@ system.terminate()</code></pre>
     (logic, p.future)
   }
 }</code></pre>
-<p>在 <code>TopKSink</code> 里，使用了一个优先级队列来保存 TOP K 部电影，通过提供一个自定义的隐式变量 <code>movieOrdering</code> 告知 <code>PriorityQueue</code> 怎样排序。得分低的电影排在队列头，这样在有一部新电影时我们只需要和队列头比较评分即可，若新电影评分更高我们就将它插入队列并将队列头删去，下面为电影入队操作具体代码：</p>
+<p>通过继承 <code>GraphStageWithMaterializedValue</code> 抽像类，可以定义一个返回特定结果的自定义 <code>Sink</code>，否则流处理结果默认为 <code>NotUsed</code>。</p>
+<pre class="prettyprint"><code class="language-scala">  override def createLogicAndMaterializedValue(
+      inheritedAttributes: Attributes): (GraphStageLogic, Future[List[Movie]])
+</code></pre>
+<p>函数 <code>createLogicAndMaterializedValue</code> 实现 <code>Sink</code> 处理逻辑并返回 <code>Sink</code> 阶段的处理逻辑 <code>GraphStageLogic</code> 和获得的 Top K 结果 <code>Future[List[Movie]]</code>，流执行后的结果（通过调用 <code>.runWith</code>）是一个异步结果（<code>Future</code>），这样将不会阻塞调用线程。</p>
+<p>在 <code>TopKSink</code> 里，使用了一个优先队列来保存 TOP K 部电影，通过提供一个自定义的隐式值 <code>movieOrdering</code> 告知 <code>PriorityQueue</code> 怎样排序。得分低的电影排在队列头，这样在有一部新电影时我们只需要和队列头比较评分即可，若新电影评分更高我们就将它插入队列并将队列头删去，下面为电影入队操作具体代码：</p>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala#L44-L48" target="_blank" title="Go to snippet source"></a><code class="language-scala">if (queue.size &lt; TOP_K) {
   queue.addOne(movie)
 } else if (queue.head.rating &lt; movie.rating) {
@@ -302,14 +311,6 @@ topN.foreach(println)
 println(topN.size)
 
 system.terminate()</code></pre>
-<p>通过继承 <code>GraphStageWithMaterializedValue</code> 抽像类，可以定义一个返回特定结果的自定义 <code>Sink</code>，否则流处理结果默认为 <code>NotUsed</code>。</p>
-<pre class="prettyprint"><code class="language-scala">  override def createLogicAndMaterializedValue(
-      inheritedAttributes: Attributes): (GraphStageLogic, Future[List[Movie]])
-</code></pre>
-<p>函数 <code>createLogicAndMaterializedValue</code> 实现 <code>Sink</code> 处理逻辑并返回 <code>Sink</code> 阶段的处理逻辑 <code>GraphStageLogic</code> 和获得的 Top K 结果 <code>Future[List[Movie]]</code>，流执行后的结果（通过调用 <code>.runWith</code>）是一个异步结果（<code>Future</code>）。这样将不会阻塞调用线程。</p>
-<p><code>buf</code> 用于缓存 Top K 个得分最高的电影，使用 <code>List</code> 模拟了一个堆结构，Top K 里评分最低的电影在链表头且按评分升序排序。</p>
-<p><code>onPush</code> 函数上游有数据传入时调用 <code>grab</code> 函数获取一个元素（<code>movie</code>）。<code>bufSize</code> 保存了当前 <code>buf</code> 的数量，当 <code>bufSize &lt; TOP_K</code> 时，调用 <code>insertMovie</code> 函数将 <code>movie</code> 直接插入到匹配顺序的 <code>buf</code> 里并将 <code>bufSize</code> 加1。否则通过 <code>buf.head.rating &lt; movie.rating</code> 比较，若为 true 则将 <code>movie</code> 加入缓存，否则 <code>buf</code> 保持不变。</p>
-<p><code>insertMovie</code> 函数实现了将新电影插入 <code>buf</code> 的逻辑，并保持 <code>buf</code> 按评分升序排序。</p>
 <h2><a href="#小结" name="小结" class="anchor"><span class="anchor-link"></span></a>小结</h2>
 <p>本文使用4种方式来求解 Top K 问题，从简单粗暴的全量读入内存并排序；到不使用排序通过一次遍历获得 Top K；再使用 Akka Streams 以流式方式异步获得；最后，通过结合 Akka HTTP 和 Akka Streams，可以HTTP请求的同时计算 Top K。</p>
 <p>有关 Akka HTTP 更多内容可阅读 <a href="https://www.yangbajing.me/scala-web-development/">《Scala Web 开发——基于Akka HTTP》</a> 。</p>

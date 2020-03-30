@@ -2,11 +2,11 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>适配响应类型到 actor &bull; Akka Cookbook</title>
+<title>怎样确保 actor 每次都在相同线程里执行？ &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
-<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/actor/pattern/adapted-response.html"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/actor/concurrent/affinity.html"/>
 <script type="text/javascript" src="../../lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../../lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="../../lib/normalize.css/normalize.css"/>
@@ -54,18 +54,7 @@ Version 1.0.0
   <li><a href="../../actor/index.html" class="page">Actor</a>
   <ul>
     <li><a href="../../actor/create-child-actor.html" class="page">创建子 actor</a></li>
-    <li><a href="../../actor/pattern/index.html" class="page">常用消息交互模式</a>
-    <ul>
-      <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a></li>
-      <li><a href="../../actor/pattern/adapted-response.html#适配响应类型到-actor" class="active page">适配响应类型到 actor</a>
-      <ul>
-        <li><a href="../../actor/pattern/adapted-response.html#适用范围" class="header">适用范围</a></li>
-        <li><a href="../../actor/pattern/adapted-response.html#问题" class="header">问题</a></li>
-      </ul></li>
-      <li><a href="../../actor/pattern/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">使用ask从外部访问actor（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给（actor）自己</a></li>
-    </ul></li>
+    <li><a href="../../actor/pattern/index.html" class="page">常用消息交互模式</a></li>
     <li><a href="../../actor/create-actor-externally.html" class="page">在 Actor 外部创建 actor</a></li>
     <li><a href="../../actor/style.html" class="page">Typed Actor 风格</a></li>
     <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
@@ -75,7 +64,12 @@ Version 1.0.0
     <li><a href="../../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
     <li><a href="../../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
     <li><a href="../../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
-    <li><a href="../../actor/concurrent/index.html" class="page">Akka 并发</a></li>
+    <li><a href="../../actor/concurrent/index.html" class="page">Akka 并发</a>
+    <ul>
+      <li><a href="../../actor/concurrent/blocking.html" class="page">怎样执行阻塞任务？</a></li>
+      <li><a href="../../actor/concurrent/affinity.html#怎样确保-actor-每次都在相同线程里执行-" class="active page">怎样确保 actor 每次都在相同线程里执行？</a></li>
+      <li><a href="../../actor/concurrent/thread.html" class="page">深入 Akka 线程</a></li>
+    </ul></li>
     <li><a href="../../actor/discovery.html" class="page">发现其它actor</a></li>
     <li><a href="../../actor/shutdown.html" class="page">怎样优雅的关闭 ActorSystem</a></li>
   </ul></li>
@@ -116,18 +110,7 @@ Version 1.0.0
   <li><a href="../../actor/index.html" class="page">Actor</a>
   <ul>
     <li><a href="../../actor/create-child-actor.html" class="page">创建子 actor</a></li>
-    <li><a href="../../actor/pattern/index.html" class="page">常用消息交互模式</a>
-    <ul>
-      <li><a href="../../actor/pattern/request-response.html" class="page">请求-响应模式</a></li>
-      <li><a href="../../actor/pattern/adapted-response.html#适配响应类型到-actor" class="active page">适配响应类型到 actor</a>
-      <ul>
-        <li><a href="../../actor/pattern/adapted-response.html#适用范围" class="header">适用范围</a></li>
-        <li><a href="../../actor/pattern/adapted-response.html#问题" class="header">问题</a></li>
-      </ul></li>
-      <li><a href="../../actor/pattern/actor-inside-ask.html" class="page">actor之间使用ask（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/actor-outside-ask.html" class="page">使用ask从外部访问actor（请求-响应模式）</a></li>
-      <li><a href="../../actor/pattern/pipe-to-self.html" class="page">将 Future 结果发送给（actor）自己</a></li>
-    </ul></li>
+    <li><a href="../../actor/pattern/index.html" class="page">常用消息交互模式</a></li>
     <li><a href="../../actor/create-actor-externally.html" class="page">在 Actor 外部创建 actor</a></li>
     <li><a href="../../actor/style.html" class="page">Typed Actor 风格</a></li>
     <li><a href="../../actor/timer.html" class="page">TimerScheduler 发送消息</a></li>
@@ -137,7 +120,12 @@ Version 1.0.0
     <li><a href="../../actor/watch-actor.html" class="page">监视 actor 的停止状态</a></li>
     <li><a href="../../actor/stop.html" class="page">怎样优雅的停止actor</a></li>
     <li><a href="../../actor/lifecycle.html" class="page">Actor 生命周期</a></li>
-    <li><a href="../../actor/concurrent/index.html" class="page">Akka 并发</a></li>
+    <li><a href="../../actor/concurrent/index.html" class="page">Akka 并发</a>
+    <ul>
+      <li><a href="../../actor/concurrent/blocking.html" class="page">怎样执行阻塞任务？</a></li>
+      <li><a href="../../actor/concurrent/affinity.html#怎样确保-actor-每次都在相同线程里执行-" class="active page">怎样确保 actor 每次都在相同线程里执行？</a></li>
+      <li><a href="../../actor/concurrent/thread.html" class="page">深入 Akka 线程</a></li>
+    </ul></li>
     <li><a href="../../actor/discovery.html" class="page">发现其它actor</a></li>
     <li><a href="../../actor/shutdown.html" class="page">怎样优雅的关闭 ActorSystem</a></li>
   </ul></li>
@@ -163,45 +151,24 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#适配响应类型到-actor" name="适配响应类型到-actor" class="anchor"><span class="anchor-link"></span></a>适配响应类型到 actor</h1>
-<p>通常情况下，发送actor的消息类型与接收actor的响应消息类型不匹配（不然就会退化成大部分actor都继承同一个trait，这样就失去了 Typed 的意义！）。这种情况下，我们提供一个正确类型的ActorRef[T]，并将接收actor返回的响应消息T包装成发送actor可以处理的类型。</p>
-<p>先定义一个消息包装类：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L30-L31" target="_blank" title="Go to snippet source"></a><code class="language-scala">sealed trait Command
-private final case class WrappedBackendResponse(response: Backend.Response) extends Command</code></pre>
-<p>消息适配器代码：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/main/scala/cookbook/actor/requestresponse/RequestResponse.scala#L38-L39" target="_blank" title="Go to snippet source"></a><code class="language-scala">val backendAdapter =
-  context.messageAdapter[Backend.Response](resp =&gt; WrappedBackendResponse(resp))</code></pre>
-<p>应该为不同的消息类型注册独立的消息适配器，同一个消息类型多次注册的消息适配器只有最后一个生效。</p>
-<p>如果响应的消息类与给定消息适配器匹配或是其消息适配器消息类型的子类型，则使用它。若有多个消息适配器符合条件，则将选用最后注册的那个。</p>
-<p>消息适配器（<code>context.messageAdapter</code>返回的<code>ActorRef[T]</code>）的生命周期同context所在actor。建议在Behaviors.step或AbstractBehavior构造函数中注册适配器，但也可以在稍后注册它们。</p>
-<p>注册适配器时提供的消息映射函数（<code>resp =&gt; WrappedBackendResponse(resp)</code>）在actor中运行，可安全的访问其（actor）内部状态。 但注意不能抛出异常，否则actor将被停止！</p>
-<h2><a href="#适用范围" name="适用范围" class="anchor"><span class="anchor-link"></span></a>适用范围</h2>
-<ol>
-  <li>在不同的actor消息协议间进行转换</li>
-  <li>订阅响应消息的actor，并将响应转换成发送actor可接收的类型</li>
-</ol>
-<h2><a href="#问题" name="问题" class="anchor"><span class="anchor-link"></span></a>问题</h2>
-<ol>
-  <li>难以检测消息是否送达或已被处理</li>
-  <li>每个响应消息只能进行一次自适应，如果注册了新的适配器则旧的将被替换。如果不同的目标actor使用相同的响应类型，则它们自动选择哪个适配器更合适。这需要在消息中编码某种相关性来解决</li>
-  <li>除非协议已经包含提供上下文的方法，例如在响应中返回发送的请求ID。否则交互就不能绑定到某个上下文中。</li>
-</ol>
+<h1><a href="#怎样确保-actor-每次都在相同线程里执行-" name="怎样确保-actor-每次都在相同线程里执行-" class="anchor"><span class="anchor-link"></span></a>怎样确保 actor 每次都在相同线程里执行？</h1>
+<p>TODO</p>
 </div>
 </article>
 <div class="row">
 <div class="small-12 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
-<a href="../../actor/pattern/request-response.html"><i class="icon-prev"></i> <span class="link-prev">请求-响应模式</span></a>
+<a href="../../actor/concurrent/blocking.html"><i class="icon-prev"></i> <span class="link-prev">怎样执行阻塞任务？</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../../actor/pattern/actor-inside-ask.html">actor之间使用ask（请求-响应模式） <i class="icon-next"></i></a>
+<a class="float-right" href="../../actor/concurrent/thread.html">深入 Akka 线程 <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 <div class="source-github row">
-在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/pattern/adapted-response.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/actor/concurrent/affinity.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">

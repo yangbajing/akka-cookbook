@@ -2,11 +2,11 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>在 Spring 里使用 Akka Streams &bull; Akka Cookbook</title>
+<title>使用 Jackson 作为序列化 &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
-<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/integration/spring-web.html"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/serialization/jackson.html"/>
 <script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
@@ -55,19 +55,17 @@ Version 1.0.0
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a>
+  <ul>
+    <li><a href="../serialization/jackson.html#使用-jackson-作为序列化" class="active page">使用 Jackson 作为序列化</a>
+    <ul>
+      <li><a href="../serialization/jackson.html#todo" class="header">TODO</a></li>
+    </ul></li>
+  </ul></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../integration/index.html" class="page">Integration into external systems</a>
-  <ul>
-    <li><a href="../integration/spring-web.html#在-spring-里使用-akka-streams" class="active page">在 Spring 里使用 Akka Streams</a>
-    <ul>
-      <li><a href="../integration/spring-web.html#添加-akka-streams-支持" class="header">添加 Akka Streams 支持</a></li>
-      <li><a href="../integration/spring-web.html#编写控制器" class="header">编写控制器</a></li>
-      <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
-    </ul></li>
-  </ul></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
   <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
@@ -98,19 +96,17 @@ Version 1.0.0
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a>
+  <ul>
+    <li><a href="../serialization/jackson.html#使用-jackson-作为序列化" class="active page">使用 Jackson 作为序列化</a>
+    <ul>
+      <li><a href="../serialization/jackson.html#todo" class="header">TODO</a></li>
+    </ul></li>
+  </ul></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
-  <li><a href="../integration/index.html" class="page">Integration into external systems</a>
-  <ul>
-    <li><a href="../integration/spring-web.html#在-spring-里使用-akka-streams" class="active page">在 Spring 里使用 Akka Streams</a>
-    <ul>
-      <li><a href="../integration/spring-web.html#添加-akka-streams-支持" class="header">添加 Akka Streams 支持</a></li>
-      <li><a href="../integration/spring-web.html#编写控制器" class="header">编写控制器</a></li>
-      <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
-    </ul></li>
-  </ul></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
   <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
@@ -125,68 +121,38 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#在-spring-里使用-akka-streams" name="在-spring-里使用-akka-streams" class="anchor"><span class="anchor-link"></span></a>在 Spring 里使用 Akka Streams</h1>
-<p>Akka Streams 作为 Reactive Streams 的一种实现，可以很方便的与其它 Reactive Streams 实现进行互操作。而从 Spring 5 开始，也提供了 Reactive Streams 实现的版本： <strong>WebFlow</strong> 。 <a href="https://doc.akka.io/docs/alpakka/2.0/spring-web.html"><strong>Alpakka Spring Web</strong></a> 项目提供了对Spring Boot的支持，可以让我们在 Spring 项目中使用 Akka Streams。</p>
-<h2><a href="#添加-akka-streams-支持" name="添加-akka-streams-支持" class="anchor"><span class="anchor-link"></span></a>添加 Akka Streams 支持</h2>
-<p>需要给Spring项目添加 Akka Streams 依赖：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % "2.0.0-M3"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
-  &lt;groupId&gt;com.lightbend.akka&lt;/groupId&gt;
-  &lt;artifactId&gt;akka-stream-alpakka-spring-web_2.13&lt;/artifactId&gt;
-  &lt;version&gt;2.0.0-M3&lt;/version&gt;
+<h1><a href="#使用-jackson-作为序列化" name="使用-jackson-作为序列化" class="anchor"><span class="anchor-link"></span></a>使用 Jackson 作为序列化</h1>
+<p>通过配置 <code>akka.actor.serialization-bindings</code> 指定特定的数据类型（及子类型）在远程通信中使用已配置的序列化工具。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-cluster/src/main/resources/reference.conf" target="_blank" title="Go to snippet source"></a><code class="language-conf">akka.actor {
+  serialization-bindings {
+    &quot;cookbook.json.CborSerializable&quot; = jackson-cbor
+    &quot;cookbook.json.JsonSerializable&quot; = jackson-json
+  }
+}</code></pre>
+<p>这里配置了两个 trait 分别使用 <code>jackson-cbor</code> 和 <code>jackson-json</code> 序列化方式，这两种序列化方式为 Akka 内置的序列化器。需要加入以下依赖使用：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-serialization-jackson" % "2.6.3"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;com.typesafe.akka&lt;/groupId&gt;
+  &lt;artifactId&gt;akka-serialization-jackson_2.13&lt;/artifactId&gt;
+  &lt;version&gt;2.6.3&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'com.lightbend.akka', name: 'akka-stream-alpakka-spring-web_2.13', version: '2.0.0-M3'
+  compile group: 'com.typesafe.akka', name: 'akka-serialization-jackson_2.13', version: '2.6.3'
 }</code></pre></dd></dl>
-<h2><a href="#编写控制器" name="编写控制器" class="anchor"><span class="anchor-link"></span></a>编写控制器</h2>
-<p>在添加了 Akka Streams 支持后，我们就可以在控制器代码里直接返回 <code>Source[T, Mat]</code> 类型的结果了。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleController.java#L20-L31" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.NotUsed;
-import akka.stream.javadsl.Source;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class SampleController {
-  @RequestMapping(&quot;/&quot;)
-  public Source&lt;String, NotUsed&gt; index() {
-    return Source.repeat(&quot;Hello world!&quot;).intersperse(&quot;\n&quot;).take(10);
-  }
-}</code></pre>
-<h2><a href="#运行程序" name="运行程序" class="anchor"><span class="anchor-link"></span></a>运行程序</h2>
-<p><code>SampleApplication.java</code> 代码如下，如通常的Spring Boot程序并无起二致。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/integration/cookbook-spring/src/main/java/cookbook/integration/springweb/SampleApplication.java#L23-L28" target="_blank" title="Go to snippet source"></a><code class="language-java">@SpringBootApplication
-public class SampleApplication {
-  public static void main(String[] args) {
-    SpringApplication.run(SampleApplication.class, args);
-  }
-}</code></pre>
-<p>运行 <code>SampleApplication</code> 启动Spring Web程序，通过<code>curl</code>访问服务示例如下：</p>
-<pre><code>$ curl -i http://localhost:8080
-HTTP/1.1 200 
-Content-Type: text/plain
-Transfer-Encoding: chunked
-Date: Wed, 20 Nov 2019 03:47:44 GMT
-
-Hello world!
-Hello world!
-Hello world!
-Hello world!
-Hello world!
-</code></pre>
-<p>可以看到响应头里有：<code>Transfer-Encoding: chunked</code>，这个结果是以流的形式将数据一块一块返回的。</p>
+<h2><a href="#todo" name="todo" class="anchor"><span class="anchor-link"></span></a>TODO</h2>
 </div>
 </article>
 <div class="row">
 <div class="small-12 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
-<a href="../integration/index.html"><i class="icon-prev"></i> <span class="link-prev">Integration into external systems</span></a>
+<a href="../serialization/index.html"><i class="icon-prev"></i> <span class="link-prev">序列化</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../util/index.html">实用工具 <i class="icon-next"></i></a>
+<a class="float-right" href="../cluster/index.html">Akka Cluster <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 <div class="source-github row">
-在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/integration/spring-web.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/serialization/jackson.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">
