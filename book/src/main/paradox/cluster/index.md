@@ -1,9 +1,9 @@
 # Akka Cluster
 
-@@toc { depth=3 }
+@@toc { depth=2 }
 
 @@@ index
 
-- [serialization-jackson](serialization-jackson.md)
+- [ddata](ddata.md)
 
 @@@

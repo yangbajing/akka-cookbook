@@ -32,43 +32,26 @@ class TopKSink(TOP_K: Int) extends GraphStageWithMaterializedValue[SinkShape[Mov
     val p: Promise[List[Movie]] = Promise()
 
     val logic = new GraphStageLogic(shape) with InHandler {
-      var buf = List[Movie]()
-      var bufSize = 0
+      private implicit val movieOrdering: Ordering[Movie] =
+        (x: Movie, y: Movie) => if (x.rating < y.rating) 1 else if (x.rating == y.rating) 0 else -1
+      private val queue = scala.collection.mutable.PriorityQueue[Movie]()
 
-      def insertMovie(list: List[Movie], movie: Movie): List[Movie] = {
-        list match {
-          case Nil => movie :: Nil
-          case list =>
-            var buf = List[Movie]()
-            var use = false
-            for (item <- list.reverse) {
-              if (!use && item.rating < movie.rating) {
-                buf ::= movie
-                use = true
-              }
-              buf ::= item
-            }
-            if (!use) {
-              buf ::= movie
-            }
-            buf
-        }
-      }
       override def preStart(): Unit = pull(in)
 
       override def onPush(): Unit = {
         val movie = grab(in)
-        buf = if (bufSize < TOP_K) {
-          bufSize += 1
-          insertMovie(buf, movie)
-        } else {
-          if (buf.head.rating < movie.rating) insertMovie(buf.slice(1, TOP_K), movie) else buf
+        // #append-movie
+        if (queue.size < TOP_K) {
+          queue.addOne(movie)
+        } else if (queue.head.rating < movie.rating) {
+          queue.addOne(movie).dequeue()
         }
+        // #append-movie
         pull(in)
       }
 
       override def onUpstreamFinish(): Unit = {
-        p.trySuccess(buf)
+        p.trySuccess(queue.toList)
       }
 
       override def onUpstreamFailure(ex: Throwable): Unit = {

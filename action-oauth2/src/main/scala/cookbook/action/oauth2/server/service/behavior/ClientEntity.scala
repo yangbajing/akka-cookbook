@@ -21,7 +21,7 @@ import akka.actor.typed.{ ActorRef, ActorSystem, Behavior }
 import akka.cluster.sharding.typed.ShardingEnvelope
 import akka.cluster.sharding.typed.scaladsl.{ ClusterSharding, Entity, EntityContext, EntityTypeKey }
 import akka.persistence.typed.PersistenceId
-import fusion.json.jackson.CborSerializable
+import fusion.json.CborSerializable
 
 object ClientEntity {
   sealed trait Command extends CborSerializable

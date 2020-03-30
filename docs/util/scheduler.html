@@ -2,11 +2,11 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>使用Jackson作为序列化 &bull; Akka Cookbook</title>
+<title>定时调度任务 &bull; Akka Cookbook</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="book"/>
-<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/cluster/serialization-jackson.html"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/util/scheduler.html"/>
 <script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
@@ -55,13 +55,16 @@ Version 1.0.0
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka Cluster</a>
-  <ul>
-    <li><a href="../cluster/serialization-jackson.html#使用jackson作为序列化" class="active page">使用Jackson作为序列化</a></li>
-  </ul></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a>
+  <ul>
+    <li><a href="../util/log.html" class="page">日志</a></li>
+    <li><a href="../util/scheduler.html#定时调度任务" class="active page">定时调度任务</a></li>
+  </ul></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </nav>
@@ -91,13 +94,16 @@ Version 1.0.0
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
-  <li><a href="../cluster/index.html" class="page">Akka Cluster</a>
-  <ul>
-    <li><a href="../cluster/serialization-jackson.html#使用jackson作为序列化" class="active page">使用Jackson作为序列化</a></li>
-  </ul></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
   <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a>
+  <ul>
+    <li><a href="../util/log.html" class="page">日志</a></li>
+    <li><a href="../util/scheduler.html#定时调度任务" class="active page">定时调度任务</a></li>
+  </ul></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </div>
@@ -111,23 +117,24 @@ Version 1.0.0
 <section class="site-content small-12 column">
 <article class="page-content row">
 <div class="small-12 column" id="docs">
-<h1><a href="#使用jackson作为序列化" name="使用jackson作为序列化" class="anchor"><span class="anchor-link"></span></a>使用Jackson作为序列化</h1>
+<h1><a href="#定时调度任务" name="定时调度任务" class="anchor"><span class="anchor-link"></span></a>定时调度任务</h1>
+<p>TODO</p>
 </div>
 </article>
 <div class="row">
 <div class="small-12 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
-<a href="../cluster/index.html"><i class="icon-prev"></i> <span class="link-prev">Akka Cluster</span></a>
+<a href="../util/log.html"><i class="icon-prev"></i> <span class="link-prev">日志</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../persistence/index.html">Akka Persistence <i class="icon-next"></i></a>
+<a class="float-right" href="../action/index.html">Action <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 <div class="source-github row">
-在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/cluster/serialization-jackson.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/util/scheduler.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
 </div>
 
 <footer class="page-footer row clearfix">

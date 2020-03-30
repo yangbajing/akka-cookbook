@@ -9,7 +9,7 @@ ThisBuild / scalaVersion := versionScala213
 
 ThisBuild / scalafmtOnCompile := true
 
-ThisBuild / resolvers ++= Seq(Resolver.bintrayRepo("akka-fusion", "maven"), Resolver.sonatypeRepo("snapshots"))
+ThisBuild / resolvers += Resolver.bintrayRepo("helloscala", "maven")
 
 lazy val root = Project(id = "akka-cookbook", base = file(".")).aggregate(
   book,
@@ -92,7 +92,7 @@ lazy val cookbookGrpc = _project("cookbook-grpc")
 
 lazy val actionOauth2 = _project("action-oauth2")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_fusionJson, _akkaPersistenceTyped) ++ _akkaClusters)
+  .settings(libraryDependencies ++= Seq(_fusionJsonJackson, _akkaPersistenceTyped) ++ _akkaClusters)
 
 lazy val cookbookActor = _project("cookbook-actor").dependsOn(cookbookCommon % "compile->compile;test->test")
 
@@ -102,7 +102,7 @@ lazy val cookbookStreams = _project("cookbook-streams")
 
 lazy val cookbookCluster = _project("cookbook-cluster")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_fusionJson) ++ _akkaClusters)
+  .settings(libraryDependencies ++= Seq(_fusionJsonJackson) ++ _akkaClusters)
 
 lazy val cookbookPersistence = _project("cookbook-persistence")
   .dependsOn(cookbookCluster, cookbookCommon % "compile->compile;test->test")

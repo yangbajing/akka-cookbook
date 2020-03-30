@@ -24,7 +24,7 @@ import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{ Effect, EventSourcedBehavior }
 import book.oauth2.OAuthUtils.DueEpochMillis
 import book.oauth2.{ AccessToken, OAuthUtils }
-import fusion.json.jackson.CborSerializable
+import fusion.json.CborSerializable
 
 import scala.concurrent.duration._
 

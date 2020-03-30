@@ -55,6 +55,7 @@ Version 1.0.0
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
@@ -67,6 +68,7 @@ Version 1.0.0
       <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
     </ul></li>
   </ul></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </nav>
@@ -96,6 +98,7 @@ Version 1.0.0
   <li><a href="../test/index.html" class="page">Test</a></li>
   <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
   <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
   <li><a href="../cluster/index.html" class="page">Akka Cluster</a></li>
   <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
   <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
@@ -108,6 +111,7 @@ Version 1.0.0
       <li><a href="../integration/spring-web.html#运行程序" class="header">运行程序</a></li>
     </ul></li>
   </ul></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
   <li><a href="../action/index.html" class="page">Action</a></li>
 </ul>
 </div>
@@ -124,12 +128,12 @@ Version 1.0.0
 <h1><a href="#在-spring-里使用-akka-streams" name="在-spring-里使用-akka-streams" class="anchor"><span class="anchor-link"></span></a>在 Spring 里使用 Akka Streams</h1>
 <p>Akka Streams 作为 Reactive Streams 的一种实现，可以很方便的与其它 Reactive Streams 实现进行互操作。而从 Spring 5 开始，也提供了 Reactive Streams 实现的版本： <strong>WebFlow</strong> 。 <a href="https://doc.akka.io/docs/alpakka/2.0/spring-web.html"><strong>Alpakka Spring Web</strong></a> 项目提供了对Spring Boot的支持，可以让我们在 Spring 项目中使用 Akka Streams。</p>
 <h2><a href="#添加-akka-streams-支持" name="添加-akka-streams-支持" class="anchor"><span class="anchor-link"></span></a>添加 Akka Streams 支持</h2>
-<p>需要给Spring项目添加 Akka Streams 依赖：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % "2.0.0-M2"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+<p>需要给Spring项目添加 Akka Streams 依赖：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % "2.0.0-M3"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;com.lightbend.akka&lt;/groupId&gt;
   &lt;artifactId&gt;akka-stream-alpakka-spring-web_2.13&lt;/artifactId&gt;
-  &lt;version&gt;2.0.0-M2&lt;/version&gt;
+  &lt;version&gt;2.0.0-M3&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'com.lightbend.akka', name: 'akka-stream-alpakka-spring-web_2.13', version: '2.0.0-M2'
+  compile group: 'com.lightbend.akka', name: 'akka-stream-alpakka-spring-web_2.13', version: '2.0.0-M3'
 }</code></pre></dd></dl>
 <h2><a href="#编写控制器" name="编写控制器" class="anchor"><span class="anchor-link"></span></a>编写控制器</h2>
 <p>在添加了 Akka Streams 支持后，我们就可以在控制器代码里直接返回 <code>Source[T, Mat]</code> 类型的结果了。</p>
@@ -176,7 +180,7 @@ Hello world!
 <a href="../integration/index.html"><i class="icon-prev"></i> <span class="link-prev">Integration into external systems</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="../action/index.html">Action <i class="icon-next"></i></a>
+<a class="float-right" href="../util/index.html">实用工具 <i class="icon-next"></i></a>
 </div>
 </section>
 </div>

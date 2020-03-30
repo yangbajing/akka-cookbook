@@ -16,7 +16,7 @@
 
 package book.oauth2
 
-import fusion.json.jackson.CborSerializable
+import fusion.json.CborSerializable
 
 /**
  * @param access_token 访问令牌

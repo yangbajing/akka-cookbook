@@ -72,12 +72,6 @@ akka.stream.scaladsl.Framing$FramingException: Stream finished but there was a t
 
 @@snip [TopKSink.scala](../../../../../cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala) { #TopKSink }
 
-## 解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影
-
-Akka HTTP提供了 HTTP Client/Server 实现，同时它也是基于 Akka Streams 实现的。上一步我们已经定义了 `TopKSink` 来消费流数据，而通过 Akka HTTP Client 获得的响应数据也是一个流（`Source[ByteString, Any]`）。我们可以将获取 `movies.csv` 文件的 HTTP 请求与取得分最高的K部电影两个任务结合到一起，**实现内存固定、处理数据无限的 Top K 程序（假设网络稳定不会断开）**。 
-
-@@snip [TopKForAkkaHTTP.scala](../../../../../cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForAkkaHTTP.scala) { #TopKForAkkaHTTP }
-
 通过继承 `GraphStageWithMaterializedValue` 抽像类，可以定义一个返回特定结果的自定义 `Sink`，否则流处理结果默认为 `NotUsed`。
 
 ```scala
@@ -85,13 +79,17 @@ Akka HTTP提供了 HTTP Client/Server 实现，同时它也是基于 Akka Stream
       inheritedAttributes: Attributes): (GraphStageLogic, Future[List[Movie]])
 ```
 
-函数 `createLogicAndMaterializedValue` 实现 `Sink` 处理逻辑并返回 `Sink` 阶段的处理逻辑 `GraphStageLogic` 和获得的 Top K 结果 `Future[List[Movie]]`，流执行后的结果（通过调用 `.runWith`）是一个异步结果（`Future`）。这样将不会阻塞调用线程。
+函数 `createLogicAndMaterializedValue` 实现 `Sink` 处理逻辑并返回 `Sink` 阶段的处理逻辑 `GraphStageLogic` 和获得的 Top K 结果 `Future[List[Movie]]`，流执行后的结果（通过调用 `.runWith`）是一个异步结果（`Future`），这样将不会阻塞调用线程。
 
-`buf` 用于缓存 Top K 个得分最高的电影，使用 `List` 模拟了一个堆结构，Top K 里评分最低的电影在链表头且按评分升序排序。
+在 `TopKSink` 里，使用了一个优先队列来保存 TOP K 部电影，通过提供一个自定义的隐式值 `movieOrdering` 告知 `PriorityQueue` 怎样排序。得分低的电影排在队列头，这样在有一部新电影时我们只需要和队列头比较评分即可，若新电影评分更高我们就将它插入队列并将队列头删去，下面为电影入队操作具体代码：
 
-`onPush` 函数上游有数据传入时调用 `grab` 函数获取一个元素（`movie`）。`bufSize` 保存了当前 `buf` 的数量，当 `bufSize < TOP_K` 时，调用 `insertMovie` 函数将 `movie` 直接插入到匹配顺序的 `buf` 里并将 `bufSize` 加1。否则通过 `buf.head.rating < movie.rating` 比较，若为 true 则将 `movie` 加入缓存，否则 `buf` 保持不变。
+@@snip [TopKSink.scala](../../../../../cookbook-streams/src/main/scala/cookbook/streams/topk/TopKSink.scala) { #append-movie }
 
-`insertMovie` 函数实现了将新电影插入 `buf` 的逻辑，并保持 `buf` 按评分升序排序。
+## 解法4：通过 Akka HTTP 在下载文件的同时求出Top K个得分最高的电影
+
+Akka HTTP提供了 HTTP Client/Server 实现，同时它也是基于 Akka Streams 实现的。上一步我们已经定义了 `TopKSink` 来消费流数据，而通过 Akka HTTP Client 获得的响应数据也是一个流（`Source[ByteString, Any]`）。我们可以将获取 `movies.csv` 文件的 HTTP 请求与取得分最高的K部电影两个任务结合到一起，**实现内存固定、处理数据无限的 Top K 程序（假设网络稳定不会断开）**。 
+
+@@snip [TopKForAkkaHTTP.scala](../../../../../cookbook-streams/src/main/scala/cookbook/streams/topk/TopKForAkkaHTTP.scala) { #TopKForAkkaHTTP }
 
 ## 小结
 
