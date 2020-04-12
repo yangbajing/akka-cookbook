@@ -171,7 +171,7 @@ consumerController ! ConsumerController.RegisterToProducerController(producerCon
 消费者的 `ConsumerController` 通过 [`ServiceKey`](https://doc.akka.io/docs/akka/current/typed/actor-discovery.html)
 动态注册到 `WorkPullingProducerController`。通过这个方式，消费者可以动态注册或删除自己到/从相同 `ServiceKey` 的生产者。
 
-与点对点交付模式类似，式作拉取模式也是客户端主动拉取的，生产者需要在收到 `Request` 请求以后才能向 `WorkPullingProducerController` 
+与点对点交付模式类似，工作拉取模式也是客户端主动拉取的，生产者需要在收到 `Request` 请求以后才能向 `WorkPullingProducerController` 
 发送消息。生产者与 `WorkPullingProducerController` 也要在同一个 ActorSystem 中，不允许跨网络，消费者亦同。生产者和消费者都需要向
 `XxxController` 发送 `Start` 消息来启动它；消费者同样需要向 `confirmTo` 发送 `ConsumerController.Confirmed` 消费来告知生产者此消息
 已被消费。因为生产者与多个消费者之间的流量控制由消费者驱动，意味着生产者发送的速度不会快于消费者的请求速度。
@@ -228,7 +228,7 @@ object ImageConverter {
 
 **图片转换生产者**
 
-`WorkPullingProducerController` 在构造时需要指定 `ServiceKey`，消费者同过相同的 `ServiceKey` 注册到生产者。
+`WorkPullingProducerController` 在构造时需要指定 `ServiceKey`，消费者通过相同的 `ServiceKey` 注册到生产者。
 
 ```scala
 import akka.actor.typed.delivery.WorkPullingProducerController
@@ -611,7 +611,7 @@ Akka Typed 在版本 2.6.4 开始终于提供了可靠交付的实现（之前�
 
 - 通过 `Receptionist` 根据 `ServiceKey` 查找远程 actor；
 - 通过 Akka Cluster Sharding 实现基于分片的可靠交付，这样就不需要手动管理消费者的创建；
-- 通过 Akka Persistence 可现了未确认消息的持久存储，以保证在程序重启后仍然可以重发未确认消息。
+- 通过 Akka Persistence 实现了未确认消息的持久存储，以保证在程序重启后仍然可以重发未确认消息。
 
 对于 Akka Typed 现在提供的各种可靠交付模式，各有各的实现方式，下面列出各自的适用场景：
 

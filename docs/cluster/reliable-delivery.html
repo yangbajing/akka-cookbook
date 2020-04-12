@@ -244,7 +244,7 @@ consumerController ! ConsumerController.RegisterToProducerController(producerCon
 <p>下面是有两个消费者时的工作拉取模式：</p>
 <p><img src="imgs/delivery-work-pulling-2.png" alt="delivery-work-pulling-2" /></p>
 <p>消费者的 <code>ConsumerController</code> 通过 <a href="https://doc.akka.io/docs/akka/current/typed/actor-discovery.html"><code>ServiceKey</code></a> 动态注册到 <code>WorkPullingProducerController</code>。通过这个方式，消费者可以动态注册或删除自己到/从相同 <code>ServiceKey</code> 的生产者。</p>
-<p>与点对点交付模式类似，式作拉取模式也是客户端主动拉取的，生产者需要在收到 <code>Request</code> 请求以后才能向 <code>WorkPullingProducerController</code> 发送消息。生产者与 <code>WorkPullingProducerController</code> 也要在同一个 ActorSystem 中，不允许跨网络，消费者亦同。生产者和消费者都需要向 <code>XxxController</code> 发送 <code>Start</code> 消息来启动它；消费者同样需要向 <code>confirmTo</code> 发送 <code>ConsumerController.Confirmed</code> 消费来告知生产者此消息 已被消费。因为生产者与多个消费者之间的流量控制由消费者驱动，意味着生产者发送的速度不会快于消费者的请求速度。</p>
+<p>与点对点交付模式类似，工作拉取模式也是客户端主动拉取的，生产者需要在收到 <code>Request</code> 请求以后才能向 <code>WorkPullingProducerController</code> 发送消息。生产者与 <code>WorkPullingProducerController</code> 也要在同一个 ActorSystem 中，不允许跨网络，消费者亦同。生产者和消费者都需要向 <code>XxxController</code> 发送 <code>Start</code> 消息来启动它；消费者同样需要向 <code>confirmTo</code> 发送 <code>ConsumerController.Confirmed</code> 消费来告知生产者此消息 已被消费。因为生产者与多个消费者之间的流量控制由消费者驱动，意味着生产者发送的速度不会快于消费者的请求速度。</p>
 <p>不同的地方在当多个消费者向生产者请求消息，在消息被实际发送到消费者之前消费者已经停止。这时，消息将被缓冲在生产者端，当有新的消费者注册或请求时， 缓冲的消息将被发送到消费者。</p>
 <h3><a href="#工作拉取示例" name="工作拉取示例" class="anchor"><span class="anchor-link"></span></a>工作拉取示例</h3>
 <p><strong>图片转换消费者（Worker）</strong></p>
@@ -287,7 +287,7 @@ object ImageConverter {
 }
 </code></pre>
 <p><strong>图片转换生产者</strong></p>
-<p><code>WorkPullingProducerController</code> 在构造时需要指定 <code>ServiceKey</code>，消费者同过相同的 <code>ServiceKey</code> 注册到生产者。</p>
+<p><code>WorkPullingProducerController</code> 在构造时需要指定 <code>ServiceKey</code>，消费者通过相同的 <code>ServiceKey</code> 注册到生产者。</p>
 <pre class="prettyprint"><code class="language-scala">import akka.actor.typed.delivery.WorkPullingProducerController
 
 object ImageWorkManager {
@@ -597,7 +597,7 @@ val durableProducerController = context.spawn(
 <ul>
   <li>通过 <code>Receptionist</code> 根据 <code>ServiceKey</code> 查找远程 actor；</li>
   <li>通过 Akka Cluster Sharding 实现基于分片的可靠交付，这样就不需要手动管理消费者的创建；</li>
-  <li>通过 Akka Persistence 可现了未确认消息的持久存储，以保证在程序重启后仍然可以重发未确认消息。</li>
+  <li>通过 Akka Persistence 实现了未确认消息的持久存储，以保证在程序重启后仍然可以重发未确认消息。</li>
 </ul>
 <p>对于 Akka Typed 现在提供的各种可靠交付模式，各有各的实现方式，下面列出各自的适用场景：</p>
 <table>
