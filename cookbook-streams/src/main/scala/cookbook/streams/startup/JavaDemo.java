@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package cookbook.action.oauth2.protocol
+package cookbook.streams.startup;
 
-import fusion.json.CborSerializable
-
-case class AccessToken(accessToken: String, expireIn: Long, refreshToken: String) extends CborSerializable
+public class JavaDemo {
+    public static void main(String[] args) {
+        System.out.println(Demo.isJava(String.class));
+        System.out.println(Demo.isJava(scala.collection.Map.class));
+    }
+}

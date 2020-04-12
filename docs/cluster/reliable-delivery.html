@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>消息的可靠交付 &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/cluster/reliable-delivery.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+
+<body id="underlay" data-toggler="nav-open">
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a>
+  <ul>
+    <li><a href="../cluster/ddata.html" class="page">使用 DistributeData 在集群间同步数据</a></li>
+    <li><a href="../cluster/reliable-delivery.html#消息的可靠交付" class="active page">消息的可靠交付</a>
+    <ul>
+      <li><a href="../cluster/reliable-delivery.html#点对点可靠交付" class="header">点对点可靠交付</a></li>
+      <li><a href="../cluster/reliable-delivery.html#工作拉取-work-pulling-" class="header">工作拉取（Work Pulling）</a></li>
+      <li><a href="../cluster/reliable-delivery.html#分片-sharding-" class="header">分片（Sharding）</a></li>
+      <li><a href="../cluster/reliable-delivery.html#持久的生产者" class="header">持久的生产者</a></li>
+      <li><a href="../cluster/reliable-delivery.html#只有流量控制" class="header">只有流量控制</a></li>
+      <li><a href="../cluster/reliable-delivery.html#总结" class="header">总结</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a>
+  <ul>
+    <li><a href="../cluster/ddata.html" class="page">使用 DistributeData 在集群间同步数据</a></li>
+    <li><a href="../cluster/reliable-delivery.html#消息的可靠交付" class="active page">消息的可靠交付</a>
+    <ul>
+      <li><a href="../cluster/reliable-delivery.html#点对点可靠交付" class="header">点对点可靠交付</a></li>
+      <li><a href="../cluster/reliable-delivery.html#工作拉取-work-pulling-" class="header">工作拉取（Work Pulling）</a></li>
+      <li><a href="../cluster/reliable-delivery.html#分片-sharding-" class="header">分片（Sharding）</a></li>
+      <li><a href="../cluster/reliable-delivery.html#持久的生产者" class="header">持久的生产者</a></li>
+      <li><a href="../cluster/reliable-delivery.html#只有流量控制" class="header">只有流量控制</a></li>
+      <li><a href="../cluster/reliable-delivery.html#总结" class="header">总结</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#消息的可靠交付" name="消息的可靠交付" class="anchor"><span class="anchor-link"></span></a>消息的可靠交付</h1>
+<p>Akka Actor 模型默认情况下是实现的最多一次交付，在本地环境发送消息还好，通常不会存在消息丢失的情况。但是在网络环境下，因为网络延迟等原因消息丢失的可能性大大增加。另外，发送端和接收端都有可能因为各种原因挂掉而造成消息丢失，无论本地还是跨网络环境。</p>
+<p>通常，消息交付有三种方式： <strong>至多一次</strong> 、 <strong>至少一次</strong> 和 <strong>恰好一次</strong>。对于要求消息不能丢失的应用场景，第一种 <strong>至多一次</strong> 的交付模式是肯定不可取的，那至少一次和恰好一次应该选择哪一种呢？对于 <strong>恰好一次</strong>，因为要保证一条消息不会被消费者消费多次， 那意味着生产者在向消费者发送消息之前需要先发送一条消息查询是否已被消费者使用过？而消费者在处理完消息向生产者发送确认（<code>Confirmed</code>） 消息后需要等待生产者返回 <code>ConfirmedAck</code> 消息，这无形中会显著增加系统消耗并降低吞吐量。最后来看一下 <strong>至少一次</strong>， 生产者在发送消息前不需要查询消费者是否已经处理过此条消息，消费者也不需要等待生产者返回 <code>ConfirmedAck</code>，这相对于 <strong>恰好一次</strong> 模式来说系统消耗将更小且吞吐量更高。 <strong>至少一次</strong> 造成的问题就是消费都可能会收到重复消息，但这在业务上可以简单地通过消息 ID 去重来解决。</p>
+<p>总的来说， <strong>至少一次</strong> 对于大部分要求消息不能丢失的应用场景都是合适的，而 Akka Typed 提供的消息可靠交付也实现了这一方式。</p>
+<p>Akka Typed 从 2.6.4 开始提供了可靠交付的 <em>预览</em> 版实现（相对于经典 actor 的至少一次交付实现），提供了三种支持的模式应用于不同的业务场景：</p>
+<ol>
+  <li>点对点：两个 Actor 之间直接发送消息</li>
+  <li>工作拉取（Work Pulling）：一个生产者 Actor 产生消息，多个消费者 Actor 消费消息（一个消息只被一个工作节点消费）</li>
+  <li>分片（Sharding）：基于 Akka Cluster Sharding 机制在集群上自动分布 Actor，不需要手动管理 Actor 的创建、重启等工作</li>
+</ol>
+<p>要使用可靠交付，需要添加下面依赖到项目：</p>
+<pre class="prettyprint"><code class="language-sbt">libraryDependencies += &quot;com.typesafe.akka&quot; %% &quot;akka-actor-typed&quot; % &quot;2.6.4&quot;
+</code></pre>
+<h2><a href="#点对点可靠交付" name="点对点可靠交付" class="anchor"><span class="anchor-link"></span></a>点对点可靠交付</h2>
+<p>Akka Typed 为点对点可靠交付抽像了生产者和消费者概念，生产者将消息发送到 <code>ProducerController</code> ，消费者通过 <code>ConsumerController</code> 接收消息。点对点可靠交付实现了至少一次交付，消费者端可能会收到重复数据。</p>
+<p><img src="imgs/delivery-p2p-1.png" alt="delivery-p2p-1" /></p>
+<p>生产者需要向 <code>ProducerController</code> 发送 <code>Start</code> （1）消息来启动它，这时生产者将收到一个 <code>RequestNext</code> （2）消息， 并可通过它向 <code>ProducerController</code> （3）发送消息。生产者只应在收到 <code>RequestNext</code> 消息时才向 <code>ProducerController</code> 发送消息， 这意味着两个 actor 之间的消息交付是一种消费者来主动拉的模式。</p>
+<p>消费者也需要向 <code>ConsumerController</code> 发送 <code>Start</code> （6）消息来启动它，之后当消息可用时消费者会收到 <code>Delivery</code> （7）消息， 消费者应在消息处理完成后向生产者发送 <code>Confirmed</code> （8）来确认这条消息已经处理完成。若当前消息未被确认（<code>ProducerController</code> 收到 <code>Confirmed</code> 消息），消费者将不会收到下一条消息。</p>
+<p>上图中 (4)、(5) 两个步骤将由 Akka 自动维护，开发人员不需要关心。当 <code>ConsumerController</code> 没有消息可用时它将向 <code>ProducerController</code> 发送 <code>Request</code> 消息请求获得消息。<code>ProducerController</code> 除了在收到 <code>Request</code> 请求之外，当发现还有未确认消息时也会主动向 <code>ConsumerController</code> 推送消息，比如从错误中恢复或者某个消息长时间未收到 <code>Confirmed</code> 确认而触发超时重发。 因为点对点可靠交付的流量控制是消费者（<code>ConsumerController</code>）控制的，这意味着生产者将不能发送比消费者处理能力更多的消息。</p>
+<p><em>注意：生产者和 <code>ProducerController</code>，以及消费者和 <code>ConsumerController</code> 必须在同一个 ActorSystem 中，不能跨网络。</em></p>
+<h3><a href="#点对点可靠交付示例" name="点对点可靠交付示例" class="anchor"><span class="anchor-link"></span></a>点对点可靠交付示例</h3>
+<p>示例以一个斐波那契数列计算做为示例，它有一个生产者计算从1开始到1000的斐波那契数例，消费者每次请求一个数字对应的斐波那契数值。</p>
+<p><strong>生产者</strong></p>
+<pre class="prettyprint"><code class="language-scala">import akka.actor.typed.ActorRef
+import akka.actor.typed.Behavior
+import akka.actor.typed.delivery.ProducerController
+import akka.actor.typed.scaladsl.Behaviors
+
+object FibonacciProducer {
+  sealed trait Command
+
+  private case class WrappedRequestNext(r: ProducerController.RequestNext[FibonacciConsumer.Command]) extends Command
+
+  def apply(
+      producerController: ActorRef[ProducerController.Command[FibonacciConsumer.Command]]): Behavior[Command] = {
+    Behaviors.setup { context =&gt;
+      val requestNextAdapter =
+        context.messageAdapter[ProducerController.RequestNext[FibonacciConsumer.Command]](WrappedRequestNext(_))
+      producerController ! ProducerController.Start(requestNextAdapter)
+
+      fibonacci(0, 1, 0)
+    }
+  }
+
+  private def fibonacci(n: Long, b: BigInt, a: BigInt): Behavior[Command] = {
+    Behaviors.receive {
+      case (context, WrappedRequestNext(next)) =&gt;
+        context.log.info(&quot;Generated fibonacci {}: {}&quot;, n, a)
+        next.sendNextTo ! FibonacciConsumer.FibonacciNumber(n, a)
+
+        if (n == 1000)
+          Behaviors.stopped
+        else
+          fibonacci(n + 1, a + b, b)
+    }
+  }
+}
+</code></pre>
+<p>有关 Akka Typed 消息适配（<code>context.messageAdapter</code>）的更多内容可以参看 <a href="https://www.yangbajing.me/akka-cookbook/actor/pattern/adapted-response.html">适配响应类型到 Actor</a> 。</p>
+<p><strong>消费者</strong></p>
+<pre class="prettyprint"><code class="language-scala">import akka.actor.typed.delivery.ConsumerController
+
+object FibonacciConsumer {
+  sealed trait Command
+
+  final case class FibonacciNumber(n: Long, value: BigInt) extends Command
+
+  private case class WrappedDelivery(d: ConsumerController.Delivery[Command]) extends Command
+
+  def apply(
+      consumerController: ActorRef[ConsumerController.Command[FibonacciConsumer.Command]]): Behavior[Command] = {
+    Behaviors.setup { context =&gt;
+      val deliveryAdapter =
+        context.messageAdapter[ConsumerController.Delivery[FibonacciConsumer.Command]](WrappedDelivery(_))
+      consumerController ! ConsumerController.Start(deliveryAdapter)
+
+      Behaviors.receiveMessagePartial {
+        case WrappedDelivery(ConsumerController.Delivery(FibonacciNumber(n, value), confirmTo)) =&gt;
+          context.log.info(&quot;Processed fibonacci {}: {}&quot;, n, value)
+          confirmTo ! ConsumerController.Confirmed
+          Behaviors.same
+      }
+    }
+  }
+}
+</code></pre>
+<p>通过向 <code>confirmTo</code> 发送 <code>ConsumerController.Confirmed</code> 消息，<code>ConsumerController</code> 将向生产者发送消息（处理）确认。 <code>ConsumerController</code> 内部隐藏了消息ID等技术细节，开发人员不需要关心应该发送哪条消息的确认消息，这简化了 API，同时可以让代码更专注于业务逻辑。</p>
+<p>下面代码构造了生产者、消费者以及它们分别需要的 <code>ProducerController</code> 和 <code>ConsumerController</code>。将生产者和消费者连接起来是通过将 <code>producerController</code> 作为 <code>RegisterToProducerController</code> 消息的内容发送到 <code>consumerController</code> 来实现的，<code>consumerController</code> 内部会实现 <code>ProducerController</code> 和 <code>ConsumerController</code> 的连接。</p>
+<pre class="prettyprint"><code class="language-scala">val consumerController = context.spawn(ConsumerController[FibonacciConsumer.Command](), &quot;consumerController&quot;)
+context.spawn(FibonacciConsumer(consumerController), &quot;consumer&quot;)
+
+val producerId = s&quot;fibonacci-${UUID.randomUUID()}&quot;
+val producerController = context.spawn(
+  ProducerController[FibonacciConsumer.Command](producerId, durableQueueBehavior = None),
+  &quot;producerController&quot;)
+context.spawn(FibonacciProducer(producerController), &quot;producer&quot;)
+
+consumerController ! ConsumerController.RegisterToProducerController(producerController)
+</code></pre>
+<h3><a href="#点对点交付语义" name="点对点交付语义" class="anchor"><span class="anchor-link"></span></a>点对点交付语义</h3>
+<p>只要生产者和消费者都没崩溃，消息就会按发送到 <code>ProducerController</code> 的顺序发送到消费者，不会丢失也不会重复。这意味着就是恰好一次处理， 消费者端不需要任何业务级的重复判断。</p>
+<p>如果生产者崩溃，那么未确认的消费可能会丢失。为了防止消息丢失可以启用 <code>ProducerController</code> 的 <code>durableQueueBehavior</code> ， 这将在生产者端启用持久化存储，通过 Akka Persistence 把未确认消息存储到外部物理存储上，这样在从崩溃中恢复以后可以继续处理未确认消息。 这意味着至少一次交付。</p>
+<p>如果消费者崩溃，那么一个新的 <code>ConsumerController</code> 可以连接到消费者。生产者将重新传递所有未确认的消息，这样消费者可能需要根据消息 ID 来判断此消息是否被处理过。这意味着至少一次交付。</p>
+<h2><a href="#工作拉取-work-pulling-" name="工作拉取-work-pulling-" class="anchor"><span class="anchor-link"></span></a>工作拉取（Work Pulling）</h2>
+<p>工作拉取模式在点对点交付的基础之上提供了一对多的消息通信方式。工作拉取指多个消费者按照自己的节奏从同一个生产者拉取消息， 而生产者并不在意有多次个消费者，也不会在不知道消费者处理能力的情况下盲目的向消费者推送消息。</p>
+<p>这里一个重要的特性是消息处理的顺序是不确定的，消息将被随机的发送到各个消费者，甚至未确认的消息在重发时也可能发送到不同的消费者上。</p>
+<p>消息从生产者发送到 <code>WorkPullingProducerController</code> ，并通过 <code>ConsumerController</code> 到达消费者 actor。 消费者的处理逻辑对点对点交付模式中消费者处理逻辑一样。下图是一个消费者时的工作拉取模式：</p>
+<p><img src="imgs/delivery-work-pulling-1.png" alt="delivery-work-pulling-1" /></p>
+<p>下面是有两个消费者时的工作拉取模式：</p>
+<p><img src="imgs/delivery-work-pulling-2.png" alt="delivery-work-pulling-2" /></p>
+<p>消费者的 <code>ConsumerController</code> 通过 <a href="https://doc.akka.io/docs/akka/current/typed/actor-discovery.html"><code>ServiceKey</code></a> 动态注册到 <code>WorkPullingProducerController</code>。通过这个方式，消费者可以动态注册或删除自己到/从相同 <code>ServiceKey</code> 的生产者。</p>
+<p>与点对点交付模式类似，式作拉取模式也是客户端主动拉取的，生产者需要在收到 <code>Request</code> 请求以后才能向 <code>WorkPullingProducerController</code> 发送消息。生产者与 <code>WorkPullingProducerController</code> 也要在同一个 ActorSystem 中，不允许跨网络，消费者亦同。生产者和消费者都需要向 <code>XxxController</code> 发送 <code>Start</code> 消息来启动它；消费者同样需要向 <code>confirmTo</code> 发送 <code>ConsumerController.Confirmed</code> 消费来告知生产者此消息 已被消费。因为生产者与多个消费者之间的流量控制由消费者驱动，意味着生产者发送的速度不会快于消费者的请求速度。</p>
+<p>不同的地方在当多个消费者向生产者请求消息，在消息被实际发送到消费者之前消费者已经停止。这时，消息将被缓冲在生产者端，当有新的消费者注册或请求时， 缓冲的消息将被发送到消费者。</p>
+<h3><a href="#工作拉取示例" name="工作拉取示例" class="anchor"><span class="anchor-link"></span></a>工作拉取示例</h3>
+<p><strong>图片转换消费者（Worker）</strong></p>
+<p>与点对点交付模式不同，工作拉取模式下 <code>ConsumerController</code> 不再是通过发送 <code>ConsumerController.RegisterToProducerController(producerController)</code> 注册消息的方式来注册到 <code>WorkPullingProducerController</code> 的，而是在构造 <code>ConsumerController</code> 时通过 <a href="https://doc.akka.io/docs/akka/current/typed/actor-discovery.html"><code>ServiceKey</code></a> 来查找生产者。 </p>
+<pre class="prettyprint"><code class="language-scala">import akka.actor.typed.delivery.ConsumerController
+import akka.actor.typed.receptionist.ServiceKey
+
+object ImageConverter {
+  sealed trait Command
+  final case class ConversionJob(resultId: UUID, fromFormat: String, toFormat: String, image: Array[Byte])
+  private case class WrappedDelivery(d: ConsumerController.Delivery[ConversionJob]) extends Command
+
+  val serviceKey = ServiceKey[ConsumerController.Command[ConversionJob]](&quot;ImageConverter&quot;)
+
+  def apply(): Behavior[Command] = {
+    Behaviors.setup { context =&gt;
+      val deliveryAdapter =
+        context.messageAdapter[ConsumerController.Delivery[ConversionJob]](WrappedDelivery(_))
+      val consumerController =
+        context.spawn(ConsumerController(serviceKey), &quot;consumerController&quot;)
+      consumerController ! ConsumerController.Start(deliveryAdapter)
+
+      Behaviors.receiveMessage {
+        case WrappedDelivery(delivery) =&gt;
+          val image = delivery.message.image
+          val fromFormat = delivery.message.fromFormat
+          val toFormat = delivery.message.toFormat
+          // convert image...
+          // store result with resultId key for later retrieval
+
+          // and when completed confirm
+          delivery.confirmTo ! ConsumerController.Confirmed
+
+          Behaviors.same
+      }
+
+    }
+  }
+
+}
+</code></pre>
+<p><strong>图片转换生产者</strong></p>
+<p><code>WorkPullingProducerController</code> 在构造时需要指定 <code>ServiceKey</code>，消费者同过相同的 <code>ServiceKey</code> 注册到生产者。</p>
+<pre class="prettyprint"><code class="language-scala">import akka.actor.typed.delivery.WorkPullingProducerController
+
+object ImageWorkManager {
+  trait Command
+  final case class Convert(fromFormat: String, toFormat: String, image: Array[Byte]) extends Command
+  private case class WrappedRequestNext(r: WorkPullingProducerController.RequestNext[ImageConverter.ConversionJob])
+      extends Command
+
+  final case class GetResult(resultId: UUID, replyTo: ActorRef[Option[Array[Byte]]]) extends Command
+
+  def apply(): Behavior[Command] = {
+    Behaviors.setup { context =&gt;
+      val requestNextAdapter =
+        context.messageAdapter[WorkPullingProducerController.RequestNext[ImageConverter.ConversionJob]](
+          WrappedRequestNext(_))
+      val producerController = context.spawn(
+        WorkPullingProducerController(
+          producerId = &quot;workManager&quot;,
+          workerServiceKey = ImageConverter.serviceKey,
+          durableQueueBehavior = None),
+        &quot;producerController&quot;)
+      producerController ! WorkPullingProducerController.Start(requestNextAdapter)
+
+      Behaviors.withStash(1000) { stashBuffer =&gt;
+        new ImageWorkManager(context, stashBuffer).waitForNext()
+      }
+    }
+  }
+
+}
+
+final class ImageWorkManager(
+    context: ActorContext[ImageWorkManager.Command],
+    stashBuffer: StashBuffer[ImageWorkManager.Command]) {
+
+  import ImageWorkManager._
+
+  private def waitForNext(): Behavior[Command] = {
+    Behaviors.receiveMessage {
+      case WrappedRequestNext(next) =&gt;
+        stashBuffer.unstashAll(active(next))
+      case c: Convert =&gt;
+        if (stashBuffer.isFull) {
+          context.log.warn(&quot;Too many Convert requests.&quot;)
+          Behaviors.same
+        } else {
+          stashBuffer.stash(c)
+          Behaviors.same
+        }
+      case GetResult(resultId, replyTo) =&gt;
+        // TODO retrieve the stored result and reply
+        Behaviors.same
+    }
+  }
+
+  private def active(
+      next: WorkPullingProducerController.RequestNext[ImageConverter.ConversionJob]): Behavior[Command] = {
+    Behaviors.receiveMessage {
+      case Convert(from, to, image) =&gt;
+        val resultId = UUID.randomUUID()
+        next.sendNextTo ! ImageConverter.ConversionJob(resultId, from, to, image)
+        waitForNext()
+      case GetResult(resultId, replyTo) =&gt;
+        // TODO retrieve the stored result and reply
+        Behaviors.same
+      case _: WrappedRequestNext =&gt;
+        throw new IllegalStateException(&quot;Unexpected RequestNext&quot;)
+    }
+  }
+}
+</code></pre>
+<h3><a href="#工作拉取语义" name="工作拉取语义" class="anchor"><span class="anchor-link"></span></a>工作拉取语义</h3>
+<p>工作拉取模式不关心消息顺序，因为每个消息会被随机的以任一路由到任何一个消费者。</p>
+<p>只要生产者和消费者不崩溃（或因为某种原因消费者被删除），消息就会被传递到消费者，不会丢失也不会重复，不需要任何业务层面的重复判断。 这意味着至少一次交付。</p>
+<p>如果生产者崩溃，那么未确认的消费可能会丢失。为了防止消息丢失可以启用 <code>WorkPullingProducerController</code> 的 <code>durableQueueBehavior</code> ， 这将在生产者端启用持久化存储，通过 Akka Persistence 把未确认消息存储到外部物理存储上，这样在从崩溃中恢复以后可以继续处理未确认消息。 这意味着至少一次交付。</p>
+<p>如果消费者崩溃或被停止，未确认消息将被重新传递到其它消费者。这种情况下，消息可能已经被处理过了，收到消息的消费者可能需要根据消息 ID 去重。 这意味着至少一次交付。</p>
+<h2><a href="#分片-sharding-" name="分片-sharding-" class="anchor"><span class="anchor-link"></span></a>分片（Sharding）</h2>
+<p>与 Akka Cluster Sharding 一起使用可靠交付，需要添加下面依赖到项目：</p>
+<pre class="prettyprint"><code class="language-sbt">libraryDependencies += &quot;com.typesafe.akka&quot; %% &quot;akka-cluster-sharding-typed&quot; % &quot;2.6.4&quot;
+</code></pre>
+<p>通过分片方式的生产者和消费者之间的消息可靠交付：</p>
+<p><img src="imgs/delivery-sharding-1.png" alt="delivery-sharding-1" /></p>
+<p>发送消息到另一个消费者：</p>
+<p><img src="imgs/delivery-sharding-2.png" alt="delivery-sharding-2" /></p>
+<p>从另一个生产者发送消息到消费者：</p>
+<p><img src="imgs/delivery-sharding-3.png" alt="delivery-sharding-3" /></p>
+<p><code>ShardingProducerController</code> 应与 <code>ShardingConsumerController</code> 一起使用。</p>
+<p>生产者可以通过 <code>ShardingProducerController</code> 发送消息到指定 <code>entityId</code> 的 <code>ShardingConsumerController</code>。每个 <code>ActorSystem</code>（节点） 的单个 <code>ShardingProducerController</code> 都可以发送消息到相同实体类型（<code>EntityTypeKey</code>）的所有消费者实体，不需要显示的注册 <code>ShardingConsumerController</code> 到 <code>ShardingProducerController</code>。</p>
+<p>在 <code>ShardingProducerController.RequestNext</code> 消息中，有关于哪些实体在请求数据的信息。但是，它也允许向未包含在 <code>RequestNext.entitiesWithDemand</code> 里的新 <code>entityId</code> 发送消息，这时候这些消息将被缓冲。这意味着，可以一次向 <code>RequestNext</code> 发送多条消息，但建议每次只发送一条，等待下一个 <code>RequestNext</code> 到来后再发送其它消息。</p>
+<p>生产者与 <code>ShardingProducerController</code> 也必须在同一个 <code>ActorSystem</code> 系统，并且不能跨网络。</p>
+<p>每个分片实体都有一个 <code>ShardingConsumerController</code>，它与 <code>ShardingProducerController</code> 之间可以有很多未确认的消息， 但受到由消费者驱动流量控制，这意味着 <code>ShardingProducerController</code> 的发送速度不会超过消费者需求的速度。</p>
+<h3><a href="#分片示例" name="分片示例" class="anchor"><span class="anchor-link"></span></a>分片示例</h3>
+<p>分片实体是一个 todo list 应用，它使用异步数据库调用存储自己在每次变化时的整个状态，当存储完成时首先把 <code>confirmTo</code> 与存储结果一起发送给 actor 自己， 再根据存储结果类型向生产者发送 <code>Confirmed</code> 确认消息。</p>
+<p><strong>消费者 <code>TodoList</code> 实体</strong></p>
+<pre class="prettyprint"><code class="language-scala">trait DB {
+  def save(id: String, value: TodoList.State): Future[Done]
+  def load(id: String): Future[TodoList.State]
+}
+
+object TodoList {
+
+  sealed trait Command
+
+  final case class AddTask(item: String) extends Command
+  final case class CompleteTask(item: String) extends Command
+
+  private final case class InitialState(state: State) extends Command
+  private final case class SaveSuccess(confirmTo: ActorRef[ConsumerController.Confirmed]) extends Command
+  private final case class DBError(cause: Throwable) extends Command
+
+  private final case class CommandDelivery(command: Command, confirmTo: ActorRef[ConsumerController.Confirmed])
+      extends Command
+
+  final case class State(tasks: Vector[String])
+
+  def apply(
+      id: String,
+      db: DB,
+      consumerController: ActorRef[ConsumerController.Start[Command]]): Behavior[Command] = {
+    Behaviors.setup[Command] { context =&gt;
+      new TodoList(context, id, db).start(consumerController)
+    }
+  }
+
+}
+
+class TodoList(context: ActorContext[TodoList.Command], id: String, db: DB) {
+  import TodoList._
+
+  private def start(consumerController: ActorRef[ConsumerController.Start[Command]]): Behavior[Command] = {
+    context.pipeToSelf(db.load(id)) {
+      case Success(value) =&gt; InitialState(value)
+      case Failure(cause) =&gt; DBError(cause)
+    }
+
+    Behaviors.receiveMessagePartial {
+      case InitialState(state) =&gt;
+        val deliveryAdapter: ActorRef[ConsumerController.Delivery[Command]] = context.messageAdapter { delivery =&gt;
+          CommandDelivery(delivery.message, delivery.confirmTo)
+        }
+        consumerController ! ConsumerController.Start(deliveryAdapter)
+        active(state)
+      case DBError(cause) =&gt;
+        throw cause
+    }
+  }
+
+  private def active(state: State): Behavior[Command] = {
+    Behaviors.receiveMessagePartial {
+      case CommandDelivery(AddTask(item), confirmTo) =&gt;
+        val newState = state.copy(tasks = state.tasks :+ item)
+        save(newState, confirmTo)
+        active(newState)
+      case CommandDelivery(CompleteTask(item), confirmTo) =&gt;
+        val newState = state.copy(tasks = state.tasks.filterNot(_ == item))
+        save(newState, confirmTo)
+        active(newState)
+      case SaveSuccess(confirmTo) =&gt;
+        confirmTo ! ConsumerController.Confirmed
+        Behaviors.same
+      case DBError(cause) =&gt;
+        throw cause
+    }
+  }
+
+  private def save(newState: State, confirmTo: ActorRef[ConsumerController.Confirmed]): Unit = {
+    context.pipeToSelf(db.save(id, newState)) {
+      case Success(_)     =&gt; SaveSuccess(confirmTo)
+      case Failure(cause) =&gt; DBError(cause)
+    }
+  }
+}
+</code></pre>
+<p>注意：通过 Cluster Sharding 启动的 TodoList 需要通过发送消息（<code>consumerController ! ConsumerController.Start(deliveryAdapter)</code>） 来手动启动 <code>ConsumerController</code> 。</p>
+<p><code>TodoService</code> 生产者：</p>
+<pre class="prettyprint"><code class="language-scala">object TodoService {
+  sealed trait Command
+
+  final case class UpdateTodo(listId: String, item: String, completed: Boolean, replyTo: ActorRef[Response])
+      extends Command
+
+  sealed trait Response
+  case object Accepted extends Response
+  case object Rejected extends Response
+  case object MaybeAccepted extends Response
+
+  private final case class WrappedRequestNext(requestNext: ShardingProducerController.RequestNext[TodoList.Command])
+      extends Command
+  private final case class Confirmed(originalReplyTo: ActorRef[Response]) extends Command
+  private final case class TimedOut(originalReplyTo: ActorRef[Response]) extends Command
+
+  def apply(producerController: ActorRef[ShardingProducerController.Command[TodoList.Command]]): Behavior[Command] = {
+    Behaviors.setup { context =&gt;
+      new TodoService(context).start(producerController)
+    }
+  }
+
+}
+
+class TodoService(context: ActorContext[TodoService.Command]) {
+  import TodoService._
+
+  private implicit val askTimeout: Timeout = 5.seconds
+
+  private def start(
+      producerController: ActorRef[ShardingProducerController.Start[TodoList.Command]]): Behavior[Command] = {
+    val requestNextAdapter: ActorRef[ShardingProducerController.RequestNext[TodoList.Command]] =
+      context.messageAdapter(WrappedRequestNext.apply)
+    producerController ! ShardingProducerController.Start(requestNextAdapter)
+
+    Behaviors.receiveMessagePartial {
+      case WrappedRequestNext(next) =&gt;
+        active(next)
+      case UpdateTodo(_, _, _, replyTo) =&gt;
+        // not hooked up with shardingProducerController yet
+        replyTo ! Rejected
+        Behaviors.same
+    }
+  }
+
+  private def active(requestNext: ShardingProducerController.RequestNext[TodoList.Command]): Behavior[Command] = {
+    Behaviors.receiveMessage {
+      case WrappedRequestNext(next) =&gt;
+        active(next)
+
+      case UpdateTodo(listId, item, completed, replyTo) =&gt;
+        if (requestNext.bufferedForEntitiesWithoutDemand.getOrElse(listId, 0) &gt;= 100)
+          replyTo ! Rejected
+        else {
+          val requestMsg = if (completed) TodoList.CompleteTask(item) else TodoList.AddTask(item)
+          context.ask[ShardingProducerController.MessageWithConfirmation[TodoList.Command], Done](
+            requestNext.askNextTo,
+            askReplyTo =&gt; ShardingProducerController.MessageWithConfirmation(listId, requestMsg, askReplyTo)) {
+            case Success(Done) =&gt; Confirmed(replyTo)
+            case Failure(_)    =&gt; TimedOut(replyTo)
+          }
+        }
+        Behaviors.same
+
+      case Confirmed(originalReplyTo) =&gt;
+        originalReplyTo ! Accepted
+        Behaviors.same
+
+      case TimedOut(originalReplyTo) =&gt;
+        originalReplyTo ! MaybeAccepted
+        Behaviors.same
+    }
+  }
+
+}
+</code></pre>
+<p>通过 ActorSystem 的守卫 actor 实例化 TodoList 服务的分片生产者和分片消费者。<code>ShardingConsumerController</code> 内部包含了 <code>ConsumerController</code>，通过在构造分片实体的时候传递给 <code>TodoList</code> actor。</p>
+<pre class="prettyprint"><code class="language-scala">object ToDoApp {
+  private val entityTypeKey = EntityTypeKey[ConsumerController.SequencedMessage[TodoList.Command]](&quot;toto&quot;)
+
+  private def behavior(db: DB): Behavior[TodoList.Command] = Behaviors.setup { context =&gt;
+    val todoEntity = Entity(entityTypeKey)(entityContext =&gt;
+      ShardingConsumerController(start =&gt; TodoList(entityContext.entityId, db, start)))
+    val todoRegion = ClusterSharding(context.system).init(todoEntity)
+    val selfAddress = Cluster(context.system).selfMember.address
+    val producerId = s&quot;todo-producer-${selfAddress.host}:${selfAddress.port}&quot;
+    val producerController =
+      context.spawn(ShardingProducerController(producerId, todoRegion, None), &quot;producerController&quot;)
+
+    context.spawn(TodoService(producerController), &quot;producer&quot;)
+
+    Behaviors.ignore
+  }
+
+  def main(args: Array[String]): Unit = {
+    val db = new DB {
+      override def save(id: String, value: TodoList.State): Future[Done] = ???
+      override def load(id: String): Future[TodoList.State] = ???
+    }
+    ActorSystem(behavior(db), &quot;todo-system&quot;)
+  }
+}
+</code></pre>
+<h3><a href="#分片交付语义" name="分片交付语义" class="anchor"><span class="anchor-link"></span></a>分片交付语义</h3>
+<p>只要生产者和消费者都没崩溃，消息就会按发送到 <code>ShardingProducerController</code> 的顺序发送，不会丢失也不会重复。这意味着就是恰好一次处理， 消费者端不需要任何业务级的重复判断。</p>
+<p>如果生产者崩溃，那么未确认消息可能丢失。为了防止消息丢失可以启用 <code>ShardingProducerController</code> 的 <code>durableQueueBehavior</code>， 这将在生产者端启用持久化存储，通过 Akka Persistence 把未确认消息存储到外部物理存储上，这样在从崩溃中恢复以后可以继续处理未确认消息。 这意味着至少一次交付。</p>
+<p>如果消费者崩溃或分片被重新平衡，那么将重新传送未确认消息。这种情况下也许会重复处理前一个消费者已经处理过的消息。</p>
+<h2><a href="#持久的生产者" name="持久的生产者" class="anchor"><span class="anchor-link"></span></a>持久的生产者</h2>
+<p>生产者在收到确认消息之前，相应的消息会一直保存在内存里以用于可能的重发。但是，如果生产者端的 JVM 崩溃，那么未确认消息将会丢失。 <code>DurableProducerQueue</code> 可用于确保消息在这种场景（JVM 崩溃）下也可以交付。因为未确认消息以持久的方式被存储，所以当生产者重启以后可以重新传送它们。 <code>EventSourcedProducerQueue</code> 是 <code>akka-persistence-typed</code> 提供的 <code>DurableProducerQueue</code> 实现。</p>
+<p><strong><em>注意，<code>DurableProducerQueueue</code> 将增加大量的性能开销。</em></strong></p>
+<p>要使用 <code>EventSourcedProducerQueue</code>，需要添加下面的依赖：</p>
+<pre class="prettyprint"><code class="language-sbt">libraryDependencies += &quot;com.typesafe.akka&quot; %% &quot;akka-persistence-typed&quot; % &quot;2.6.4&quot;
+</code></pre>
+<p>要使用 <code>EventSourcedProducerQueue</code> 非常简单，比如前面的图片转换示例，可以按下面代码描述使用：</p>
+<pre class="prettyprint"><code class="language-scala">import akka.persistence.typed.delivery.EventSourcedProducerQueue
+import akka.persistence.typed.PersistenceId
+
+val durableQueue =
+  EventSourcedProducerQueue[ImageConverter.ConversionJob](PersistenceId.ofUniqueId(&quot;ImageWorkManager&quot;))
+val durableProducerController = context.spawn(
+  WorkPullingProducerController(
+    producerId = &quot;workManager&quot;,
+    workerServiceKey = ImageConverter.serviceKey,
+    durableQueueBehavior = Some(durableQueue)),
+  &quot;producerController&quot;)
+</code></pre>
+<p>可以看到，只需要在构建 <code>WorkPullingProducerController</code> 时传递一个 <code>EventSourcedProducerQueue</code> 的实例即可。 <em>需要注意的是，务必确保 <code>PersistenceId</code> 的唯一性。</em></p>
+<h2><a href="#只有流量控制" name="只有流量控制" class="anchor"><span class="anchor-link"></span></a>只有流量控制</h2>
+<p>可以不重发丢失的消息，但仍然使用流量控制。当生产者和消息者都在相同的本地 ActorSystem 上时，这可能有用。这样做会更高效， 因为在确认之前消息不必被保存在 <code>ProducerController</code> 的内存中，但缺点是丢失的消息将不被重传。可以参考 <code>ConsumerController</code> 的 <a href="https://doc.akka.io/docs/akka/current/general/configuration-reference.html#akka-actor-typed"><code>only-flow-control</code></a> 配置。</p>
+<h2><a href="#总结" name="总结" class="anchor"><span class="anchor-link"></span></a>总结</h2>
+<p>Akka Typed 在版本 2.6.4 开始终于提供了可靠交付的实现（之前只有经典、非类型 actor 版本的实现）：至少一次交付（At Least Once Delivery）。 可以看到，提供了可靠交付实现是基于 Akka 已有功能之上的，比如：</p>
+<ul>
+  <li>通过 <code>Receptionist</code> 根据 <code>ServiceKey</code> 查找远程 actor；</li>
+  <li>通过 Akka Cluster Sharding 实现基于分片的可靠交付，这样就不需要手动管理消费者的创建；</li>
+  <li>通过 Akka Persistence 可现了未确认消息的持久存储，以保证在程序重启后仍然可以重发未确认消息。</li>
+</ul>
+<p>对于 Akka Typed 现在提供的各种可靠交付模式，各有各的实现方式，下面列出各自的适用场景：</p>
+<table>
+  <thead>
+    <tr>
+      <th>交互模式 </th>
+      <th>传输方式 </th>
+      <th>流量控制 </th>
+      <th>未确认消息持久化 </th>
+      <th>适用场景 </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>点对点 </td>
+      <td>消费者拉 </td>
+      <td>有 </td>
+      <td>支持 </td>
+      <td>两个 actor 之间发送消息 </td>
+    </tr>
+    <tr>
+      <td>工作拉取 </td>
+      <td>消费者拉 </td>
+      <td>有 </td>
+      <td>支持 </td>
+      <td>需要有多个消费者消费单个生产者的消息时，通过并行处理提高处理能力 </td>
+    </tr>
+    <tr>
+      <td>分片 </td>
+      <td>消费者拉 </td>
+      <td>有 </td>
+      <td>支持 </td>
+      <td>消费者需要水平分配的集群节点上，并可自动重新平衡 </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../cluster/ddata.html"><i class="icon-prev"></i> <span class="link-prev">使用 DistributeData 在集群间同步数据</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../persistence/index.html">Akka Persistence <i class="icon-next"></i></a>
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/cluster/reliable-delivery.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2020 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>

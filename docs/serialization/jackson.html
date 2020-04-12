@@ -129,12 +129,12 @@ Version 1.0.0
     &quot;cookbook.json.JsonSerializable&quot; = jackson-json
   }
 }</code></pre>
-<p>这里配置了两个 trait 分别使用 <code>jackson-cbor</code> 和 <code>jackson-json</code> 序列化方式，这两种序列化方式为 Akka 内置的序列化器。需要加入以下依赖使用：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-serialization-jackson" % "2.6.3"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+<p>这里配置了两个 trait 分别使用 <code>jackson-cbor</code> 和 <code>jackson-json</code> 序列化方式，这两种序列化方式为 Akka 内置的序列化器。需要加入以下依赖使用：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-serialization-jackson" % "2.6.4"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;com.typesafe.akka&lt;/groupId&gt;
   &lt;artifactId&gt;akka-serialization-jackson_2.13&lt;/artifactId&gt;
-  &lt;version&gt;2.6.3&lt;/version&gt;
+  &lt;version&gt;2.6.4&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'com.typesafe.akka', name: 'akka-serialization-jackson_2.13', version: '2.6.3'
+  compile group: 'com.typesafe.akka', name: 'akka-serialization-jackson_2.13', version: '2.6.4'
 }</code></pre></dd></dl>
 <h2><a href="#todo" name="todo" class="anchor"><span class="anchor-link"></span></a>TODO</h2>
 </div>

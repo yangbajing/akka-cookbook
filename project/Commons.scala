@@ -31,7 +31,9 @@ object Commons {
       fork in run := true,
       fork in Test := true,
       parallelExecution in Test := false,
-      libraryDependencies ++= Seq(Dependencies._fusionTestkit % Test))
+      libraryDependencies ++= Seq(
+          "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+          Dependencies._fusionTestkit % Test))
 }
 
 object Publishing {
