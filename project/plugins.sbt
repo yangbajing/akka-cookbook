@@ -17,6 +17,3 @@ addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.4")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.2.1")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.7-1")
 addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.5")
-
-//resolvers += Resolver.bintrayIvyRepo("helloscala", "ivy")
-addSbtPlugin("com.helloscala.fusion" % "fusion-sbt-plugin" % "2.0.7-SNAPSHOT")
