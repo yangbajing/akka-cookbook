@@ -125,8 +125,8 @@ Version 1.0.0
 <p>通过配置 <code>akka.actor.serialization-bindings</code> 指定特定的数据类型（及子类型）在远程通信中使用已配置的序列化工具。</p>
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-cluster/src/main/resources/reference.conf" target="_blank" title="Go to snippet source"></a><code class="language-conf">akka.actor {
   serialization-bindings {
-    &quot;cookbook.json.CborSerializable&quot; = jackson-cbor
-    &quot;cookbook.json.JsonSerializable&quot; = jackson-json
+    &quot;CborSerializable&quot; = jackson-cbor
+    &quot;JsonSerializable&quot; = jackson-json
   }
 }</code></pre>
 <p>这里配置了两个 trait 分别使用 <code>jackson-cbor</code> 和 <code>jackson-json</code> 序列化方式，这两种序列化方式为 Akka 内置的序列化器。需要加入以下依赖使用：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-serialization-jackson" % "2.6.4"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;

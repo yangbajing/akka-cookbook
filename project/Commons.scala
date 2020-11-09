@@ -1,3 +1,4 @@
+import Dependencies._
 import bintray.BintrayKeys._
 import com.typesafe.sbt.SbtNativePackager.autoImport.maintainer
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{ HeaderLicense, headerLicense }
@@ -33,7 +34,9 @@ object Commons {
       parallelExecution in Test := false,
       libraryDependencies ++= Seq(
           "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-          Dependencies._fusionTestkit % Test))
+          _akkaTypedTestkit % Test,
+          _akkaStreamTestkit % Test,
+          _scalatest % Test))
 }
 
 object Publishing {

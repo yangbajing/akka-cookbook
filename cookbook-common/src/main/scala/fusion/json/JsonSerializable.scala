@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cookbook.json
+package fusion.json
 
 // #JsonSerializable
 trait JsonSerializable
