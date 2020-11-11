@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>集群限流 &bull; Akka Cookbook</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="book"/>
+<link rel="canonical" href="https://www.yangbajing.me/akka-cookbook/cluster/rate-limiter.html"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="../css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page-6.css"/>
+<link rel="stylesheet" type="text/css" href="../css/banner.css"/>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png"/>
+<link rel="manifest" href="../images/manifest.json"/>
+<meta name="msapplication-TileImage" content="../images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+
+<body id="underlay" data-toggler="nav-open">
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div id="overlay-search-container" class="nav-header-search">
+<input id="overlay-search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a>
+  <ul>
+    <li><a href="../cluster/ddata.html" class="page">使用 DistributeData 在集群间同步数据</a></li>
+    <li><a href="../cluster/reliable-delivery.html" class="page">消息的可靠交付</a></li>
+    <li><a href="../cluster/rate-limiter.html#集群限流" class="active page">集群限流</a>
+    <ul>
+      <li><a href="../cluster/rate-limiter.html#极速实现" class="header">极速实现</a></li>
+      <li><a href="../cluster/rate-limiter.html#超时等待" class="header">超时等待</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<div class="site-content-wrapper">
+<aside class="sticky-sidebar show-for-large">
+<header class="nav-header sticky-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="../index.html">Akka Cookbook</a></h1>
+</div>
+<div class="nav-header-version">
+Version 1.0.0
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-scala">Scala</option><option class="group" value="group-java">Java</option></select>
+</div>
+<div class="nav-header-search">
+<input id="search" type="search" class="search" placeholder="Search" />
+</div>
+</header>
+<nav class="site-nav sticky-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="../introduction.html" class="page">Introduction</a></li>
+  <li><a href="../actor/index.html" class="page">Actor</a></li>
+  <li><a href="../test/index.html" class="page">Test</a></li>
+  <li><a href="../streams/index.html" class="page">Akka Streams</a></li>
+  <li><a href="../http/index.html" class="page">Akka HTTP</a></li>
+  <li><a href="../serialization/index.html" class="page">序列化</a></li>
+  <li><a href="../cluster/index.html" class="page">Akka Cluster</a>
+  <ul>
+    <li><a href="../cluster/ddata.html" class="page">使用 DistributeData 在集群间同步数据</a></li>
+    <li><a href="../cluster/reliable-delivery.html" class="page">消息的可靠交付</a></li>
+    <li><a href="../cluster/rate-limiter.html#集群限流" class="active page">集群限流</a>
+    <ul>
+      <li><a href="../cluster/rate-limiter.html#极速实现" class="header">极速实现</a></li>
+      <li><a href="../cluster/rate-limiter.html#超时等待" class="header">超时等待</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="../persistence/index.html" class="page">Akka Persistence</a></li>
+  <li><a href="../grpc/index.html" class="page">Akka gRPC</a></li>
+  <li><a href="../integration/index.html" class="page">Integration into external systems</a></li>
+  <li><a href="../util/index.html" class="page">实用工具</a></li>
+  <li><a href="../action/index.html" class="page">Action</a></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer sticky-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="../images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+<article class="page-content row">
+<div class="small-12 column" id="docs">
+<h1><a href="#集群限流" name="集群限流" class="anchor"><span class="anchor-link"></span></a>集群限流</h1>
+<p>限流的主要目的是对并发访问进行速度控制，在很多业务场景中都会用到。如：防止突发流量打垮服务、控制客户端调用某些 API 的次数和防止爬虫等。</p>
+<p>常见的限流工具有：</p>
+<ol>
+  <li><code>RateLimiter</code>（来自 Guava 库）：基于令牌桶算法实现的单机限流</li>
+  <li>Nginx：提供了多种限流算法模块</li>
+  <li><code>Sentinel</code>：由阿里巴巴开发的一款分布式限流框架。</li>
+</ol>
+<p>本文开始将通过使用 Guava 的 <code>RateLimiter</code> 和 Akka 快速实现一个集群限流功能，然后再根据可能的实际使用情况基于 Akka 实现一个限流库/框架，并讨论其在 Akka 或非 Akka 环境中的各种适用场景及用法。 </p>
+<h2><a href="#极速实现" name="极速实现" class="anchor"><span class="anchor-link"></span></a>极速实现</h2>
+<p>这里通过 Guava 的 <code>RateLimiter</code> + Akka Cluster Sharding 快速实现一个集群限流器，示例代码如下：</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-cluster/src/main/scala/cookbook/rate/ClusterRate.scala#L31-L65" target="_blank" title="Go to snippet source"></a><code class="language-scala">object ClusterRate {
+  sealed trait Command
+
+  case class Acquire(n: Int, replyTo: ActorRef[Acquired]) extends Command
+  case class Acquired(result: Boolean)
+  case class SetRate(permitsPerSecond: Double) extends Command
+
+  val entityTypeKey: EntityTypeKey[Command] = EntityTypeKey(&quot;ClusterRate&quot;)
+
+  def init(system: ActorSystem[_]): ActorRef[ShardingEnvelope[Command]] =
+    ClusterSharding(system).init(Entity(entityTypeKey)(entityContext =&gt; apply(entityContext.entityId)))
+
+  private[rate] def apply(name: String): Behavior[Command] = Behaviors.setup { context =&gt;
+    new ClusterRate(name, context).receive
+  }
+}
+
+import cookbook.rate.ClusterRate._
+class ClusterRate(name: String, context: ActorContext[Command]) {
+  private val config = context.system.settings.config
+  private val permitsPerSecond = config.getDouble(&quot;rate.permitsPerSecond&quot;)
+  private val rate = RateLimiter.create(permitsPerSecond)
+  println(s&quot;The permitsPerSecond is $permitsPerSecond&quot;)
+
+  def receive: Behavior[Command] = Behaviors.receiveMessage {
+    case Acquire(n, replyTo) =&gt;
+      Behaviors.same
+      val result = rate.tryAcquire(n)
+      replyTo ! Acquired(result)
+      Behaviors.same
+    case SetRate(permitsPerSecond) =&gt;
+      rate.setRate(permitsPerSecond)
+      Behaviors.same
+  }
+}</code></pre>
+<p>这就是在 Akka 中实现一个集群限流功能的所有代码了，我们来分析下它实现的功能：</p>
+<ol>
+  <li>我们通过使用 Akka Cluster Sharding 来实现了一个基于“分片机制”的分布式 <code>Entity</code> actor，其 <code>entityId</code>（即：<code>entityContext.entityId</code>）既为分片 ID，Akka 可以保证在相同时间只有一个 <code>Entity</code> actor 在集群内存活。这样，我们就可以通过 Akka 的 <code>Entity</code> actor 获得了一个集群内唯一的 <code>RateLimiter</code>，而 <code>entityId</code> 就可以用来区分不同地限流简略（或者对应到不同的限流 URI、服务名等）。</li>
+  <li>在 <code>ClusterRate</code> 伴身对象里定义了两个消息和一个返回值，实现：
+    <ul>
+      <li>申请令牌（<code>Acquire</code>为请求，<code>Acquired</code>为响应）</li>
+      <li>重置每秒可生成令牌数（<code>SetRate</code>）</li>
+    </ul>
+  </li>
+</ol>
+<h3><a href="#测试" name="测试" class="anchor"><span class="anchor-link"></span></a>测试</h3>
+<p>测试非常简单，我们将发起 3 次 <code>Acquire</code> 请求申请令牌，然后观察断言结果。</p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-cluster/src/test/scala/cookbook/rate/ClusterRateTest.scala#L33-L62" target="_blank" title="Go to snippet source"></a><code class="language-scala">class ClusterRateTest
+    extends ScalaTestWithActorTestKit(&quot;&quot;&quot;{
+    |akka.actor.provider = cluster
+    |akka.remote.artery.canonical.hostname = 127.0.0.1
+    |akka.remote.artery.canonical.port = 25520
+    |akka.cluster.seed-nodes = [&quot;akka://ClusterRateTest@127.0.0.1:25520&quot;]
+    |rate.permitsPerSecond = 2}&quot;&quot;&quot;.stripMargin)
+    with AnyWordSpecLike
+    with BeforeAndAfterAll {
+  override protected def beforeAll(): Unit = {
+    ClusterRate.init(system)
+  }
+
+  &quot;ClusterRate&quot; should {
+    &quot;acquire&quot; in {
+      val rateLimiterRef = ClusterSharding(system).entityRefFor(ClusterRate.entityTypeKey, &quot;rateLimiter&quot;)
+
+      val acquireResult1 = rateLimiterRef.ask(replyTo =&gt; ClusterRate.Acquire(1, replyTo)).futureValue
+      acquireResult1.result shouldBe true
+
+      val acquireResult2 = rateLimiterRef.ask(replyTo =&gt; ClusterRate.Acquire(1, replyTo)).futureValue
+      acquireResult2.result shouldBe false
+
+      TimeUnit.MILLISECONDS.sleep(600)
+
+      val acquireResult3 = rateLimiterRef.ask(replyTo =&gt; ClusterRate.Acquire(1, replyTo)).futureValue
+      acquireResult3.result shouldBe true
+    }
+  }
+}</code></pre>
+<p>上面是对 <code>ClusterRate</code> 的一个粗略的单元测试，我们可以看到 <code>acquireResult2</code> 的结果为 <code>false</code>，而不是预期的 <code>true</code>，这是因为 guava <code>RateLimiter</code> 里设置的每秒令牌数并不是一次性生成的，它会在 1 秒内均匀分配。</p>
+<h3><a href="#问题" name="问题" class="anchor"><span class="anchor-link"></span></a>问题</h3>
+<p>Akka 下一个集群限流功能实现好了，但它还是有些的问题；或者，你不知道在 Akka 环境或非 Akka 环境中怎样使用它？这些问题有：</p>
+<ol>
+  <li><code>Acquire</code> 不支持超时</li>
+  <li>Akka Actor 中怎样此集群限流功能？</li>
+  <li>Akka HTTP 中怎样此集群限流功能？</li>
+  <li>非 Akka 环境中可以使用此功能吗？比如：Spring</li>
+</ol>
+<p>在接下来的系列文章中将对其进行一一解决，敬请期待。</p>
+<h2><a href="#超时等待" name="超时等待" class="anchor"><span class="anchor-link"></span></a>超时等待</h2>
+<p>TODO 1. actor 内不应调用阻塞函数 .tryAcquire X  2. 重新实现 RateLimiter，通过 Akka timeout 垂柳 .tryAcquire</p>
+<p>TODO 1. acquireId 区分每次令牌获取  2. RateLimiter 未限制突发流量问题的解决</p>
+</div>
+</article>
+<div class="row">
+<div class="small-12 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="../cluster/reliable-delivery.html"><i class="icon-prev"></i> <span class="link-prev">消息的可靠交付</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+<a class="float-right" href="../persistence/index.html">Akka Persistence <i class="icon-next"></i></a>
+</div>
+</section>
+</div>
+</div>
+<div class="source-github row">
+在此文档中发现错误？该页面的源代码可以在 <a href="https://github.com/yangbajing/akka-cookbook/tree/master/book/src/main/paradox/cluster/rate-limiter.md" target="_blank">这里</a> 找到。欢迎随时编辑并提交Pull Request。
+</div>
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="../images/akka-icon.svg" />
+<section class="copyright">
+<div>Akka Cookbook is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2019-2020 <a href="https://www.yangbajing.me" target="_blank">羊八井花园.</a> |
+<a href="https://www.github.com/yangbajing" target="_blank">Github：@yangbajing</a> |
+<a href="https://weibo.com/yangbajing" target="_blank">Weibo: @yangbajing</a> |
+<a href="https://www.yangbajing.me/akka-cookbook" target="_blank">《Akka Cookbook》</a>
+</p>
+</section>
+</footer>
+</section>
+</main>
+</div>
+
+<script type="text/javascript" src="../js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="../js/metadata-toggle.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- Algolia docs search -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script>
+<style>.algolia-autocomplete { display: block !important }</style>
+<script type="text/javascript">
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+docsearch({
+apiKey: 'bc8e6a27d54d01e7d322395f061bf539',
+indexName: 'akka-cookbook',
+inputSelector: '#overlay-search',
+algoliaOptions: {
+hitsPerPage: 5
+}
+});
+
+// set up "/" as global shortcut for focusing on search
+jQuery(document).keypress(function (event) {
+if (event.keyCode == 47) {
+jQuery("#search").focus();
+return false; // swallow key event, otherwise the / char would be input into the search box
+}
+});
+</script>
+
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>

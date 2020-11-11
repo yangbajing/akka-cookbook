@@ -1,3 +1,3 @@
 #!/bin/sh
 
-#sbt book/paradox
+sbt book/paradox

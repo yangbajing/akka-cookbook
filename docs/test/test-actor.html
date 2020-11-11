@@ -133,12 +133,12 @@ Version 1.0.0
 <div class="small-12 column" id="docs">
 <h1><a href="#测试-actor" name="测试-actor" class="anchor"><span class="anchor-link"></span></a>测试 actor</h1>
 <p><code>akka-actor-testkit-typed</code>测试库为Akka（Typed）提供了开箱即用的测试工具，通常可以实现<code>ScalaTestWithActorTestKit</code>来实现自己的单元测试。有关更多 <strong>scalatest</strong> 的内容请访问官方网站： <a href="http://www.scalatest.org/">http://scalatest.org</a>。</p>
-<p>要使用<code>akka-actor-testkit-typed</code>对Akka代码进行测试，需要添加以下依赖到sbt项目：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.6.4"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+<p>要使用<code>akka-actor-testkit-typed</code>对Akka代码进行测试，需要添加以下依赖到sbt项目：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.typesafe.akka" %% "akka-actor-testkit-typed" % "2.6.10"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;com.typesafe.akka&lt;/groupId&gt;
   &lt;artifactId&gt;akka-actor-testkit-typed_2.13&lt;/artifactId&gt;
-  &lt;version&gt;2.6.4&lt;/version&gt;
+  &lt;version&gt;2.6.10&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'com.typesafe.akka', name: 'akka-actor-testkit-typed_2.13', version: '2.6.4'
+  compile group: 'com.typesafe.akka', name: 'akka-actor-testkit-typed_2.13', version: '2.6.10'
 }</code></pre></dd></dl>
 <h2><a href="#测试代码" name="测试代码" class="anchor"><span class="anchor-link"></span></a>测试代码</h2>
 <p>首先列出待测试actor的消息协议：</p>

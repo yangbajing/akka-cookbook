@@ -128,12 +128,12 @@ Version 1.0.0
 <h1><a href="#在-spring-里使用-akka-streams" name="在-spring-里使用-akka-streams" class="anchor"><span class="anchor-link"></span></a>在 Spring 里使用 Akka Streams</h1>
 <p>Akka Streams 作为 Reactive Streams 的一种实现，可以很方便的与其它 Reactive Streams 实现进行互操作。而从 Spring 5 开始，也提供了 Reactive Streams 实现的版本： <strong>WebFlow</strong> 。 <a href="https://doc.akka.io/docs/alpakka/2.0/spring-web.html"><strong>Alpakka Spring Web</strong></a> 项目提供了对Spring Boot的支持，可以让我们在 Spring 项目中使用 Akka Streams。</p>
 <h2><a href="#添加-akka-streams-支持" name="添加-akka-streams-支持" class="anchor"><span class="anchor-link"></span></a>添加 Akka Streams 支持</h2>
-<p>需要给Spring项目添加 Akka Streams 依赖：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % "2.0.0-RC2"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+<p>需要给Spring项目添加 Akka Streams 依赖：</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "com.lightbend.akka" %% "akka-stream-alpakka-spring-web" % "2.0.2"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
   &lt;groupId&gt;com.lightbend.akka&lt;/groupId&gt;
   &lt;artifactId&gt;akka-stream-alpakka-spring-web_2.13&lt;/artifactId&gt;
-  &lt;version&gt;2.0.0-RC2&lt;/version&gt;
+  &lt;version&gt;2.0.2&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'com.lightbend.akka', name: 'akka-stream-alpakka-spring-web_2.13', version: '2.0.0-RC2'
+  compile group: 'com.lightbend.akka', name: 'akka-stream-alpakka-spring-web_2.13', version: '2.0.2'
 }</code></pre></dd></dl>
 <h2><a href="#编写控制器" name="编写控制器" class="anchor"><span class="anchor-link"></span></a>编写控制器</h2>
 <p>在添加了 Akka Streams 支持后，我们就可以在控制器代码里直接返回 <code>Source[T, Mat]</code> 类型的结果了。</p>

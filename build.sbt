@@ -100,7 +100,7 @@ lazy val cookbookStreams = _project("cookbook-streams")
 
 lazy val cookbookCluster = _project("cookbook-cluster")
   .dependsOn(cookbookCommon % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_akkaSerializationJackson) ++ _akkaClusters)
+  .settings(libraryDependencies ++= Seq(_guava, _akkaSerializationJackson) ++ _akkaClusters)
 
 lazy val cookbookPersistence = _project("cookbook-persistence")
   .dependsOn(cookbookCluster, cookbookCommon % "compile->compile;test->test")

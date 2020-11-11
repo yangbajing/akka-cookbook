@@ -67,4 +67,6 @@ object Dependencies {
   val _springs = Seq("org.springframework.boot" % "spring-boot-starter-web" % versionSpringBoot)
 
   val _alpnAgent = "org.mortbay.jetty.alpn" % "jetty-alpn-agent" % versionAlpnAgent
+
+  val _guava = "com.google.guava" % "guava" % "30.0-jre"
 }

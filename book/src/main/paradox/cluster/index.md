@@ -6,5 +6,6 @@
 
 - [ddata](ddata.md)
 - [reliable-delivery](reliable-delivery.md)
+- [rate-limiter](rate-limiter.md)
 
 @@@
