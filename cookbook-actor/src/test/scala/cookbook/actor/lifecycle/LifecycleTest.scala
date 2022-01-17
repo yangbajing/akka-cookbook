@@ -21,10 +21,10 @@ import java.util.concurrent.TimeUnit
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.SupervisorStrategy
 import akka.actor.typed.scaladsl.Behaviors
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
 // #LifecycleTest
-class LifecycleTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class LifecycleTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "Lifecycle" should {
     "lifecycle" in {
       val ref = spawn(Behaviors.supervise(Lifecycle()).onFailure(SupervisorStrategy.restart))

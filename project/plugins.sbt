@@ -1,17 +1,44 @@
 logLevel := Level.Info
 
+resolvers += Resolver.sbtPluginRepo("releases")
 resolvers += Resolver.bintrayIvyRepo("2m", "sbt-plugins")
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.2.0")
+
+libraryDependencies += Defaults.sbtPluginExtra(
+  "com.eed3si9n" % "sbt-assembly" % "0.15.0",
+  (sbtBinaryVersion in pluginCrossBuild).value,
+  (scalaBinaryVersion in pluginCrossBuild).value)
+
+addDependencyTreePlugin
+
+// these comment markers are for including code into the docs
+//#sbt-multi-jvm
 addSbtPlugin("com.typesafe.sbt" % "sbt-multi-jvm" % "0.4.0")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.9")
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.5.2")
-addSbtPlugin("com.lightbend.akka" % "sbt-paradox-akka" % "0.29")
-addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.0.0")
+//#sbt-multi-jvm
+
+addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.6.0")
+addSbtPlugin("com.lightbend.sbt" % "sbt-bill-of-materials" % "1.0.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.27")
+// sbt-osgi 0.9.5 is available but breaks including jdk9-only classes
+// sbt-osgi 0.9.6 is available but breaks populating akka-protobuf-v3
+//addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.4")
+//addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1")
+//addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.1.1")
+//addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
+//addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "3.0.0")
+//addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.0")
+//addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.6.1")
+addSbtPlugin("com.lightbend.akka" % "sbt-paradox-akka" % "0.38")
+//addSbtPlugin("com.lightbend" % "sbt-whitesource" % "0.1.18")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
+//addSbtPlugin("com.hpe.sbt" % "sbt-pull-request-validator" % "1.0.0")
+//addSbtPlugin("net.bzzt" % "sbt-reproducible-builds" % "0.25")
+//addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
+//addSbtPlugin("com.lightbend.sbt" % "sbt-publish-rsync" % "0.2")
+
+addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.1")
+addSbtPlugin("com.lightbend.akka.grpc" % "sbt-akka-grpc" % "2.1.2")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 addSbtPlugin("com.lightbend.sbt" % "sbt-javaagent" % "0.1.5")
-addSbtPlugin("com.lightbend.akka.grpc" % "sbt-akka-grpc" % "1.0.2")
-addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.4.4")
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.2.1")
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.7-1")
 addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.5")

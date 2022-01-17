@@ -23,7 +23,7 @@ import akka.actor.typed.scaladsl.AskPattern._
 import akka.cluster.sharding.typed.ShardingEnvelope
 import akka.cluster.sharding.typed.scaladsl.ClusterSharding
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.wordspec.AnyAnyWordSpecLike
 
 /**
  * @author Yang Jing <a href="mailto:yang.xunjing@qq.com">yangbajing</a>
@@ -37,7 +37,7 @@ class ClusterRateTest
     |akka.remote.artery.canonical.port = 25520
     |akka.cluster.seed-nodes = ["akka://ClusterRateTest@127.0.0.1:25520"]
     |rate.permitsPerSecond = 2}""".stripMargin)
-    with AnyWordSpecLike
+    with AnyAnyWordSpecLike
     with BeforeAndAfterAll {
   override protected def beforeAll(): Unit = {
     ClusterRate.init(system)

@@ -175,7 +175,7 @@ Version 1.0.0
   }
 }</code></pre>
 <p>下面是<code>Lifecycle</code>行为的测试代码：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/lifecycle/LifecycleTest.scala#L27-L37" target="_blank" title="Go to snippet source"></a><code class="language-scala">class LifecycleTest extends ScalaTestWithActorTestKit with WordSpecLike {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/lifecycle/LifecycleTest.scala#L27-L37" target="_blank" title="Go to snippet source"></a><code class="language-scala">class LifecycleTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   &quot;Lifecycle&quot; should {
     &quot;lifecycle&quot; in {
       val ref = spawn(Behaviors.supervise(Lifecycle()).onFailure(SupervisorStrategy.restart))

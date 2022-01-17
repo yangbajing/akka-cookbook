@@ -18,6 +18,7 @@ package book.oauth2.peraccesstoken
 
 import akka.actor.typed.scaladsl.{ Behaviors, TimerScheduler }
 import akka.actor.typed.{ ActorRef, ActorSystem, Behavior }
+import akka.cluster.sharding.typed.ClusterShardingSettings.PassivationStrategySettings
 import akka.cluster.sharding.typed.scaladsl.{ ClusterSharding, Entity, EntityTypeKey }
 import akka.cluster.sharding.typed.{ ClusterShardingSettings, ShardingEnvelope }
 import akka.persistence.typed.scaladsl.{ Effect, EventSourcedBehavior }
@@ -44,8 +45,8 @@ object AccessTokenEntity {
 
   def init(system: ActorSystem[_]): ActorRef[ShardingEnvelope[Command]] =
     ClusterSharding(system).init(
-      Entity(TypeKey)(ec => apply(ec.entityId))
-        .withSettings(ClusterShardingSettings(system).withPassivateIdleEntityAfter(Duration.Zero)))
+      Entity(TypeKey)(ec => apply(ec.entityId)).withSettings(ClusterShardingSettings(system).withPassivationStrategy(
+        PassivationStrategySettings.defaults.withIdleEntityPassivation(Duration.Zero))))
 
   private def apply(accessToken: String): Behavior[Command] =
     Behaviors.setup(context =>

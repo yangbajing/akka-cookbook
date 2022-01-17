@@ -18,9 +18,9 @@ package cookbook.streams
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.stream.scaladsl.{ Sink, Source }
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class FlowTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class FlowTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "Interleave Flow" must {
     "before interleave end add element" in {
       val expected = Seq("", "1", "-", "2", "-", "3", "-", "4", "-", "5", "-")

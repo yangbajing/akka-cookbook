@@ -1,15 +1,15 @@
 import sbt._
 
 object Dependencies {
-  val versionScala213 = "2.13.3"
-  val versionSpringBoot = "2.3.4.RELEASE"
+  val versionScala213 = "2.13.7"
+  val versionSpringBoot = "2.3.12.RELEASE"
   val versionScalatest = "3.1.4"
-  val versionAkka = "2.6.10"
-  val versionAlpakka = "2.0.2"
-  val versionAkkaHttp = "10.2.1"
-  val versionCassandra = "4.9.0"
-  val versionScalaLogging = "3.9.2"
-  val versionLogback = "1.2.3"
+  val versionAkka = "2.6.18"
+  val versionAlpakka = "3.0.4"
+  val versionAkkaHttp = "10.2.7"
+  val versionCassandra = "4.13.0"
+  val versionScalaLogging = "3.9.4"
+  val versionLogback = "1.2.10"
   val versionAlpnAgent = "2.0.10"
 
   val _scalatest = "org.scalatest" %% "scalatest" % versionScalatest
@@ -68,5 +68,5 @@ object Dependencies {
 
   val _alpnAgent = "org.mortbay.jetty.alpn" % "jetty-alpn-agent" % versionAlpnAgent
 
-  val _guava = "com.google.guava" % "guava" % "30.0-jre"
+  val _guava = "com.google.guava" % "guava" % "31.0.1-jre"
 }

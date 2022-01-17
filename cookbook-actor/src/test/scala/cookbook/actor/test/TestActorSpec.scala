@@ -19,7 +19,7 @@ package cookbook.actor.test
 import akka.actor.testkit.typed.scaladsl.{ ScalaTestWithActorTestKit, TestProbe }
 import akka.actor.typed.{ ActorRef, Behavior }
 import akka.actor.typed.scaladsl.Behaviors
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 import akka.actor.typed.scaladsl.AskPattern._
 import org.scalatest.time.{ Milliseconds, Seconds, Span }
 
@@ -46,7 +46,7 @@ object TestActor {
   // #TestActor_apply
 }
 
-class TestActorSpec extends ScalaTestWithActorTestKit with WordSpecLike {
+class TestActorSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   import TestActor._
   override implicit val patience =
     PatienceConfig(Span(5, Seconds), Span(10, Milliseconds))

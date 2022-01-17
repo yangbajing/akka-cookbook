@@ -192,7 +192,7 @@ class ClusterRate(name: String, context: ActorContext[Command]) {
     |akka.remote.artery.canonical.port = 25520
     |akka.cluster.seed-nodes = [&quot;akka://ClusterRateTest@127.0.0.1:25520&quot;]
     |rate.permitsPerSecond = 2}&quot;&quot;&quot;.stripMargin)
-    with AnyWordSpecLike
+    with AnyAnyWordSpecLike
     with BeforeAndAfterAll {
   override protected def beforeAll(): Unit = {
     ClusterRate.init(system)

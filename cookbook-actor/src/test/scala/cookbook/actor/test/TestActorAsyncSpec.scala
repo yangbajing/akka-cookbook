@@ -19,10 +19,10 @@ package cookbook.actor.test
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.AskPattern._
 import cookbook.actor.test.TestActor.{ Answer, Hello, Reply }
-import org.scalatest.AsyncWordSpecLike
+import org.scalatest.AsyncAnyWordSpecLike
 
 // #TestActorAsyncSpec
-class TestActorAsyncSpec extends ScalaTestWithActorTestKit with AsyncWordSpecLike {
+class TestActorAsyncSpec extends ScalaTestWithActorTestKit with AsyncAnyWordSpecLike {
   "TestActorAsync" must {
     "async-assert" in {
       val actor = spawn(TestActor())

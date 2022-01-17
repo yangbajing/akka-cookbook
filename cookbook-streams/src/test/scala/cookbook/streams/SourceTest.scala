@@ -19,9 +19,9 @@ package cookbook.streams
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{ Keep, Sink, Source }
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class SourceTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class SourceTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "Cycle Source" must {
     "continuously generate the same sequence" in {
       //#cycle

@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{ Sink, Source }
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class GreeterServiceTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class GreeterServiceTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "GreeterService" must {
     val greeterService = new GreeterServiceImpl()
     "sayHello" in {

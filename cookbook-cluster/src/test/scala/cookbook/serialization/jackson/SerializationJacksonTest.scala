@@ -19,13 +19,13 @@ package cookbook.serialization.jackson
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.serialization.jackson.JacksonObjectMapperProvider
 import akka.actor.typed.scaladsl.adapter._
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
 object SerializationJacksonTest {
   case class User(name: String, sex: Int)
   case class Error(status: Int, message: String)
 }
-class SerializationJacksonTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class SerializationJacksonTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   import SerializationJacksonTest._
   private lazy val objectMapper =
     JacksonObjectMapperProvider(system.toClassic).getOrCreate("jackson-json", None)

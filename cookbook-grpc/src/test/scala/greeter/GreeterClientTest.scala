@@ -17,7 +17,6 @@
 package greeter
 
 import java.util.concurrent.TimeUnit
-
 import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.adapter._
@@ -25,11 +24,11 @@ import akka.grpc.GrpcClientSettings
 import akka.http.scaladsl.Http
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{ Sink, Source }
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 
-class GreeterClientTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class GreeterClientTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   private implicit val classicSystem = system.toClassic
   private implicit val ec = system.executionContext
   private var greeterClient: GreeterServiceClient = _

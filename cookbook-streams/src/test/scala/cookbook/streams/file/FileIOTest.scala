@@ -21,9 +21,9 @@ import java.nio.file.Files
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.stream.scaladsl.{ FileIO, Framing, Sink, Source }
 import akka.util.ByteString
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class FileIOTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class FileIOTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   // #file-io-top
   private val LINE_SEPARATOR = ByteString("\n")
   private val file = Files.createTempFile("cookbook", "txt")

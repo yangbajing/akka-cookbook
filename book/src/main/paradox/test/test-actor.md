@@ -68,5 +68,5 @@ override implicit val patience =
 @@snip [TestActorAsyncSpec](../../../../../cookbook-actor/src/test/scala/cookbook/actor/test/TestActorAsyncSpec.scala) { #TestActorAsyncSpec }
 
 @@@note
-读者会发现，这里使用了`AsyncWordSpecLike`特质而非`AsyncWordSpec`，包括`TestActorSpec`也使用了以`Like`后缀结尾的特质。加`Like`后缀和未加的区别在哪？其实看下两者的签名即可知道，有`Like`后缀的是以`trait`定义的，而没有的却是用`class`或`abstract class`定义的。因为Java不允许多继承（Scala兼容Java），而`ScalaTestWithActorTestKit`本身是一个抽像类，所以我们需要使用各测试风格规范（如：`WordSpec`、`FunSpec`、`FlatSpec`、`AsyncWordSpec`等）`Like`后缀版本。
+读者会发现，这里使用了`AsyncAnyWordSpecLike`特质而非`AsyncWordSpec`，包括`TestActorSpec`也使用了以`Like`后缀结尾的特质。加`Like`后缀和未加的区别在哪？其实看下两者的签名即可知道，有`Like`后缀的是以`trait`定义的，而没有的却是用`class`或`abstract class`定义的。因为Java不允许多继承（Scala兼容Java），而`ScalaTestWithActorTestKit`本身是一个抽像类，所以我们需要使用各测试风格规范（如：`WordSpec`、`FunSpec`、`FlatSpec`、`AsyncWordSpec`等）`Like`后缀版本。
 @@@

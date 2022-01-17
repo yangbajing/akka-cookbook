@@ -1,9 +1,8 @@
 import Commons._
 import Dependencies._
 
-ThisBuild / offline := true
-
-ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true).withLatestSnapshots(false)
+//ThisBuild / offline := true
+//ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true).withLatestSnapshots(false)
 
 ThisBuild / scalaVersion := versionScala213
 
@@ -40,7 +39,7 @@ lazy val book =
       publish / skip := true,
       paradoxRoots := List("index.html"),
       paradoxGroups := Map("Language" -> Seq("Scala", "Java")),
-      sourceDirectory in Compile in paradoxTheme := sourceDirectory.value / "main" / "paradox" / "_template",
+      Compile / paradoxTheme / sourceDirectory:= sourceDirectory.value / "main" / "paradox" / "_template",
       Compile / paradoxProperties ++= Map(
           "project.name" -> "Akka Cookbook",
           "canonical.base_url" -> "https://www.yangbajing.me/akka-cookbook",
@@ -64,9 +63,9 @@ lazy val cookbookGrpc = _project("cookbook-grpc")
   .dependsOn(cookbookStreams, cookbookCommon % "compile->compile;test->test")
   .settings(
     javaAgents += _alpnAgent % "runtime;test",
-    mainClass in assembly := Some("greeter.GreeterApplication"),
-    test in assembly := {},
-    assemblyMergeStrategy in assembly := {
+    assembly / mainClass := Some("greeter.GreeterApplication"),
+    assembly / test := {},
+    assembly / assemblyMergeStrategy := {
       case PathList("io", "netty", xs @ _*)               => MergeStrategy.first
       case PathList("google", "protobuf", xs @ _*)        => MergeStrategy.first
       case PathList("com", "google", "protobuf", xs @ _*) => MergeStrategy.first
@@ -80,7 +79,7 @@ lazy val cookbookGrpc = _project("cookbook-grpc")
       case n if n.endsWith(".txt")   => MergeStrategy.concat
       case n if n.endsWith("NOTICE") => MergeStrategy.concat
       case x =>
-        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        val oldStrategy = (assembly / assemblyMergeStrategy ).value
         oldStrategy(x)
     },
     akkaGrpcCodeGeneratorSettings += "server_power_apis",

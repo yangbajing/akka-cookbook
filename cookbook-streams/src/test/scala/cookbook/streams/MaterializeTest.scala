@@ -23,11 +23,11 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.stream.IOResult
 import akka.stream.scaladsl.{ FileIO, Framing, Keep, Sink, Source }
 import akka.util.ByteString
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.Future
 
-class MaterializeTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class MaterializeTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "Materializer" must {
     "keep" in {
       // #keep

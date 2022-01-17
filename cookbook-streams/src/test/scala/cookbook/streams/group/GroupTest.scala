@@ -18,12 +18,12 @@ package cookbook.streams.group
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.stream.scaladsl.{ Sink, Source }
-import org.scalatest.WordSpecLike
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class GroupTest extends ScalaTestWithActorTestKit with WordSpecLike {
+class GroupTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "Group" should {
     // #grouped
     "grouped" in {

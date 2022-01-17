@@ -198,7 +198,7 @@ final case class Answer(message: String) extends Reply</code></pre>
 <h2><a href="#异步断言" name="异步断言" class="anchor"><span class="anchor-link"></span></a>异步断言</h2>
 <h3><a href="#使用-asyncwordspec-特质" name="使用-asyncwordspec-特质" class="anchor"><span class="anchor-link"></span></a>使用 AsyncWordSpec 特质</h3>
 <p>使用<code>AsyncWordSpec</code>进行异步断言测试，它需要每个测试用例都以<code>Future</code>返回，我们在<code>Future</code>的转换函数里进行断言测试：</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorAsyncSpec.scala#L25-L36" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TestActorAsyncSpec extends ScalaTestWithActorTestKit with AsyncWordSpecLike {
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/akka-cookbook/tree/master/cookbook-actor/src/test/scala/cookbook/actor/test/TestActorAsyncSpec.scala#L25-L36" target="_blank" title="Go to snippet source"></a><code class="language-scala">class TestActorAsyncSpec extends ScalaTestWithActorTestKit with AsyncAnyWordSpecLike {
   &quot;TestActorAsync&quot; must {
     &quot;async-assert&quot; in {
       val actor = spawn(TestActor())
@@ -210,7 +210,7 @@ final case class Answer(message: String) extends Reply</code></pre>
     }
   }
 }</code></pre><div class="callout note "><div class="callout-title">Note</div>
-<p>读者会发现，这里使用了<code>AsyncWordSpecLike</code>特质而非<code>AsyncWordSpec</code>，包括<code>TestActorSpec</code>也使用了以<code>Like</code>后缀结尾的特质。加<code>Like</code>后缀和未加的区别在哪？其实看下两者的签名即可知道，有<code>Like</code>后缀的是以<code>trait</code>定义的，而没有的却是用<code>class</code>或<code>abstract class</code>定义的。因为Java不允许多继承（Scala兼容Java），而<code>ScalaTestWithActorTestKit</code>本身是一个抽像类，所以我们需要使用各测试风格规范（如：<code>WordSpec</code>、<code>FunSpec</code>、<code>FlatSpec</code>、<code>AsyncWordSpec</code>等）<code>Like</code>后缀版本。</p></div>
+<p>读者会发现，这里使用了<code>AsyncAnyWordSpecLike</code>特质而非<code>AsyncWordSpec</code>，包括<code>TestActorSpec</code>也使用了以<code>Like</code>后缀结尾的特质。加<code>Like</code>后缀和未加的区别在哪？其实看下两者的签名即可知道，有<code>Like</code>后缀的是以<code>trait</code>定义的，而没有的却是用<code>class</code>或<code>abstract class</code>定义的。因为Java不允许多继承（Scala兼容Java），而<code>ScalaTestWithActorTestKit</code>本身是一个抽像类，所以我们需要使用各测试风格规范（如：<code>WordSpec</code>、<code>FunSpec</code>、<code>FlatSpec</code>、<code>AsyncWordSpec</code>等）<code>Like</code>后缀版本。</p></div>
 </div>
 </article>
 <div class="row">
